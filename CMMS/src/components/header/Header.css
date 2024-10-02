@@ -1,0 +1,77 @@
+header{
+    width: 100%;
+    height: 80%;
+    margin: auto;
+    padding: 15px 0px   ;
+}
+.logo{
+    display: flex;
+    align-items: center;
+    height: 55px;
+}
+
+header .headerSearch{
+    width: 100%;
+    height: 50px;
+    border: 1px solid #C4D7FF;
+    padding: 10px 15px;
+}
+
+header .headerSearch .selectDropWrapper{
+    width: 20%;
+    font-size: 1rem;
+    font-weight: bold;
+    position: relative;
+}
+
+header .headerSearch .selectDropWrapper::after{
+    content: '';
+    width: 1px;
+    height: 30px;
+    background-color: black;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+
+header .headerSearch .search{
+    width: 80%;
+    padding-left: 30px;
+    position: relative;
+}
+header .headerSearch .search input{
+    width: 100%;
+    height: 40px;
+    border: 0px;
+    outline: none !important;
+    font-size: 1rem;
+}
+
+header .headerSearch .search .searchIcon{
+    position: absolute;
+    top: 5px;
+    right: 15px;
+    opacity: 0.7;   
+}
+
+header .countryWrapper .selectDropWrapper{
+    width: 200px !important;
+    padding-left: 10px ;
+    margin-top: 5px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    /* -webkit-box-shadow: 5px 5px 15px rgba(0,0,0,0.2); */
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+}
+header .countryWrapper .selectDropWrapper .handleClick{
+    width: 100%;
+}
+
+header .countryWrapper .selectDropWrapper .handleClick .openSelect .arrow{
+    top: 5px;
+}
+
+header .countryWrapper .openSelect{
+    color: #87A2FF;
+}
