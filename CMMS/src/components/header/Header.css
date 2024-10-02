@@ -57,7 +57,7 @@ header .headerSearch .search .searchIcon{
 header .countryWrapper .selectDropWrapper{
     width: 200px !important;
     padding-left: 10px ;
-    margin-top: 5px;
+    margin-bottom: 10px;
     height: 40px;
     display: flex;
     align-items: center;
@@ -74,4 +74,55 @@ header .countryWrapper .selectDropWrapper .handleClick .openSelect .arrow{
 
 header .countryWrapper .openSelect{
     color: #87A2FF;
+}
+header .headerTabs{ padding-left: 40px;}
+header .headerTabs li{position: relative;}
+header .headerTabs li span{
+    font-size: 18px;
+    cursor: pointer;
+}
+
+header .headerTabs li span img{
+    margin-right: 5px;
+}
+header .headerTabs li span.badge{
+    width: 20px;
+    height: 20px;
+    color: #fff;
+    font-weight: 400;
+    position: absolute;
+    top: -12px;
+    left: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+}
+.dropdownMenu{
+    position: absolute;
+    top: 40px;
+    right: 0px;
+    width: 200px;
+    height: auto;
+    background: #fff;
+    box-shadow: 0px 3px 6px rgb(0 0 0/ 20%);
+    padding-left: 0px !important;
+    padding: 5px 0px;
+}
+.dropdownMenu li{
+    width: 100% !important;
+    list-style: none;
+}
+
+.dropdownMenu li button{
+    width: 100% !important;
+    text-align: left !important;
+    justify-content: flex-start !important;
+    color: rgba(0, 0, 0, 0.7)!important;
+    text-transform: capitalize !important;
+    padding: 10px 15px !important;
+}
+.dropdownMenu li button svg{
+    opacity: 0.7;
+    margin-right: 7px !important;
 }

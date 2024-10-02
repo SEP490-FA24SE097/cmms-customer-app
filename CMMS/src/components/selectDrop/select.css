@@ -50,6 +50,7 @@
     width: 100%;
     padding: 10px;
     color: rgb(0, 0, 0,0.7);
+    border-radius: 5px;
 }
 .selectedDrop .searchResult li.active{
     background: #C4D7FF;
