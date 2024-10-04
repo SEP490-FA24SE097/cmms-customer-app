@@ -13,7 +13,9 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import { ClickAwayListener } from '@mui/base';
 
+import Nav from "./nav/nav";
 
 export default function Header(){
 
@@ -76,43 +78,46 @@ export default function Header(){
                                 <div className="countryWrapper">
                                     <Select data={countryList} placeholder='Your location' icon ={<LocationOnOutlinedIcon style={{opacity:'0.5'}}/>}/>
                                 </div>
-
-                                <ul className="list list-inline mb-2 headerTabs">
-                                    <li className="list-inline-item">
-                                        <span>
-                                            <img src={Wishlist} alt="wishlist" />
-                                            <span className="badge bg-info rounded-circle">3</span>  
-                                               Wishlist
-                                        </span>
-                                    </li>
-                                    <li className="list-inline-item">
-                                        <span>
-                                            <img src={Cart} alt="wishlist" />
-                                            <span className="badge bg-info rounded-circle">3</span>  
-                                               Wishlist
-                                        </span>
-                                    </li>
-                                    <li className="list-inline-item">
-                                        <span onClick={() => setIsOpenDownDown(isOpenDropDown => !isOpenDropDown)}>
-                                            <img src={User} alt="wishlist" />
-                                                Account
-                                        </span>
-                                    {
-                                        isOpenDropDown!== false &&
-                                        <ul className="dropdownMenu">
-                                            <li><Button><PersonOutlineOutlinedIcon/> My Account</Button></li>
-                                            <li><Button><ManageSearchOutlinedIcon/> Order History</Button></li>
-                                            <li><Button><FavoriteBorderOutlinedIcon/> My Wishlist</Button></li>
-                                            <li><Button><LogoutOutlinedIcon/> Sign Out</Button></li>
-                                        </ul>
-                                    }
-                                    </li>
-                                </ul>
+                                <ClickAwayListener onClickAway={() => setIsOpenDownDown(false)}>
+                                    <ul className="list list-inline mb-2 headerTabs">
+                                        <li className="list-inline-item">
+                                            <span>
+                                                <img src={Wishlist} alt="wishlist" />
+                                                <span className="badge bg-info rounded-circle">3</span>  
+                                                Wishlist
+                                            </span>
+                                        </li>
+                                        <li className="list-inline-item">
+                                            <span>
+                                                <img src={Cart} alt="wishlist" />
+                                                <span className="badge bg-info rounded-circle">3</span>  
+                                                Wishlist
+                                            </span>
+                                        </li>
+                                        <li className="list-inline-item">
+                                            <span onClick={() => setIsOpenDownDown(isOpenDropDown => !isOpenDropDown)}>
+                                                <img src={User} alt="wishlist" />
+                                                    Account
+                                            </span>
+                                        {
+                                            isOpenDropDown!== false &&
+                                            <ul className="dropdownMenu">
+                                                <li><Button><PersonOutlineOutlinedIcon/> My Account</Button></li>
+                                                <li><Button><ManageSearchOutlinedIcon/> Order History</Button></li>
+                                                <li><Button><FavoriteBorderOutlinedIcon/> My Wishlist</Button></li>
+                                                <li><Button><LogoutOutlinedIcon/> Sign Out</Button></li>
+                                            </ul>
+                                        }
+                                        </li>
+                                    </ul>
+                                </ClickAwayListener>
                             </div>
                         </div>
                     </div>
                 </div>
             </header>
+
+            <Nav/>
         </>
     );
 }

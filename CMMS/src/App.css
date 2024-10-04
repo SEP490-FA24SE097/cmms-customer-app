@@ -10,9 +10,17 @@ body{
   font-family: "Roboto", sans-serif;
 }
 
+
 .container-fluid{
   padding: 0px 50px;
 }
 .cursor{
   cursor: pointer;
+}
+
+.bg-b,.bg-info{
+  background: #4379F2 !important;
+}
+.text-b{
+  color: #4379F2;
 }

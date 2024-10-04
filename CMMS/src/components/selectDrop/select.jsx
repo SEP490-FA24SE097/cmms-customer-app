@@ -42,7 +42,7 @@ export default function Select({data, placeholder, icon}){
             <div  className="selectDropWrapper cursor position-relative">
                 <div onClick={handleClick} className="handleClick">
                     {icon}
-                    <span className="openSelect" >{selectItem.length>14 ? selectItem.substr(0,12) + '...' : selectItem} 
+                    <span className="openSelect" >{selectItem.length>14 ? selectItem.substr(0,14) + '...' : selectItem} 
                         <KeyboardArrowDownIcon className="arrow"/>
                     </span>
                 </div>

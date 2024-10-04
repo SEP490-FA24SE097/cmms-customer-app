@@ -13,14 +13,15 @@ header{
 header .headerSearch{
     width: 100%;
     height: 50px;
-    border: 1px solid #C4D7FF;
+    border: 1px solid #4379F2;
     padding: 10px 15px;
+    border-radius: 4px;
 }
 
 header .headerSearch .selectDropWrapper{
-    width: 20%;
+    width: 22%;
     font-size: 1rem;
-    font-weight: bold;
+    font-weight: 500;
     position: relative;
 }
 
@@ -35,7 +36,7 @@ header .headerSearch .selectDropWrapper::after{
 }
 
 header .headerSearch .search{
-    width: 80%;
+    width: 78%;
     padding-left: 30px;
     position: relative;
 }
@@ -73,9 +74,9 @@ header .countryWrapper .selectDropWrapper .handleClick .openSelect .arrow{
 }
 
 header .countryWrapper .openSelect{
-    color: #87A2FF;
+    color: #4379F2;
 }
-header .headerTabs{ padding-left: 40px;}
+header .headerTabs{ padding-left: 40px; display: flex; gap: 15px;}
 header .headerTabs li{position: relative;}
 header .headerTabs li span{
     font-size: 18px;
@@ -89,14 +90,14 @@ header .headerTabs li span.badge{
     width: 20px;
     height: 20px;
     color: #fff;
-    font-weight: 400;
+    font-weight: bold;
     position: absolute;
     top: -12px;
     left: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 15px;
+    font-size: 12px;
 }
 .dropdownMenu{
     position: absolute;
@@ -105,9 +106,10 @@ header .headerTabs li span.badge{
     width: 200px;
     height: auto;
     background: #fff;
-    box-shadow: 0px 3px 6px rgb(0 0 0/ 20%);
+    box-shadow: 0px 3px 6px rgba(0 0 0/ 0.16) ,0px 3px 6px rgba(0 0 0/ 0.23);
     padding-left: 0px !important;
     padding: 5px 0px;
+    z-index: 100;
 }
 .dropdownMenu li{
     width: 100% !important;
@@ -126,3 +128,5 @@ header .headerTabs li span.badge{
     opacity: 0.7;
     margin-right: 7px !important;
 }
+
+.dropdownMenu li button:hover{ background: #f1f1f1 !important;}
