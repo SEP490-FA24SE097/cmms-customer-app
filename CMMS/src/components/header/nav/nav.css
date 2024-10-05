@@ -12,15 +12,15 @@
     text-transform: capitalize !important;
 }
 
-.nav ul li{ position: relative;}
+.nav nav ul li{ position: relative;}
 
-.nav ul li button{
+.nav nav ul li button{
     text-transform: capitalize !important;
     padding: 20px 25px !important;
     color: #4379F2 !important;
 }
 
-.nav ul li button a{
+.nav nav ul li button a{
     text-decoration: none !important;
     color: rgba(0, 0, 0, 0.8);
     font-size: 18px;
@@ -29,7 +29,7 @@
 .nav .part3 .phNo h4{ font-size: 30px; line-height: 28px !important;}
 .nav .part3 .phNo p{ font-size: 15px;}
 
-.nav .dropdown_menu{
+.nav nav .dropdown_menu{
     position: absolute;
     top: 140%;
     left: 0%;
@@ -74,6 +74,8 @@
     height: auto !important;
     padding: 25px 35px !important;
 }
+
+.nav nav ul li svg{ font-size: 18px;}
 
 .megaMenu .col ul li{ margin-bottom: 10px !important; display: block;}
 
