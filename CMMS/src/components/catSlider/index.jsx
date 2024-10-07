@@ -38,7 +38,7 @@ export default function CatSlider(){
                             return (
                                 <div className="item">
                                     <div className="info" style={{background:item}}>
-                                        <img src="https://lh3.googleusercontent.com/proxy/YDmxfj4_5UtEvRDsh3OCQsYSipAl63LSJBlnlilS2INOpsfzRLt37UGsHLIAV5ozXirItHSX_PSSbwQ00u4OBql7-yiOOhKptnsQ9_uZEySQ2A" alt="" />
+                                        <img src="https://png.pngtree.com/png-vector/20231201/ourmid/pngtree-two-bricks-strength-png-image_10802515.png" alt="" />
                                         <h5>Gach</h5>
                                         <p>20 loai</p>
                                     </div>
@@ -49,7 +49,6 @@ export default function CatSlider(){
                 </div>
             </div>
 
-            <br /><br /><br /><br /><br /><br /><br />
         </>
     );
 }

@@ -1,0 +1,29 @@
+.homeProducts{
+    padding: 20px 0px;
+    margin-bottom: 50px;
+}
+
+.fillerTab li{
+    margin-left: 20px;
+}
+
+.fillerTab li a{
+    color: #000;
+    text-decoration: none;
+    font-size: 16px;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    font-weight: 500;
+}
+
+.fillerTab li:hover a{
+    color: #4379F2;
+    transform: translateY(-10px);
+}
+
+.homeProducts .productRow{ display: flex; padding: 25px 0px; margin: 0px -10px; flex-wrap: wrap;}
+
+.homeProducts .productRow .item{
+    width: 20%;
+    padding: 15px 15px;
+}

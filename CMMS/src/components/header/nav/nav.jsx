@@ -65,7 +65,7 @@ export default function Nav(){
                                     </div>
                                 </li>
                                 <li className="list-inline-item">
-                                    <Button><Link>Blog</Link></Button>
+                                    <Button><Link>Brand <KeyboardArrowDownIcon/></Link></Button>
                                 </li>
                                 <li className="list-inline-item">
                                     <Button><Link>PageTest <KeyboardArrowDownIcon/></Link></Button>

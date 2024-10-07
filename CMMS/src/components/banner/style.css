@@ -1,0 +1,25 @@
+.bannerSection { padding: 20px 0px;}
+
+.bannerSection img{
+    height: 300px;
+    object-fit: cover;
+}
+
+.bannerSection .box{
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    border-radius: 5px;
+}
+.bannerSection .box .catName{
+    position: absolute;
+    bottom: 8px;
+    font-size: 30px;
+    color: #fff;
+    text-shadow: 1px 1px 2px #4379F2;
+}
+
+.bannerSection .box:hover img{
+    transform: scale(1.1);
+}

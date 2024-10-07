@@ -10,6 +10,7 @@ body{
   font-family: "Roboto", sans-serif;
 }
 
+.transition{ transition: all 0.3s ease-in-out;}
 
 .container-fluid{
   padding: 0px 50px;
