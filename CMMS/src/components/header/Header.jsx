@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useRef} from "react";
 import '../header/Header.css';
 import Logo from '../../assets/images/logo.svg';
 import SearchIcon from '../../assets/images/search.svg';
@@ -20,6 +20,7 @@ import Nav from "./nav/nav";
 export default function Header(){
 
     const [isOpenDropDown, setIsOpenDownDown] = useState(false);
+    const headerRef = useRef();
 
     const [categories,setCategories] = useState([
         'Xi măng',
@@ -56,6 +57,7 @@ export default function Header(){
 
     return (    
         <>
+        <div className="headerWrapper" ref={headerRef}>
             <header>
                 <div className="container-fluid">
                     <div className="row">
@@ -118,6 +120,7 @@ export default function Header(){
             </header>
 
             <Nav/>
+        </div>
         </>
     );
 }

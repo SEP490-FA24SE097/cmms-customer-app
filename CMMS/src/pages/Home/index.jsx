@@ -16,7 +16,7 @@ export default function Home(){
                 <div className="container-fluid">
                     <div className="d-flex align-items-center">
                         <h2 className="hd mb-0 mt-0">Popular Product</h2>
-                        <ul className="list list-inline ms-auto fillerTab">
+                        <ul className="list list-inline ms-auto fillerTab mb-0">
                             <li className="list-inline-item">
                                 <a href="" className="cursor">All</a>
                             </li>
@@ -37,16 +37,16 @@ export default function Home(){
 
                     <div className="row productRow">
                         <div className="item">
-                            <Product/>
+                            <Product  tag="hot"/>
                         </div>
                         <div className="item">
-                            <Product/>
+                            <Product  tag="new"/>
                         </div>
                         <div className="item">
-                            <Product/>
+                            <Product tag="sale"/>
                         </div>
                         <div className="item">
-                            <Product/>
+                            <Product tag="best"/>
                         </div>
                         <div className="item">
                             <Product/>
