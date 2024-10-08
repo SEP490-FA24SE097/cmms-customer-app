@@ -55,6 +55,17 @@ export default function Header(){
         }
     }
 
+    useEffect(()=>{
+        window.addEventListener("scroll",()=>{
+            let position = window.pageYOffset;
+            if(position > 100){
+                headerRef.current.classList.add('fixed')
+            }else{
+                headerRef.current.classList.remove('fixed')
+            }
+        })
+    })
+
     return (    
         <>
         <div className="headerWrapper" ref={headerRef}>
@@ -120,6 +131,10 @@ export default function Header(){
             </header>
 
             <Nav/>
+        </div>
+
+        <div className="afterHeader">
+            
         </div>
         </>
     );

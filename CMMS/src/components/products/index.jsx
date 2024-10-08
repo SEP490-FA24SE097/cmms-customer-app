@@ -48,11 +48,11 @@ export default function Product(props){
                 <span className="brand d-block">By <Link href="" className="text-b">Cuong</Link></span>
 
                 <div className="d-flex align-items-center">
-                    <div className="d-flex align-items-center">
+                    <div className="d-flex align-items-start money">
                         <span className="price text-b">200.000 đ</span> <span className="oldPrice">250.000 đ</span>
                     </div>
-
                     <Button className="bg-b ms-auto transition"><ShoppingCartOutlinedIcon/> Add</Button>
+
                 </div>
             </div>
         </div>

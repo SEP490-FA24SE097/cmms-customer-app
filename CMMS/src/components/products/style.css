@@ -113,6 +113,10 @@
     text-decoration: none;
 }
 
+.money{
+    flex-direction: column;
+}
+
 .productThumb .brand{color: rgba(0, 0, 0, 0.6);}
 
 .productThumb .brand a{
