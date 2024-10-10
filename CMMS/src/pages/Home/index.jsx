@@ -7,6 +7,8 @@ import './style.css'
 
 import Banner4 from "../../assets/images/banner4.jpg";
 import Slider from "react-slick";
+import TopProducts from "./topProducts";
+import Footer from "../../components/footer/Footer";
 
 export default function Home(){
 
@@ -134,6 +136,27 @@ export default function Home(){
                     </div>
                 </div>
             </section>
+
+            <section className="topProductsSection">
+                <div className="container-fluid">
+                    <div className="row">
+                        <div className="col">
+                            <TopProducts title="Top Selling"/>
+                        </div>
+                        <div className="col">
+                            <TopProducts title="Trending Products"/>
+                        </div>
+                        <div className="col">
+                            <TopProducts title="Recently added"/>
+                        </div>
+                        <div className="col">
+                            <TopProducts title="Top Rate"/>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <Footer/>
         </>
     );
 }

@@ -28,6 +28,20 @@ body{
 
 .hd{font-size: 35px; font-weight: 600; margin-bottom: 30px;}
 
+.price{
+  font-size: 22px;
+  margin-right: 20px;
+  font-weight: bold;
+}
+
+.oldPrice{
+  font-size: 15px;
+  opacity: 0.6;
+  color: #000;
+  text-decoration: line-through;
+}
+
+
 /* START TOOLTIP STYLES */
 [tooltip] {
   position: relative; /* opinion 1 */

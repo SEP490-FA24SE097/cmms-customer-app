@@ -23,15 +23,34 @@ export default function Select({data, placeholder, icon}){
         setSelectItem(name);
     }
 
-    const filterList = (e) =>{
-        const keyword = e.target.value.toLowerCase();
+    // const filterList = (e) =>{
+    //     const keyword = e.target.value.toLowerCase();
         
+    //     const list = listData2.filter((item) =>{
+    //         return item.toLowerCase().includes(keyword);
+    //     })
+
+    //     const list2 = list.filter((item,index) => list.indexOf(item) === index); //check duplicate
+
+    //     setListData(list2);
+    // }
+    function removeVietnameseTones(str) {
+        return str
+            .normalize("NFD") // Tách ký tự tổ hợp
+            .replace(/[\u0300-\u036f]/g, '') // Loại bỏ dấu
+            .replace(/đ/g, 'd') // Chuyển đ thành d
+            .replace(/Đ/g, 'D'); // Chuyển Đ thành D
+    }
+    
+    const filterList = (e) =>{
+        const keyword = removeVietnameseTones(e.target.value.toLowerCase()); // Bỏ dấu từ khóa
+    
         const list = listData2.filter((item) =>{
-            return item.toLowerCase().includes(keyword);
-        })
-
-        const list2 = list.filter((item,index) => list.indexOf(item) === index); //check duplicate
-
+            return removeVietnameseTones(item.toLowerCase()).includes(keyword); // Bỏ dấu khi so sánh
+        });
+    
+        const list2 = list.filter((item,index) => list.indexOf(item) === index); // Kiểm tra trùng lặp
+    
         setListData(list2);
     }
 
