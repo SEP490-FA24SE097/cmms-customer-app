@@ -30,6 +30,13 @@ body{
   background: #FDC404 !important;
 }
 
+.btn-b a{
+  color: #fff !important;
+  text-decoration: none;
+}
+
+.btn-lg{font-size: 22px !important;}
+
 .bg-b,.bg-info{
   background: #4379F2 !important;
 }
