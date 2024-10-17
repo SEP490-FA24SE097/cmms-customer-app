@@ -4,6 +4,8 @@ import Header from './components/header/Header';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
+import Listing from "./pages/Listing";
+import Footer from "./components/footer/Footer";
 
 function App() {
 
@@ -12,8 +14,9 @@ function App() {
       <Header />
       <Routes>
         <Route exact={true} path="/" element={<Home/>} />
-        <Route exact={true} path="/about" element={<About/>} />
+        <Route exact={true} path="/listing" element={<Listing/>} />
       </Routes>
+      <Footer/>
     </BrowserRouter>
   )
 }

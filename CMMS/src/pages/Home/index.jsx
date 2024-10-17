@@ -8,7 +8,7 @@ import './style.css'
 import Banner4 from "../../assets/images/banner4.jpg";
 import Slider from "react-slick";
 import TopProducts from "./topProducts";
-import Footer from "../../components/footer/Footer";
+
 
 export default function Home(){
 
@@ -156,7 +156,6 @@ export default function Home(){
                 </div>
             </section>
 
-            <Footer/>
         </>
     );
 }
