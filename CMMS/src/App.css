@@ -215,10 +215,41 @@ body{
   opacity: 0.5;
 }
 
+.breadcrumWrapper{
+  width: 100%;
+  height: auto;
+  padding: 30px 0px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
 
+.breadcrumb2{
+  background: none !important;
+  padding: 0px !important;
+  margin-top: 10px;
+}
 
-
-
+ul.breadcrumb {
+  padding: 10px 16px;
+  list-style: none;
+  background-color: #eee;
+}
+ul.breadcrumb li {
+  display: inline;
+  font-size: 18px;
+}
+ul.breadcrumb li+li:before {
+  padding: 8px;
+  color: black;
+  content: ">\00a0";
+}
+ul.breadcrumb li a {
+  color: #4379F2;
+  text-decoration: none !important;
+}
+ul.breadcrumb li a:hover {
+  color: #4379F2;
+  text-decoration: underline;
+}
 
 
 
