@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Image from 'next/image'
 import { useRouter } from "next/navigation";
 
-export default function Home() {
+export default function RegisterPage() {
 
   const router =useRouter();
 
@@ -25,7 +25,7 @@ export default function Home() {
             <h1 className="text-3xl font-bold lg:text-4xl">Tạo tài khoản mới</h1>
  
             </div>
-          <form className="w-1/3">
+          <form className="w-56 lg:w-1/3">
 
                 <Label htmlFor="fullname">Họ và tên</Label>
               <Input className="mt-2 mb-4 bg-transparent"
@@ -37,7 +37,7 @@ export default function Home() {
 
               <Label htmlFor="password">Mật khẩu</Label>
               <Input className="mt-2 mb-2 bg-transparent"
-                type="password" id="password" placeholder="Password"/>
+                type="password" id="password" placeholder="Password"/>  
 
                 <Label htmlFor="phone">Số điện thoại</Label>
               <Input className="mt-2 mb-2 bg-transparent"
