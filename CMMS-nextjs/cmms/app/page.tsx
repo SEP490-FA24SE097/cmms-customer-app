@@ -2,13 +2,9 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Header from "@/components/header/header";
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+import HomePage from "./(client)/home/home";
+
+
 export default function Home() {
 
   const router = useRouter();
@@ -16,7 +12,8 @@ export default function Home() {
   return (
     <div>
       <Header/>
-      <Button onClick={() => router.push("/login")}> Login</Button>
+      {/* <Button onClick={() => router.push("/login")}> Login</Button> */}
+      <HomePage/>
     </div>
   );
 }
