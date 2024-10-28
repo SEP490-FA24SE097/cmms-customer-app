@@ -299,7 +299,7 @@ export default function Header() {
                     <li><Button size="lg" className="text-xl font-semibold text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none py-7">Trang chủ</Button></li>
                     <li>
                         <Popover>
-                            <PopoverTrigger>
+                            <PopoverTrigger asChild>
                                 <Button size="lg" className="text-xl font-semibold text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none py-7">Sản phẩm <IoIosArrowDown/></Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-screen">
@@ -338,7 +338,7 @@ export default function Header() {
                     </li>
                     <li>
                         <Popover>
-                            <PopoverTrigger>
+                            <PopoverTrigger asChild>
                                 <Button size="lg" className="text-xl font-semibold text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none py-7">Thương hiệu <IoIosArrowDown/></Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-60">
