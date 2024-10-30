@@ -484,9 +484,9 @@ const HomePage: React.FC = () => {
                             </HoverCard>
                           </div>
                         </div>
-                        <h2 className="text-lg font-semibold text-start my-2 hover:text-red-300 transition ease-in-out duration-300">
-                          {product.title}
-                        </h2>
+                        <h2 className="text-lg font-semibold text-start w-full my-2 lg:h-[55px] hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
+                    {product.title}
+                  </h2>
                         <div className="flex w-full justify-start items-center gap-4">
                           <Rating
                             name="product-rating"
@@ -656,9 +656,9 @@ const HomePage: React.FC = () => {
                           </HoverCard>
                         </div>
                       </div>
-                      <h2 className="text-lg font-semibold text-start my-2 hover:text-red-300 transition ease-in-out duration-300">
-                        {product.title}
-                      </h2>
+                      <h2 className="text-lg font-semibold text-start w-full my-2 lg:h-[55px] hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
+                    {product.title}
+                  </h2>
                       <div className="flex w-full justify-start items-center gap-4">
                         <Rating
                           name="product-rating"

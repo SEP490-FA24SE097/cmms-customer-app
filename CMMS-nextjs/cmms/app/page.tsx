@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import Header from "@/components/header/header";
 import HomePage from "./(client)/home/home";
 import Footer from "@/components/footer/footer";
+import Listing from "./(client)/product/page";
+import DetailsPage from "./(client)/product/[id]/page";
 
 export default function Home() {
 
@@ -12,8 +14,9 @@ export default function Home() {
   return (
     <div>
       <Header/>
-      {/* <Button onClick={() => router.push("/login")}> Login</Button> */}
-      <HomePage/>
+      {/* <HomePage/> */}
+      {/* <Listing/> */}
+      <DetailsPage/>
       <Footer/>
     </div>
   );

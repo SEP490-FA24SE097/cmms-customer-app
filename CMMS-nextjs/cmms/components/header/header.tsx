@@ -140,7 +140,7 @@ export default function Header() {
 
   return (
     
-    <nav className="bg-[#fff]">
+    <nav className="bg-[#fff] shadow-lg mb-2">
         <div className="max-w-[85%] mx-auto px-4 sm:px-6 lg:px-8 py-3 border-b">
             <div className="flex items-center justify-between h-16">
                 <div className="flex items-center">
@@ -295,7 +295,7 @@ export default function Header() {
                 </div>
             </div>
         </div>
-        <div className="max-w-[85%] mx-auto px-4 sm:px-6 lg:px-8 py-3 border-b">
+        <div className="max-w-[85%] mx-auto px-4 sm:px-6 lg:px-8 py-3">
             <div className="flex items-center justify-center h-14">
                 <ul className="flex">
                     <li><Button size="lg" className="text-xl font-semibold text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none py-7">Trang chủ</Button></li>
