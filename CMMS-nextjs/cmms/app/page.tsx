@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Header from "@/components/header/header";
@@ -9,21 +9,22 @@ import DetailsPage from "./(client)/product/[id]/page";
 import CartPage from "./(client)/cart/page";
 import CheckoutPage from "./(client)/checkout/page";
 import WishlistPage from "./(client)/wishlist/page";
+import ProfilePage from "./(client)/profile/page";
 
 export default function Home() {
-
   const router = useRouter();
 
   return (
     <div>
-      <Header/>
-      {/* <HomePage/> */}
+      <Header />
+      {/* <HomePage /> */}
       {/* <Listing/> */}
       {/* <DetailsPage/> */}
       {/* <CartPage/> */}
       {/* <CheckoutPage/> */}
-      <WishlistPage/>
-      <Footer/>
+      {/* <WishlistPage/> */}
+      <ProfilePage />
+      <Footer />
     </div>
   );
 }
