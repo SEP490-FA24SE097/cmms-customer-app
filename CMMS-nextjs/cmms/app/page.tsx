@@ -8,6 +8,7 @@ import Listing from "./(client)/product/page";
 import DetailsPage from "./(client)/product/[id]/page";
 import CartPage from "./(client)/cart/page";
 import CheckoutPage from "./(client)/checkout/page";
+import WishlistPage from "./(client)/wishlist/page";
 
 export default function Home() {
 
@@ -20,7 +21,8 @@ export default function Home() {
       {/* <Listing/> */}
       {/* <DetailsPage/> */}
       {/* <CartPage/> */}
-      <CheckoutPage/>
+      {/* <CheckoutPage/> */}
+      <WishlistPage/>
       <Footer/>
     </div>
   );
