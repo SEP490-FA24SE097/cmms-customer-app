@@ -6,6 +6,7 @@ import HomePage from "./(client)/home/home";
 import Footer from "@/components/footer/footer";
 import Listing from "./(client)/product/page";
 import DetailsPage from "./(client)/product/[id]/page";
+import CartPage from "./(client)/cart/page";
 
 export default function Home() {
 
@@ -16,7 +17,8 @@ export default function Home() {
       <Header/>
       {/* <HomePage/> */}
       {/* <Listing/> */}
-      <DetailsPage/>
+      {/* <DetailsPage/> */}
+      <CartPage/>
       <Footer/>
     </div>
   );
