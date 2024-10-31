@@ -177,7 +177,7 @@ export default function Header() {
                             </DropdownMenuContent>
                         </DropdownMenu>
                         <div className="flex w-full max-w-sm items-center">
-                            <Input type="" placeholder="Search" className="hidden sm:block w-1/2 lg:h-10 lg:text-2xl lg:w-[200px] xl:w-[500px]"/>
+                            <Input type="search" placeholder="Tìm kiếm" className="hidden sm:block w-1/2 lg:h-10 lg:text-2xl lg:w-[200px] xl:w-[500px]"/>
                             <Button variant="outline" type="submit" className="bg-blue-300 lg:h-10">
                                 <FaSearch className="h-5 w-5" />
                             </Button>

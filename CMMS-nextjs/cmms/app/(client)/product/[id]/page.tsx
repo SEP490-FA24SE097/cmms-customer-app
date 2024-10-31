@@ -531,7 +531,7 @@ export default function DetailsPage() {
         </div>
 
         <div className="bg-white p-6 mt-5 rounded-sm shadow-lg">
-          <Tabs defaultValue="info" className="w-full">
+          <Tabs  defaultValue="info" className="w-full">
             <TabsList className="grid grid-cols-2 lg:w-[400px]">
               <TabsTrigger className="font-bold" value="info">
                 Mô tả

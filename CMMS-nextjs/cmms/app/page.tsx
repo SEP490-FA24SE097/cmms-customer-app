@@ -7,6 +7,7 @@ import Footer from "@/components/footer/footer";
 import Listing from "./(client)/product/page";
 import DetailsPage from "./(client)/product/[id]/page";
 import CartPage from "./(client)/cart/page";
+import CheckoutPage from "./(client)/checkout/page";
 
 export default function Home() {
 
@@ -18,7 +19,8 @@ export default function Home() {
       {/* <HomePage/> */}
       {/* <Listing/> */}
       {/* <DetailsPage/> */}
-      <CartPage/>
+      {/* <CartPage/> */}
+      <CheckoutPage/>
       <Footer/>
     </div>
   );
