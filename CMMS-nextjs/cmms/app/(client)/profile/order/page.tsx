@@ -192,7 +192,7 @@ export default function Order() {
                           <div className="border-t">
                             <div className="max-w-2xl mx-auto bg-white text-black">
                               <div>
-                                <div className="h-[60vh] overflow-hidden overflow-y-auto">
+                                <div className="h-[50vh] 2xl:h-[60vh] overflow-hidden overflow-y-auto">
                                 <table className="w-full text-left">
                                 <thead className="bg-gray-100">
                                   <tr>

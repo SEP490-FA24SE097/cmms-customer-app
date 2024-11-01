@@ -188,81 +188,81 @@ const fakeProducts = [
   },
 ];
 const fakeCategories = [
-    { name: "Tất cả", key: "all" },
-    { name: "Vật tư nội thất", key: "vat_tu_noi_that" },
-    { name: "Sàn", key: "san" },
-    { name: "Gạch", key: "gach" },
-  ];
-  const topSelling = [
-    {
-      title: "Nestle Original Coffee-Mate Coffee Creamer",
-      imgSrc: "https://storage.googleapis.com/a1aa/image/oIEjoUxsE8IzBhehnDS6SMfqhsr9OhqbFi4rlpyTm7LGigrTA.jpg",
-      rating: 4.0,
-      price: "$32.85",
-      oldPrice: "$33.8"
-    },
-    {
-      title: "Nestle Original Coffee-Mate Coffee Creamer",
-      imgSrc: "https://storage.googleapis.com/a1aa/image/eUse4NslW1nQrUZF55JJdN37zVnQifglErfXZgZkypf7QEcdC.jpg",
-      rating: 4.0,
-      price: "$32.85",
-      oldPrice: "$33.8"
-    },
-    {
-      title: "Nestle Original Coffee-Mate Coffee Creamer",
-      imgSrc: "https://storage.googleapis.com/a1aa/image/fLeb6HEdUwhdb0AfUyDafZt5QPY4hjEI57vCWAGl9bOjICuOB.jpg",
-      rating: 4.0,
-      price: "$32.85",
-      oldPrice: "$33.8"
-    }
-  ];
+  { name: "Tất cả", key: "all" },
+  { name: "Vật tư nội thất", key: "vat_tu_noi_that" },
+  { name: "Sàn", key: "san" },
+  { name: "Gạch", key: "gach" },
+];
+const topSelling = [
+  {
+    title: "Nestle Original Coffee-Mate Coffee Creamer",
+    imgSrc: "https://storage.googleapis.com/a1aa/image/oIEjoUxsE8IzBhehnDS6SMfqhsr9OhqbFi4rlpyTm7LGigrTA.jpg",
+    rating: 4.0,
+    price: "$32.85",
+    oldPrice: "$33.8"
+  },
+  {
+    title: "Nestle Original Coffee-Mate Coffee Creamer",
+    imgSrc: "https://storage.googleapis.com/a1aa/image/eUse4NslW1nQrUZF55JJdN37zVnQifglErfXZgZkypf7QEcdC.jpg",
+    rating: 4.0,
+    price: "$32.85",
+    oldPrice: "$33.8"
+  },
+  {
+    title: "Nestle Original Coffee-Mate Coffee Creamer",
+    imgSrc: "https://storage.googleapis.com/a1aa/image/fLeb6HEdUwhdb0AfUyDafZt5QPY4hjEI57vCWAGl9bOjICuOB.jpg",
+    rating: 4.0,
+    price: "$32.85",
+    oldPrice: "$33.8"
+  }
+];
 
-  const trendingProducts = [
-    {
-      title: "Organic Cage-Free Grade A Large Brown Eggs",
-      imgSrc: "https://storage.googleapis.com/a1aa/image/MppG6HpIa1IzMpJ8iu5Yg3g71d4k6U2L0znUNhHOQiQgI46E.jpg",
-      rating: 4.0,
-      price: "$32.85",
-      oldPrice: "$33.8"
-    },
-    {
-      title: "Seeds of Change Organic Quinoa, Brown, & Red Rice",
-      imgSrc: "https://storage.googleapis.com/a1aa/image/UKuFf2QirtWmCaZOGghKqh3FOPirfxmO5pwDax7qa6UEigrTA.jpg",
-      rating: 4.0,
-      price: "$32.85",
-      oldPrice: "$33.8"
-    },
-    {
-      title: "Naturally Flavored Cinnamon Vanilla Light Roast Coffee",
-      imgSrc: "https://storage.googleapis.com/a1aa/image/BREdiMbk087GHNKoz3eYUfcsT9PkgP00MJNHo7NmaueHEBXnA.jpg",
-      rating: 4.0,
-      price: "$32.85",
-      oldPrice: "$33.8"
-    }
-  ];
+const trendingProducts = [
+  {
+    title: "Organic Cage-Free Grade A Large Brown Eggs",
+    imgSrc: "https://storage.googleapis.com/a1aa/image/MppG6HpIa1IzMpJ8iu5Yg3g71d4k6U2L0znUNhHOQiQgI46E.jpg",
+    rating: 4.0,
+    price: "$32.85",
+    oldPrice: "$33.8"
+  },
+  {
+    title: "Seeds of Change Organic Quinoa, Brown, & Red Rice",
+    imgSrc: "https://storage.googleapis.com/a1aa/image/UKuFf2QirtWmCaZOGghKqh3FOPirfxmO5pwDax7qa6UEigrTA.jpg",
+    rating: 4.0,
+    price: "$32.85",
+    oldPrice: "$33.8"
+  },
+  {
+    title: "Naturally Flavored Cinnamon Vanilla Light Roast Coffee",
+    imgSrc: "https://storage.googleapis.com/a1aa/image/BREdiMbk087GHNKoz3eYUfcsT9PkgP00MJNHo7NmaueHEBXnA.jpg",
+    rating: 4.0,
+    price: "$32.85",
+    oldPrice: "$33.8"
+  }
+];
 
-  const recentlyAdded = [
-    {
-      title: "Pepperidge Farm Farmhouse Hearty White Bread",
-      imgSrc: "https://storage.googleapis.com/a1aa/image/84eyYaZTWF3rLiECFOoPYrecF5J7YBJ3PKfSE0lKTlzXEBXnA.jpg",
-      rating: 4.0,
-      price: "$32.85",
-      oldPrice: "$33.8"
-    },
-    {
-      title: "Organic Frozen Triple Berry Blend",
-      imgSrc: "https://storage.googleapis.com/a1aa/image/vvKCkp9SJq5NOtemfMlAPRM9nx2el8r8lBSaCe6Ek0woICuOB.jpg",
-      rating: 4.0,
-      price: "$32.85",
-      oldPrice: "$33.8"
-    },
-    {
-      title: "Oroweat Country Buttermilk Bread",
-      imgSrc: "https://storage.googleapis.com/a1aa/image/nluiZf4n6dTFN6kJNjhRWpeOf57Fy7seOHKZMZwEAjMwICuOB.jpg",
-      rating: 4.0,
-      price: "$32.85",
-      oldPrice: "$33.8"
-    }
+const recentlyAdded = [
+  {
+    title: "Pepperidge Farm Farmhouse Hearty White Bread",
+    imgSrc: "https://storage.googleapis.com/a1aa/image/84eyYaZTWF3rLiECFOoPYrecF5J7YBJ3PKfSE0lKTlzXEBXnA.jpg",
+    rating: 4.0,
+    price: "$32.85",
+    oldPrice: "$33.8"
+  },
+  {
+    title: "Organic Frozen Triple Berry Blend",
+    imgSrc: "https://storage.googleapis.com/a1aa/image/vvKCkp9SJq5NOtemfMlAPRM9nx2el8r8lBSaCe6Ek0woICuOB.jpg",
+    rating: 4.0,
+    price: "$32.85",
+    oldPrice: "$33.8"
+  },
+  {
+    title: "Oroweat Country Buttermilk Bread",
+    imgSrc: "https://storage.googleapis.com/a1aa/image/nluiZf4n6dTFN6kJNjhRWpeOf57Fy7seOHKZMZwEAjMwICuOB.jpg",
+    rating: 4.0,
+    price: "$32.85",
+    oldPrice: "$33.8"
+  }
 ];
 const HomePage: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -296,8 +296,8 @@ const HomePage: React.FC = () => {
     setSelectedCategory(category);
   };
 
-    // Filter products based on selected category
-    const filteredProducts = selectedCategory === "all"
+  // Filter products based on selected category
+  const filteredProducts = selectedCategory === "all"
     ? fakeProducts
     : fakeProducts.filter(product => product.category === selectedCategory);
   return (
@@ -318,9 +318,8 @@ const HomePage: React.FC = () => {
               <div
                 key={slideIndex}
                 onClick={() => goToSlide(slideIndex)}
-                className={`hidden group-hover:block p-2 border-2 rounded-full cursor-pointer ${
-                  currentIndex === slideIndex ? "bg-red-300 border-red-300" : ""
-                }`}
+                className={`hidden group-hover:block p-2 border-2 rounded-full cursor-pointer ${currentIndex === slideIndex ? "bg-red-300 border-red-300" : ""
+                  }`}
               ></div>
             ))}
           </div>
@@ -395,7 +394,7 @@ const HomePage: React.FC = () => {
                         <img
                           src={product.imgSrc}
                           alt={product.title}
-                          className="w-full h-72 object-cover mb-4 group-hover:scale-110 ease-in-out duration-300"
+                          className="w-full h-64 lg:h-60 2xl:h-72 object-cover mb-4 group-hover:scale-110 ease-in-out duration-300"
                         />
                         <div className="flex w-full justify-between">
                           <div className="bg-blue-400 px-2 py-1 rounded-sm my-1">
@@ -485,13 +484,14 @@ const HomePage: React.FC = () => {
                           </div>
                         </div>
                         <h2 className="text-lg font-semibold text-start w-full my-2 lg:h-[55px] hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
-                    {product.title}
-                  </h2>
+                          {product.title}
+                        </h2>
                         <div className="flex w-full justify-start items-center gap-4">
                           <Rating
                             name="product-rating"
                             value={product.rating}
                             precision={0.5}
+                            className="text-xl 2xl:text-2xl"
                             readOnly
                           />
                           <span className="text-black text-sm font-semibold">
@@ -503,10 +503,10 @@ const HomePage: React.FC = () => {
                         </div>
                         <div className="flex w-full justify-between items-center mt-3">
                           <div className="flex gap-2">
-                            <div className="text-2xl font-normal text-stone-400 line-through">
+                            <div className="text-xl sm:text-[16px] 2xl:text-xl font-normal text-stone-400 line-through">
                               {product.price}đ
                             </div>
-                            <div className="text-2xl font-semibold">
+                            <div className="text-xl sm:text-[16px] 2xl:text-xl font-semibold">
                               {product.price}đ
                             </div>
                           </div>
@@ -533,18 +533,18 @@ const HomePage: React.FC = () => {
             Háng bán chạy
           </h2>
           <div>
-          <ul className="flex gap-1">
-            {fakeCategories.map((category, index) => (
-              <li key={index}>
-                <Button
-                  onClick={() => handleCategoryChange(category.key)}
-                  className={`bg-transparent shadow-none font-bold ${selectedCategory === category.key ? 'bg-black text-white' : 'text-black hover:bg-slate-700 hover:text-white'}`}
-                >
-                  {category.name}
-                </Button>
-              </li>
-            ))}
-          </ul>
+            <ul className="flex gap-1">
+              {fakeCategories.map((category, index) => (
+                <li key={index}>
+                  <Button
+                    onClick={() => handleCategoryChange(category.key)}
+                    className={`bg-transparent shadow-none font-bold ${selectedCategory === category.key ? 'bg-black text-white' : 'text-black hover:bg-slate-700 hover:text-white'}`}
+                  >
+                    {category.name}
+                  </Button>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
         <Carousel
@@ -657,12 +657,13 @@ const HomePage: React.FC = () => {
                         </div>
                       </div>
                       <h2 className="text-lg font-semibold text-start w-full my-2 lg:h-[55px] hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
-                    {product.title}
-                  </h2>
+                        {product.title}
+                      </h2>
                       <div className="flex w-full justify-start items-center gap-4">
                         <Rating
                           name="product-rating"
                           value={product.rating}
+                          className="text-xl 2xl:text-2xl"
                           precision={0.5}
                           readOnly
                         />
@@ -675,10 +676,10 @@ const HomePage: React.FC = () => {
                       </div>
                       <div className="flex w-full justify-between items-center mt-3">
                         <div className="flex gap-2">
-                          <div className="text-2xl font-normal text-stone-400 line-through">
+                          <div className="text-xl sm:text-[16px] 2xl:text-xl font-normal text-stone-400 line-through">
                             {product.price}đ
                           </div>
-                          <div className="text-2xl font-semibold">
+                          <div className="text-xl sm:text-[16px] 2xl:text-xl font-semibold">
                             {product.price}đ
                           </div>
                         </div>
@@ -699,122 +700,123 @@ const HomePage: React.FC = () => {
         </Carousel>
       </div>
       <div className="max-w-[85%] mx-auto py-5">
-      <div >
-      <div className="container mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
-          {/* Top Selling */}
-          <div>
-            <h2 className="text-2xl font-bold mb-4">Top Selling</h2>
-            <div className="border-b-2 border-stone-300 mb-4"></div>
-            <div className="space-y-10">
-              {topSelling.map((product, index) => (
-                <div key={index} className="group flex items-center p-2 rounded-sm transition ease-in-out hover:-translate-y-1 duration-300">
-                  <img alt={`Image of ${product.title}`} className="w-32 h-32 rounded" src={product.imgSrc} />
-                  <div className="ml-8">
-                    <h3 className="text-lg font-semibold group-hover:text-red-300 transition ease-in-out duration-300">{product.title}</h3>
-                    <div className="flex w-full justify-start items-center gap-4">
-                        <Rating
-                          name="product-rating"
-                          value={product.rating}
-                          precision={0.5}
-                          readOnly
-                        />
-                        <span className="text-black text-sm font-semibold">
-                          ({product.rating})
-                        </span>
-                      </div>
-                      <div className="flex w-full justify-between items-center mt-3">
-                        <div className="flex gap-2">
-                          <div className="text-2xl font-normal text-stone-400 line-through">
-                            {product.price}đ
-                          </div>
-                          <div className="text-2xl font-semibold">
-                            {product.price}đ
+        <div >
+          <div className="container mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
+              {/* Top Selling */}
+              <div>
+                <h2 className="text-2xl font-bold mb-4">Top Selling</h2>
+                <div className="border-b-2 border-stone-300 mb-4"></div>
+                <div className="space-y-10">
+                  {topSelling.map((product, index) => (
+                    <div key={index} className="group flex items-center p-2 rounded-sm transition ease-in-out hover:-translate-y-1 duration-300">
+                      <img alt={`Image of ${product.title}`} className="w-32 h-32 rounded" src={product.imgSrc} />
+                      <div className="ml-8">
+                        <h3 className="text-lg font-semibold group-hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">{product.title}</h3>
+                        <div className="flex w-full justify-start items-center gap-4">
+                          <Rating
+                            name="product-rating"
+                            value={product.rating}
+                            precision={0.5}
+                            className="text-xl 2xl:text-2xl"
+                            readOnly
+                          />
+                          <span className="text-black text-sm font-semibold">
+                            ({product.rating})
+                          </span>
+                        </div>
+                        <div className="flex w-full justify-between items-center mt-3">
+                          <div className="flex flex-col gap-0 sm:gap-0">
+                            <div className="text-xl sm:text-[18px] font-semibold">
+                              {product.price}đ
+                            </div>
+                            <div className="ml-1 text-lg sm:text-[14px] font-normal text-stone-400 line-through">
+                              {product.price}đ
+                            </div>
                           </div>
                         </div>
                       </div>
-                  </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          {/* Trending Products */}
-          <div>
-            <h2 className="text-2xl font-bold mb-4">Trending Products</h2>
-            <div className="border-b-2 border-stone-300 mb-4"></div>
-            <div className="space-y-10">
-            {trendingProducts.map((product, index) => (
-                <div key={index} className="group flex items-center p-2 rounded-sm transition ease-in-out hover:-translate-y-1 duration-300">
-                  <img alt={`Image of ${product.title}`} className="w-32 h-32 rounded" src={product.imgSrc} />
-                  <div className="ml-8">
-                    <h3 className="text-lg font-semibold group-hover:text-red-300 transition ease-in-out duration-300">{product.title}</h3>
-                    <div className="flex w-full justify-start items-center gap-4">
-                        <Rating
-                          name="product-rating"
-                          value={product.rating}
-                          precision={0.5}
-                          readOnly
-                        />
-                        <span className="text-black text-sm font-semibold">
-                          ({product.rating})
-                        </span>
-                      </div>
-                      <div className="flex w-full justify-between items-center mt-3">
-                        <div className="flex gap-2">
-                          <div className="text-2xl font-normal text-stone-400 line-through">
-                            {product.price}đ
-                          </div>
-                          <div className="text-2xl font-semibold">
-                            {product.price}đ
+              {/* Trending Products */}
+              <div>
+                <h2 className="text-2xl font-bold mb-4">Trending Products</h2>
+                <div className="border-b-2 border-stone-300 mb-4"></div>
+                <div className="space-y-10">
+                  {trendingProducts.map((product, index) => (
+                    <div key={index} className="group flex items-center p-2 rounded-sm transition ease-in-out hover:-translate-y-1 duration-300">
+                      <img alt={`Image of ${product.title}`} className="w-32 h-32 rounded" src={product.imgSrc} />
+                      <div className="ml-8">
+                        <h3 className="text-lg font-semibold group-hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">{product.title}</h3>
+                        <div className="flex w-full justify-start items-center gap-4">
+                          <Rating
+                            name="product-rating"
+                            value={product.rating}
+                            precision={0.5}
+                            readOnly
+                          />
+                          <span className="text-black text-sm font-semibold">
+                            ({product.rating})
+                          </span>
+                        </div>
+                        <div className="flex w-full justify-between items-center mt-3">
+                          <div className="flex flex-col gap-0 sm:gap-0">
+                            <div className="text-xl sm:text-[18px] font-semibold">
+                              {product.price}đ
+                            </div>
+                            <div className="ml-1 text-lg sm:text-[14px] font-normal text-stone-400 line-through">
+                              {product.price}đ
+                            </div>
                           </div>
                         </div>
                       </div>
-                  </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          {/* Recently Added */}
-          <div>
-            <h2 className="text-2xl font-bold mb-4">Recently Added</h2>
-            <div className="border-b-2 border-stone-300 mb-4"></div>
-            <div className="space-y-10">
-            {recentlyAdded.map((product, index) => (
-                <div key={index} className="group flex items-center p-2 rounded-sm transition ease-in-out hover:-translate-y-1 duration-300">
-                  <img alt={`Image of ${product.title}`} className="w-32 h-32 rounded" src={product.imgSrc} />
-                  <div className="ml-8">
-                    <h3 className="text-lg font-semibold group-hover:text-red-300 transition ease-in-out duration-300">{product.title}</h3>
-                    <div className="flex w-full justify-start items-center gap-4">
-                        <Rating
-                          name="product-rating"
-                          value={product.rating}
-                          precision={0.5}
-                          readOnly
-                        />
-                        <span className="text-black text-sm font-semibold">
-                          ({product.rating})
-                        </span>
-                      </div>
-                      <div className="flex w-full justify-between items-center mt-3">
-                        <div className="flex gap-2">
-                          <div className="text-2xl font-normal text-stone-400 line-through">
-                            {product.price}đ
-                          </div>
-                          <div className="text-2xl font-semibold">
-                            {product.price}đ
+              {/* Recently Added */}
+              <div>
+                <h2 className="text-2xl font-bold mb-4">Recently Added</h2>
+                <div className="border-b-2 border-stone-300 mb-4"></div>
+                <div className="space-y-10">
+                  {recentlyAdded.map((product, index) => (
+                    <div key={index} className="group flex items-center p-2 rounded-sm transition ease-in-out hover:-translate-y-1 duration-300">
+                      <img alt={`Image of ${product.title}`} className="w-32 h-32 rounded" src={product.imgSrc} />
+                      <div className="ml-8">
+                        <h3 className="text-lg font-semibold group-hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">{product.title}</h3>
+                        <div className="flex w-full justify-start items-center gap-4">
+                          <Rating
+                            name="product-rating"
+                            value={product.rating}
+                            precision={0.5}
+                            readOnly
+                          />
+                          <span className="text-black text-sm font-semibold">
+                            ({product.rating})
+                          </span>
+                        </div>
+                        <div className="flex w-full justify-between items-center mt-3">
+                          <div className="flex flex-col gap-0 sm:gap-0">
+                            <div className="text-xl sm:text-[18px] font-semibold">
+                              {product.price}đ
+                            </div>
+                            <div className="ml-1 text-lg sm:text-[14px] font-normal text-stone-400 line-through">
+                              {product.price}đ
+                            </div>
                           </div>
                         </div>
                       </div>
-                  </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
       </div>
     </section>
   );

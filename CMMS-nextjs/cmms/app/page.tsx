@@ -17,13 +17,13 @@ export default function Home() {
   return (
     <div>
       <Header />
-      {/* <HomePage /> */}
+      <HomePage />
       {/* <Listing/> */}
       {/* <DetailsPage/> */}
       {/* <CartPage/> */}
       {/* <CheckoutPage/> */}
       {/* <WishlistPage/> */}
-      <ProfilePage />
+      {/* <ProfilePage /> */}
       <Footer />
     </div>
   );
