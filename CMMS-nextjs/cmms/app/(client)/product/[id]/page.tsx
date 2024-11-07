@@ -531,7 +531,7 @@ export default function DetailsPage() {
         </div>
 
         <div className="bg-white p-6 mt-5 rounded-sm shadow-lg">
-          <Tabs  defaultValue="info" className="w-full">
+          <Tabs defaultValue="info" className="w-full">
             <TabsList className="grid grid-cols-2 lg:w-[400px]">
               <TabsTrigger className="font-bold" value="info">
                 Mô tả
@@ -835,7 +835,8 @@ export default function DetailsPage() {
                           {product.title}
                         </h2>
                         <div className="flex w-full justify-start items-center gap-4">
-                          <Rating size="small"
+                          <Rating
+                            size="small"
                             name="product-rating"
                             value={product.rating}
                             precision={0.5}
@@ -857,7 +858,6 @@ export default function DetailsPage() {
                               {product.price}đ
                             </div>
                           </div>
-
                         </div>
                       </CardContent>
                     </Card>
