@@ -17,8 +17,8 @@ export default function Home() {
   return (
     <div>
       <Header />
-      <HomePage />
-      {/* <Listing/> */}
+      {/* <HomePage /> */}
+      <Listing/>  
       {/* <DetailsPage/> */}
       {/* <CartPage/> */}
       {/* <CheckoutPage/> */}

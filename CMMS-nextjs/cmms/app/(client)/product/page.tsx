@@ -83,7 +83,20 @@ const colorfake = [
   { title: "Đỏ(Red)" },
 ];
 const filter = ["sam sung", "toshiba"];
-const fakeProducts = [
+type Product = {
+  category: string;
+  discount: string;
+  isFavorite: boolean;
+  imgSrc: string;
+  title: string;
+  rating: number;
+  reviews: number;
+  delivery: string;
+  price: string;
+  shippingIcon: string;
+  priceIcon: string;
+};
+const fakeProducts: Product[] = [
   {
     category: "vat_tu_noi_that",
     discount: "Up to 35% off",
@@ -254,6 +267,24 @@ const fakeProducts = [
     priceIcon: "fas fa-tag",
   },
 ];
+const addToCart = (product: Product): void => {
+  // Retrieve the current cart from localStorage, or initialize an empty array if none exists
+  let cart: (Product & { quantity: number })[] = JSON.parse(localStorage.getItem('cart') || '[]');
+
+  // Check if the product is already in the cart
+  const productIndex = cart.findIndex((item) => item.title === product.title);
+
+  if (productIndex !== -1) {
+    // If product is already in the cart, update its quantity
+    cart[productIndex].quantity += 1;
+  } else {
+    // Add new product with initial quantity of 1
+    cart.push({ ...product, quantity: 1 });
+  }
+
+  // Save the updated cart back to localStorage
+  localStorage.setItem('cart', JSON.stringify(cart));
+};
 const valuetext = (value: number) => {
   return `${value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}đ`;
 };
@@ -265,6 +296,7 @@ export default function Listing() {
     setValue(newValue as number[]);
   };
 
+  
   return (
     <div className="bg-gray-100">
       <div className="max-w-[85%] mx-auto">
@@ -472,138 +504,138 @@ export default function Listing() {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pt-8">
-          {fakeProducts.map((product, index) => (
-            <div className="">
-              <Card
-                className="pt-6 max-h-[550px] overflow-hidden hover:overflow-y-auto [&::-webkit-scrollbar]:w-2 rounded-sm
+      {fakeProducts.map((product, index) => (
+        <div key={index} className="">
+          <Card className="pt-6 max-h-[550px] overflow-hidden hover:overflow-y-auto [&::-webkit-scrollbar]:w-2 rounded-sm
                 [&::-webkit-scrollbar-track]:bg-gray-100
-                [&::-webkit-scrollbar-thumb]:bg-gray-300 cursor-pointer group"
-              >
-                <CardContent className="flex flex-col items-center">
-                  <img
-                    src={product.imgSrc}
-                    alt={product.title}
-                    className="w-full h-72 object-cover mb-4 group-hover:scale-110 ease-in-out duration-300"
-                  />
-                  <div className="flex w-full justify-between">
-                    <div className="bg-blue-400 px-2 py-1 rounded-sm my-1">
-                      {product.discount}
-                    </div>
-                    <div className="flex items-center gap-2 mr-2">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            className="text-stone-500 hover:text-black hover:bg-white"
+                [&::-webkit-scrollbar-thumb]:bg-gray-300 cursor-pointer group">
+            <CardContent className="flex flex-col items-center">
+              <img
+                src={product.imgSrc}
+                alt={product.title}
+                className="w-full h-64 lg:h-60 2xl:h-72 object-cover mb-4 group-hover:scale-110 ease-in-out duration-300"
+              />
+              <div className="flex w-full justify-between">
+                <div className="bg-blue-400 px-2 py-1 rounded-sm my-1">
+                  {product.discount}
+                </div>
+                <div className="flex items-center gap-2 mr-2">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="text-stone-500 hover:text-black hover:bg-white"
+                      >
+                        <HoverCard>
+                          <HoverCardTrigger>
+                            <FaRegEye size={25} />
+                          </HoverCardTrigger>
+                          <HoverCardContent
+                            side="top"
+                            className="w-fit p-2 bg-slate-950 text-white border-none"
                           >
-                            <HoverCard>
-                              <HoverCardTrigger>
-                                <FaRegEye size={25} />
-                              </HoverCardTrigger>
-                              <HoverCardContent
-                                side="top"
-                                className="w-fit p-2 bg-slate-950 text-white border-none"
-                              >
-                                Xem nhanh
-                              </HoverCardContent>
-                            </HoverCard>
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
-                          <DialogHeader>
-                            <DialogTitle>Edit profile</DialogTitle>
-                            <DialogDescription>
-                              Make changes to your profile here. Click save when
-                              you're done.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="grid gap-4 py-4">
-                            <div className="grid grid-cols-4 items-center gap-4">
-                              <Label htmlFor="name" className="text-right">
-                                Name
-                              </Label>
-                              <Input
-                                id="name"
-                                defaultValue="Pedro Duarte"
-                                className="col-span-3"
-                              />
+                            Xem nhanh
+                          </HoverCardContent>
+                        </HoverCard>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>Edit profile</DialogTitle>
+                        <DialogDescription>
+                          Make changes to your profile here. Click save when
+                          you're done.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="name" className="text-right">
+                            Name
+                          </Label>
+                          <Input
+                            id="name"
+                            defaultValue="Pedro Duarte"
+                            className="col-span-3"
+                          />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="username" className="text-right">
+                            Username
+                          </Label>
+                          <Input
+                            id="username"
+                            defaultValue="@peduarte"
+                            className="col-span-3"
+                          />
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button type="submit">Save changes</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+
+                  <HoverCard>
+                    <HoverCardTrigger>
+                      {product.isFavorite ? (
+                        <CiHeart
+                          className="text-stone-500 hover:text-black"
+                          size={25}
+                        />
+                      ) : (
+                        <FaHeart className="text-red-300" size={25} />
+                      )}
+                    </HoverCardTrigger>
+                    <HoverCardContent
+                      side="top"
+                      className="w-fit p-2 bg-slate-950 text-white border-none"
+                    >
+                      Yêu thích
+                    </HoverCardContent>
+                  </HoverCard>
+                </div>
+              </div>
+              <h2 className="text-lg font-semibold text-start w-full my-2 lg:h-[55px] hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
+                {product.title}
+              </h2>
+              <div className="flex w-full justify-start items-center gap-4">
+                <Rating
+                  name="product-rating"
+                  value={product.rating}
+                  precision={0.5}
+                  className="text-xl 2xl:text-2xl"
+                  readOnly
+                />
+                <span className="text-black text-sm font-semibold">
+                  {product.rating}
+                </span>
+                <span className="text-gray-600 text-sm">
+                  ({product.reviews} reviews)
+                </span>
+              </div>
+              <div className="flex w-full justify-between items-center mt-3">
+                          <div className="flex gap-2">
+                            <div className="text-xl sm:text-[16px] 2xl:text-xl font-normal text-stone-400 line-through">
+                              {product.price}đ
                             </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                              <Label htmlFor="username" className="text-right">
-                                Username
-                              </Label>
-                              <Input
-                                id="username"
-                                defaultValue="@peduarte"
-                                className="col-span-3"
-                              />
+                            <div className="text-xl sm:text-[16px] 2xl:text-xl font-semibold">
+                              {product.price}đ
                             </div>
                           </div>
-                          <DialogFooter>
-                            <Button type="submit">Save changes</Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-
-                      <HoverCard>
-                        <HoverCardTrigger>
-                          {product.isFavorite && (
-                            <CiHeart
-                              className="text-stone-500 hover:text-black"
-                              size={25}
-                            />
-                          )}
-                          {!product.isFavorite && (
-                            <FaHeart className="text-red-300" size={25} />
-                          )}
-                        </HoverCardTrigger>
-                        <HoverCardContent
-                          side="top"
-                          className="w-fit p-2 bg-slate-950 text-white border-none"
-                        >
-                          Yêu thích
-                        </HoverCardContent>
-                      </HoverCard>
-                    </div>
-                  </div>
-                  <h2 className="text-lg font-semibold text-start w-full my-2 lg:h-[55px] hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
-                    {product.title}
-                  </h2>
-                  <div className="flex w-full justify-start items-center gap-4">
-                    <Rating
-                      name="product-rating"
-                      value={product.rating}
-                      precision={0.5}
-                      readOnly
-                    />
-                    <span className="text-black text-sm font-semibold">
-                      {product.rating}
-                    </span>
-                    <span className="text-gray-600 text-sm">
-                      ({product.reviews} reviews)
-                    </span>
-                  </div>
-                  <div className="flex w-full justify-between items-center mt-3">
-                    <div className="flex gap-2">
-                      <div className="text-2xl font-normal text-stone-400 line-through">
-                        {product.price}đ
-                      </div>
-                      <div className="text-2xl font-semibold">
-                        {product.price}đ
-                      </div>
-                    </div>
-                    <div>
-                      <button className="px-3 py-2 font-semibold text-sm bg-red-300 hover:bg-red-400 text-white rounded-md shadow-sm group-hover:scale-125 ease-in-out duration-300 ">
-                        <RiShoppingCart2Line size={25} />
-                      </button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          ))}
+                          <div>
+                            <button 
+                            onClick={() => addToCart(product)}
+                            className="px-3 py-2 font-semibold text-sm bg-red-300 hover:bg-red-400 text-white rounded-md shadow-sm group-hover:scale-125 ease-in-out duration-300 ">
+                              <RiShoppingCart2Line size={25} />
+                            </button>
+                          </div>
+                        </div>
+            </CardContent>
+          </Card>
         </div>
-        <div className="p-5">
+      ))}
+    </div>
+        <div className="py-10">
           <Pagination>
             <PaginationContent>
               <PaginationItem>

@@ -570,7 +570,7 @@ const HomePage: React.FC = () => {
                       <img
                         src={product.imgSrc}
                         alt={product.title}
-                        className="w-full h-72 object-cover mb-4 group-hover:scale-110 ease-in-out duration-300"
+                        className="w-full h-64 lg:h-60 2xl:h-72 object-cover mb-4 group-hover:scale-110 ease-in-out duration-300"
                       />
                       <div className="flex w-full justify-between">
                         <div className="bg-blue-400 px-2 py-1 rounded-sm my-1">
