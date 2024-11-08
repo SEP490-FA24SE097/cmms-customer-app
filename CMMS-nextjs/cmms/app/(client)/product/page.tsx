@@ -73,6 +73,10 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import Slider from "@mui/material/Slider";
+import {
+  useGetMaterial,
+  useGetMaterialById,
+} from "@/lib/actions/materials/react-query/material-query";
 
 const top100Films = [
   { title: "The Shawshank Redemption", year: 1994 },
@@ -346,6 +350,19 @@ export default function Listing() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+
+  const { data, isLoading } = useGetMaterial();
+
+  // id => const materialId = "8fcded53-6a10-4219-a938-75f49fe645ec"
+  const { data: materialData, isLoading: isLoadingMaterialData } =
+    useGetMaterialById("8fcded53-6a10-4219-a938-75f49fe645ec");
+
+  if (!isLoading) <div>...Loading</div>;
+  if (!isLoadingMaterialData) <div>...Loading</div>;
+
+  console.log(data?.data);
+  console.log(materialData?.data);
+
   const handleChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number[]);
   };

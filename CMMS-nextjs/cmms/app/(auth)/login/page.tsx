@@ -4,15 +4,73 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import { FcGoogle } from "react-icons/fc";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { signIn } from "next-auth/react";
+import { useToast } from "@/hooks/use-toast";
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
 
 export default function LoginPage() {
   const router = useRouter();
-  const handleSubmit = () => {
-    router.push("/");
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
+
+  const LoginSchema = z.object({
+    userName: z.string().min(1, "User name is required"),
+    password: z.string().min(1, "Password is required"),
+  });
+
+  const form = useForm({
+    resolver: zodResolver(LoginSchema),
+    defaultValues: {
+      userName: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
+    try {
+      const res = await signIn("credentials", {
+        redirect: false,
+        userName: values.userName,
+        password: values.password,
+        callbackUrl,
+      });
+
+      if (!res?.error) {
+        router.push("/"); // Redirect to homepage
+        toast({
+          title: "Đăng nhập thành công",
+          description: "Bạn đã đăng nhập thành công!",
+        });
+        form.reset();
+      } else {
+        toast({
+          title: "Lỗi đăng nhập",
+          description: "Tên đăng nhập hoặc mật khẩu sai",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Lỗi",
+        description: "Có lỗi xảy ra rồi",
+        variant: "destructive"
+      });
+    }
   };
+  const { toast } = useToast();
   return (
     <main className="bg-[#26313c] h-screen flex items-center justify-center p-10">
       <div className="grid w-full h-full grid-cols-1 bg-white md:grid-cols-2 box-animate">
@@ -27,50 +85,77 @@ export default function LoginPage() {
               Chào mừng bạn đến với trang web của chúng tôi!
             </p>
           </div>
-          <form>
-            <Button
-              className="flex items-center w-full mb-4 gap-4 px-10 bg-transparent"
-              variant="outline"
-            >
-              <FcGoogle />
-              Đăng nhập bằng google
-            </Button>
-
-            <Label htmlFor="username">Tài khoản</Label>
-            <Input
-              className="mt-2 mb-4 bg-transparent"
-              id="username"
-              placeholder="Username"
-            />
-
-            <Label htmlFor="password">Mật khẩu</Label>
-            <Input
-              className="mt-2 mb-2 bg-transparent"
-              type="password"
-              id="password"
-              placeholder="Password"
-            />
-
-            <a className="text-sm flex justify-end font-medium text-primary-600 hover:underline dark:text-primary-500">
-              Quên mật khẩu?
-            </a>
-
-            <Button
-              type="submit"
-              className="w-full mt-5 rounded-full font-bold  bg-indigo-600 hover:bg-indigo-700 "
-            >
-              Đăng nhập
-            </Button>
-            <p className="mt-3 flex justify-center text-sm font-light text-gray-500 dark:text-gray-400">
-              Tôi chưa có tài khoản?{" "}
-              <Link
-                href="/register"
-                className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <Button
+                className="flex items-center w-full mb-4 gap-4 px-10 bg-transparent"
+                variant="outline"
               >
-                Đăng ký
-              </Link>
-            </p>
-          </form>
+                <FcGoogle />
+                Đăng nhập bằng google
+              </Button>
+
+              <FormField
+                control={form.control}
+                name="userName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="block text-base font-bold text-gray-200 mb-1">
+                      userName
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        className="block w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition duration-150 ease-in-out"
+                        placeholder="Nhập userName"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500 text-sm mt-1" />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem className="relative">
+                    <FormLabel className="block text-base font-bold text-gray-200 mb-1">
+                      Mật khẩu
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        className="block w-full px-4 py-3 pr-10 bg-gray-900 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition duration-150 ease-in-out"
+                        placeholder="Nhập mật khẩu"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500 text-sm mt-1" />
+                  </FormItem>
+                )}
+              />
+
+              <a className="text-sm flex justify-end font-medium text-primary-600 hover:underline dark:text-primary-500">
+                Quên mật khẩu?
+              </a>
+
+              <Button
+                type="submit"
+                className="w-full mt-5 rounded-full font-bold bg-indigo-600 hover:bg-indigo-700 "
+              >
+                Đăng nhập
+              </Button>
+              <p className="mt-3 flex justify-center text-sm font-light text-gray-500 dark:text-gray-400">
+                Tôi chưa có tài khoản?{" "}
+                <Link
+                  href="/register"
+                  className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+                >
+                  Đăng ký
+                </Link>
+              </p>
+            </form>
+          </Form>
         </div>
         <div className="relative hidden md:block">
           <Image

@@ -1,8 +1,11 @@
 import localFont, { Roboto } from "next/font/google";
 import type { Metadata } from "next";
 import "./globals.css";
+import { QueryProvider } from "@/providers/query-provider";
+import { Toaster } from "@/components/ui/toaster";
+import SessionProviders from "@/providers/session-provider";
 
-const roboto = Roboto({weight: '400', subsets: ["vietnamese"]})
+const roboto = Roboto({ weight: "400", subsets: ["vietnamese"] });
 
 // const geistSans = localFont({
 //   src: "./fonts/GeistVF.woff",
@@ -27,10 +30,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${roboto.className} antialiased`}
-      >
-        {children}
+      <body className={`${roboto.className} antialiased`}>
+        <SessionProviders>
+          <QueryProvider>
+            {children}
+            <Toaster />
+          </QueryProvider>
+        </SessionProviders>
       </body>
     </html>
   );
