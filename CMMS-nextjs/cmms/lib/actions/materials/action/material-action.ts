@@ -16,9 +16,9 @@ import {
 // form mẫu fetch list
 export async function getMaterials(): Promise<ApiListResponse<IMaterial>> {
   noStore();
-
+  
   const result = await fetchListData<IMaterial>(
-    "/materials?page=1&itemPerPage=50"
+    "/materials?page=1&itemPerPage=10", 
   );
 
   if (!result.success) {

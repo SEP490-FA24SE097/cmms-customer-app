@@ -77,6 +77,11 @@ import {
   useGetMaterial,
   useGetMaterialById,
 } from "@/lib/actions/materials/react-query/material-query";
+import {
+  MaterialStore,
+  useShoppingContext,
+} from "@/context/shopping-cart-context";
+import { IMaterial } from "@/lib/actions/materials/type/material-type";
 
 const top100Films = [
   { title: "The Shawshank Redemption", year: 1994 },
@@ -109,237 +114,7 @@ type Product = {
   shippingIcon: string;
   priceIcon: string;
 };
-const fakeProducts: Product[] = [
-  {
-    category: "vat_tu_noi_that",
-    discount: "Up to 35% off",
-    isFavorite: false,
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/kTGOfrYVKoTrQyvha64sqOyzbE5EXYyDfkfFuc2T26QN74WnA.jpg",
-    title:
-      'Apple iMac 27", 1TB HDD, Retina 5K Display, tina 5K Display, M3 Max tina 5K Display, M3 Max M3 Max',
-    rating: 5.0,
-    reviews: 455,
-    delivery: "Fast Delivery",
-    price: "1,699,699",
-    shippingIcon: "fas fa-shipping-fast",
-    priceIcon: "fas fa-tag",
-  },
-  {
-    category: "vat_tu_noi_that",
-    discount: "Up to 35% off",
-    isFavorite: false,
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/kTGOfrYVKoTrQyvha64sqOyzbE5EXYyDfkfFuc2T26QN74WnA.jpg",
-    title: 'Apple iMac 27", 1TB HDD, Retina 5K Display, M3 Max',
-    rating: 5.0,
-    reviews: 455,
-    delivery: "Fast Delivery",
-    price: "1,699,699",
-    shippingIcon: "fas fa-shipping-fast",
-    priceIcon: "fas fa-tag",
-  },
-  {
-    category: "vat_tu_noi_that",
-    discount: "Up to 35% off",
-    isFavorite: false,
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/kTGOfrYVKoTrQyvha64sqOyzbE5EXYyDfkfFuc2T26QN74WnA.jpg",
-    title: 'Apple iMac 27", 1TB HDD, Retina 5K Display, M3 Max',
-    rating: 5.0,
-    reviews: 455,
-    delivery: "Fast Delivery",
-    price: "1,699,699",
-    shippingIcon: "fas fa-shipping-fast",
-    priceIcon: "fas fa-tag",
-  },
-  {
-    category: "vat_tu_noi_that",
-    discount: "Up to 35% off",
-    isFavorite: false,
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/kTGOfrYVKoTrQyvha64sqOyzbE5EXYyDfkfFuc2T26QN74WnA.jpg",
-    title: 'Apple iMac 27", 1TB HDD, Retina 5K Display, M3 Max',
-    rating: 5.0,
-    reviews: 455,
-    delivery: "Fast Delivery",
-    price: "1,699,699",
-    shippingIcon: "fas fa-shipping-fast",
-    priceIcon: "fas fa-tag",
-  },
-  {
-    category: "vat_tu_noi_that",
-    discount: "Up to 35% off",
-    isFavorite: false,
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/kTGOfrYVKoTrQyvha64sqOyzbE5EXYyDfkfFuc2T26QN74WnA.jpg",
-    title: 'Apple iMac 27", 1TB HDD, Retina 5K Display, M3 Max',
-    rating: 5.0,
-    reviews: 455,
-    delivery: "Fast Delivery",
-    price: "1,699,699",
-    shippingIcon: "fas fa-shipping-fast",
-    priceIcon: "fas fa-tag",
-  },
-  {
-    category: "gach",
-    discount: "Up to 15% off",
-    isFavorite: true,
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/HK1eMFUFPXWtOSupifnfYkSQgwdMqxyU1FzRvDN4kjyR74WnA.jpg",
-    title: "Apple iPhone 15 Pro Max, 256GB, Blue Titanium",
-    rating: 4.5,
-    reviews: 1233,
-    delivery: "Best Seller",
-    price: "1,199,199",
-    shippingIcon: "fas fa-crown",
-    priceIcon: "fas fa-tag",
-  },
-  {
-    category: "vat_tu_noi_that",
-    discount: "Up to 35% off",
-    isFavorite: false,
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/7FaRzFXljfSIZSMnL8Ny6WNdTbyIgMoteB0uhfFJ0QrS74WnA.jpg",
-    title: "iPad Pro 13-Inch (M4): XDR Display, 512GB",
-    rating: 4,
-    reviews: 879,
-    delivery: "Shipping Today",
-    price: "799,199",
-    shippingIcon: "fas fa-shipping-fast",
-    priceIcon: "fas fa-tag",
-  },
-  {
-    category: "gach",
-    discount: "Up to 10% off",
-    isFavorite: false,
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/w9j3qd5LMxLjG1P0FaAkJoBScpkxfJJfw5edDawzmJlK74WnA.jpg",
-    title: "PlayStation®5 Console – 1TB, PRO Controller",
-    rating: 4.5,
-    reviews: 2957,
-    delivery: "Fast Delivery",
-    price: "499,199",
-    shippingIcon: "fas fa-shipping-fast",
-    priceIcon: "fas fa-tag",
-  },
-  {
-    category: "san",
-    discount: "Up to 35% off",
-    isFavorite: true,
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/kTGOfrYVKoTrQyvha64sqOyzbE5EXYyDfkfFuc2T26QN74WnA.jpg",
-    title: 'Apple iMac 27", 1TB HDD, Retina 5K Display, M3 Max',
-    rating: 3.0,
-    reviews: 455,
-    delivery: "Fast Delivery",
-    price: "1,699,199",
-    shippingIcon: "fas fa-shipping-fast",
-    priceIcon: "fas fa-tag",
-  },
-  {
-    category: "vat_tu_noi_that",
-    discount: "Up to 15% off",
-    isFavorite: false,
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/HK1eMFUFPXWtOSupifnfYkSQgwdMqxyU1FzRvDN4kjyR74WnA.jpg",
-    title: "Apple iPhone 15 Pro Max, 256GB, Blue Titanium",
-    rating: 4.5,
-    reviews: 1233,
-    delivery: "Best Seller",
-    price: "1,199,199",
-    shippingIcon: "fas fa-crown",
-    priceIcon: "fas fa-tag",
-  },
-  {
-    category: "vat_tu_noi_that",
-    discount: "Up to 35% off",
-    isFavorite: false,
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/7FaRzFXljfSIZSMnL8Ny6WNdTbyIgMoteB0uhfFJ0QrS74WnA.jpg",
-    title: "iPad Pro 13-Inch (M4): XDR Display, 512GB",
-    rating: 4,
-    reviews: 879,
-    delivery: "Shipping Today",
-    price: "799,199",
-    shippingIcon: "fas fa-shipping-fast",
-    priceIcon: "fas fa-tag",
-  },
-  {
-    category: "san",
-    discount: "Up to 10% off",
-    isFavorite: false,
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/w9j3qd5LMxLjG1P0FaAkJoBScpkxfJJfw5edDawzmJlK74WnA.jpg",
-    title: "PlayStation®5 Console – 1TB, PRO Controller",
-    rating: 3.5,
-    reviews: 2957,
-    delivery: "Fast Delivery",
-    price: "499,199",
-    shippingIcon: "fas fa-shipping-fast",
-    priceIcon: "fas fa-tag",
-  },
-];
 
-const productData = {
-  name: "Seeds of Change Organic Quinoa, Brown",
-  price: 38,
-  originalPrice: 52,
-  discount: "26% Off",
-  rating: 4,
-  description:
-    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam rem officia, corrupti reiciendis minima nisi modi, quasi, odio minus dolore impedit fuga eum eligendi.",
-  sizeOptions: ["50g", "60g", "80g", "100g", "150g"],
-  colors: ["Xanh", "Đỏ", "Vàng", "Tím", "Hồng"],
-  sku: "FWM15VKT",
-  mfgDate: "Jun 4, 2022",
-  shelfLife: "70 days",
-  tags: ["Snack", "Organic", "Brown"],
-  stock: 8,
-  images: [
-    {
-      src: "https://storage.googleapis.com/a1aa/image/SFugHfITaRQGLyavvykKGxIs1e5hLff8trk68uBVudegeaA7E.jpg",
-      alt: "Main product image",
-    },
-    {
-      src: "https://storage.googleapis.com/a1aa/image/Pt3asJ56WfwJICsfzigVqFFzaiL2fJs87zfLHIw3c53OvGwOB.jpg",
-      alt: "Mango juice",
-    },
-    {
-      src: "https://storage.googleapis.com/a1aa/image/CVaoYsf7EaW3cyQ5PO0rJNJqHygiftgG9v4d4EXau6GwrBsTA.jpg",
-      alt: "Bananas",
-    },
-    {
-      src: "https://storage.googleapis.com/a1aa/image/C0XU1GB0Ic5RFNLgehfcGFac0chmuDqUceOX8AIB4qJeuGwOB.jpg",
-      alt: "Sliced watermelon",
-    },
-    {
-      src: "https://storage.googleapis.com/a1aa/image/teabFYGONcWDba9e5R5fWDUTmL8WZPOyrZiUSaJGhJccXDYnA.jpg",
-      alt: "Durian fruit",
-    },
-  ],
-};
-
-const addToCart = (product: Product): void => {
-  // Retrieve the current cart from localStorage, or initialize an empty array if none exists
-  let cart: (Product & { quantity: number })[] = JSON.parse(
-    localStorage.getItem("cart") || "[]"
-  );
-
-  // Check if the product is already in the cart
-  const productIndex = cart.findIndex((item) => item.title === product.title);
-
-  if (productIndex !== -1) {
-    // If product is already in the cart, update its quantity
-    cart[productIndex].quantity += 1;
-  } else {
-    // Add new product with initial quantity of 1
-    cart.push({ ...product, quantity: 1 });
-  }
-
-  // Save the updated cart back to localStorage
-  localStorage.setItem("cart", JSON.stringify(cart));
-};
 const valuetext = (value: number) => {
   return `${value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}đ`;
 };
@@ -348,34 +123,63 @@ export default function Listing() {
   const [value, setValue] = useState([100000, 200000]);
   const [count, setCount] = useState(1);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  const [selectedColor, setSelectedColor] = useState<string | null>(null);
 
   const { data, isLoading } = useGetMaterial();
-
+  const [materialId, setMaterialId] = useState<string>(
+    "8fcded53-6a10-4219-a938-75f49fe645ec"
+  );
   // id => const materialId = "8fcded53-6a10-4219-a938-75f49fe645ec"
   const { data: materialData, isLoading: isLoadingMaterialData } =
-    useGetMaterialById("8fcded53-6a10-4219-a938-75f49fe645ec");
+    useGetMaterialById(materialId);
+  const images = [
+    {
+      src: materialData?.data?.material.imageUrl,
+      alt: "Main product image",
+    },
+    // Spread the subImages array, if it exists
+    // ...(materialData?.data?.material.subImages || []).map(
+    //   (subImage, index) => ({
+    //     src: subImage,
+    //     alt: `Sub image ${index + 1}`,
+    //   })
+    // ),
+    // Spread the variants array, if it exists
+    ...(materialData?.data?.variants || []).map((variant, index) => ({
+      src: variant.image,
+      alt: `Variant image ${index + 1}`,
+    })),
+  ];
+
+  // console.log(images);
 
   if (!isLoading) <div>...Loading</div>;
   if (!isLoadingMaterialData) <div>...Loading</div>;
 
-  console.log(data?.data);
-  console.log(materialData?.data);
+  // console.log(data?.data);
+  // console.log(materialData?.data);
 
+  const { addCartItem } = useShoppingContext();
+
+
+
+  const handleAddToCart = (material: IMaterial) => {
+    const materialId = material.material.id;
+    const storeId = material.material.id;
+    const data = { materialId, storeId } as MaterialStore;
+
+    addCartItem(data);
+  };
   const handleChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number[]);
   };
   const prevSlide = () => {
     const isFirstSlide = currentIndex === 0;
-    const newIndex = isFirstSlide
-      ? productData.images.length - 1
-      : currentIndex - 1;
+    const newIndex = isFirstSlide ? images.length - 1 : currentIndex - 1;
     setCurrentIndex(newIndex);
   };
 
   const nextSlide = () => {
-    const isLastSlide = currentIndex === productData.images.length - 1;
+    const isLastSlide = currentIndex === images.length - 1;
     const newIndex = isLastSlide ? 0 : currentIndex + 1;
     setCurrentIndex(newIndex);
   };
@@ -620,8 +424,8 @@ export default function Listing() {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pt-8">
-          {fakeProducts.map((product, index) => (
-            <div key={index} className="">
+          {data?.data.map((product, index) => (
+            <div key={product.material.id} className="">
               <Card
                 className="pt-6 max-h-[550px] overflow-hidden hover:overflow-y-auto [&::-webkit-scrollbar]:w-2 rounded-sm
                 [&::-webkit-scrollbar-track]:bg-gray-100
@@ -629,19 +433,20 @@ export default function Listing() {
               >
                 <CardContent className="flex flex-col items-center">
                   <img
-                    src={product.imgSrc}
-                    alt={product.title}
+                    src={product.material.imageUrl}
+                    alt={product.material.name}
                     className="w-full h-64 lg:h-60 2xl:h-72 object-cover mb-4 group-hover:scale-110 ease-in-out duration-300"
                   />
                   <div className="flex w-full justify-between">
                     <div className="bg-blue-400 px-2 py-1 rounded-sm my-1">
-                      {product.discount}
+                      {/* {product.discount} */} 20%
                     </div>
                     <div className="flex items-center gap-2 mr-2">
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button
                             variant="ghost"
+                            onClick={() => setMaterialId(product.material.id)}
                             className="text-stone-500 hover:text-black hover:bg-white"
                           >
                             <HoverCard>
@@ -663,7 +468,7 @@ export default function Listing() {
                               <div className="w-full sm:h-[55vh] h-[40vh] m-auto py-5 relative group">
                                 <div
                                   style={{
-                                    backgroundImage: `url(${productData.images[currentIndex].src})`,
+                                    backgroundImage: `url(${images[currentIndex].src})`,
                                   }}
                                   onClick={handleClick}
                                   className="w-full h-full rounded-xl bg-center bg-cover duration-500 cursor-pointer"
@@ -694,7 +499,7 @@ export default function Listing() {
                                   <div className="relative w-full max-w-4xl">
                                     {/* Full-size Image */}
                                     <img
-                                      src={productData.images[currentIndex].src}
+                                      src={images[currentIndex].src}
                                       alt=""
                                       className="w-full h-auto rounded-lg"
                                     />
@@ -724,27 +529,25 @@ export default function Listing() {
                                     className="w-full max-w-sm"
                                   >
                                     <CarouselContent className="-ml-1">
-                                      {productData.images.map(
-                                        (slide, slideIndex) => (
-                                          <CarouselItem
+                                      {images.map((slide, slideIndex) => (
+                                        <CarouselItem
+                                          key={slideIndex}
+                                          className="pl-1 basis-1/4"
+                                        >
+                                          <img
+                                            src={slide.src}
                                             key={slideIndex}
-                                            className="pl-1 basis-1/4"
-                                          >
-                                            <img
-                                              src={slide.src}
-                                              key={slideIndex}
-                                              onClick={() =>
-                                                goToSlide(slideIndex)
-                                              }
-                                              className={`border-2 h-20 w-20 rounded-sm cursor-pointer ${
-                                                currentIndex === slideIndex
-                                                  ? " border-red-300"
-                                                  : ""
-                                              }`}
-                                            />
-                                          </CarouselItem>
-                                        )
-                                      )}
+                                            onClick={() =>
+                                              goToSlide(slideIndex)
+                                            }
+                                            className={`border-2 h-20 w-20 rounded-sm cursor-pointer ${
+                                              currentIndex === slideIndex
+                                                ? " border-red-300"
+                                                : ""
+                                            }`}
+                                          />
+                                        </CarouselItem>
+                                      ))}
                                     </CarouselContent>
                                     <CarouselPrevious />
                                     <CarouselNext />
@@ -771,13 +574,13 @@ export default function Listing() {
                                 </span>
                               </div>
                               <h1 className="text-3xl font-bold">
-                                {productData.name}
+                                {materialData?.data?.material.name}
                               </h1>
 
                               <div className="flex items-center">
                                 <Rating
                                   name="half-rating-read"
-                                  defaultValue={productData.rating}
+                                  defaultValue={4}
                                   precision={0.5}
                                   readOnly
                                 />
@@ -788,60 +591,50 @@ export default function Listing() {
 
                               <div className="flex items-center space-x-2">
                                 <span className="text-3xl font-bold text-red-500">
-                                  {productData.price}đ
+                                  {materialData?.data?.material.salePrice}đ
                                 </span>
                                 <span className="text-gray-500 line-through">
-                                  {productData.originalPrice}đ
+                                  {materialData?.data?.material.salePrice}đ
                                 </span>
                                 <span className="text-red-500 text-sm">
-                                  {productData.discount}
+                                  20%
                                 </span>
                               </div>
 
                               <p className="text-gray-600">
-                                {productData.description}
+                                {materialData?.data?.material.description}
                               </p>
 
                               <div>
-                                <span className="text-gray-600">
-                                  Size / Weight:
-                                </span>
+                                <span className="text-gray-600">Các loại</span>
                                 <div className="flex items-center mt-2 space-x-2">
-                                  {productData.sizeOptions.map(
-                                    (size, index) => (
-                                      <button
+                                  {materialData?.data?.variants.map(
+                                    (variant, index) => (
+                                      <div
                                         key={index}
-                                        onClick={() => setSelectedSize(size)}
-                                        className={`px-3 hover:bg-red-100 hover:text-red-600 py-1 border rounded ${
-                                          selectedSize === size
-                                            ? "bg-red-100 text-red-600"
-                                            : ""
-                                        }`}
+                                        className="flex items-center border p-3 mb-3 hover:bg-red-100 hover:text-red-600"
                                       >
-                                        {size}
-                                      </button>
+                                        <img
+                                          src={variant.image}
+                                          alt={`Variant ${index + 1}`}
+                                          className="w-16 h-10 object-cover mb-2"
+                                        />
+                                        <div className="flex gap-2 mt-2">
+                                          {variant.attributes.map(
+                                            (attribute, idx) => (
+                                              <button
+                                                key={idx}
+                                                className="flex py-1"
+                                              >
+                                                {attribute.name}:{" "}
+                                                {attribute.value}
+                                              </button>
+                                            )
+                                          )}
+                                        </div>
+                                      </div>
                                     )
                                   )}
-                                </div>
-                              </div>
-
-                              {/* Color Options */}
-                              <div>
-                                <span className="text-gray-600">Màu sắc:</span>
-                                <div className="flex items-center mt-2 space-x-2">
-                                  {productData.colors.map((color, index) => (
-                                    <button
-                                      key={index}
-                                      onClick={() => setSelectedColor(color)}
-                                      className={`px-3 hover:bg-red-100 hover:text-red-600 py-1 border rounded ${
-                                        selectedColor === color
-                                          ? "bg-red-100 text-red-600"
-                                          : ""
-                                      }`}
-                                    >
-                                      {color}
-                                    </button>
-                                  ))}
                                 </div>
                               </div>
 
@@ -883,14 +676,18 @@ export default function Listing() {
 
                       <HoverCard>
                         <HoverCardTrigger>
-                          {product.isFavorite ? (
+                          {/* {product.isFavorite ? (
                             <CiHeart
                               className="text-stone-500 hover:text-black"
                               size={25}
                             />
                           ) : (
                             <FaHeart className="text-red-300" size={25} />
-                          )}
+                          )} */}
+                          <CiHeart
+                            className="text-stone-500 hover:text-black"
+                            size={25}
+                          />
                         </HoverCardTrigger>
                         <HoverCardContent
                           side="top"
@@ -902,35 +699,36 @@ export default function Listing() {
                     </div>
                   </div>
                   <h2 className="text-lg font-semibold text-start w-full my-2 lg:h-[55px] hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
-                    {product.title}
+                    {product.material.name}
                   </h2>
                   <div className="flex w-full justify-start items-center gap-4">
                     <Rating
                       name="product-rating"
-                      value={product.rating}
+                      value={4} //{product.rating}
                       precision={0.5}
                       className="text-xl 2xl:text-2xl"
                       readOnly
                     />
                     <span className="text-black text-sm font-semibold">
-                      {product.rating}
+                      {/* {product.rating} */} 4
                     </span>
                     <span className="text-gray-600 text-sm">
-                      ({product.reviews} reviews)
+                      {/* ({product.reviews} reviews) */}
+                      (10 reviews)
                     </span>
                   </div>
                   <div className="flex w-full justify-between items-center mt-3">
                     <div className="flex gap-2">
                       <div className="text-xl sm:text-[16px] 2xl:text-xl font-normal text-stone-400 line-through">
-                        {product.price}đ
+                        {product.material.salePrice}đ
                       </div>
                       <div className="text-xl sm:text-[16px] 2xl:text-xl font-semibold">
-                        {product.price}đ
+                        {product.material.salePrice}đ
                       </div>
                     </div>
                     <div>
                       <button
-                        onClick={() => addToCart(product)}
+                        onClick={() => handleAddToCart(product)}
                         className="px-3 py-2 font-semibold text-sm bg-red-300 hover:bg-red-400 text-white rounded-md shadow-sm group-hover:scale-125 ease-in-out duration-300 "
                       >
                         <RiShoppingCart2Line size={25} />

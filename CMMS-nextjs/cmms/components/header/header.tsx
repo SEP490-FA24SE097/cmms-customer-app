@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -23,8 +23,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { IoMdMenu } from "react-icons/io";
-import { IoMdClose } from "react-icons/io";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -54,6 +52,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
+import { useShoppingContext } from "@/context/shopping-cart-context";
+import { createAndGetCart } from "@/lib/actions/cart/action/cart";
+import { CloudCog } from "lucide-react";
+import { ICart } from "@/lib/actions/cart/type/cart-type";
 
 const products = [
   {
@@ -180,6 +182,30 @@ export default function Header() {
     }
   };
 
+  // const [isOpenCart, setIsOpenCart] = useState(false);
+  const [cartData, setCartData] = useState<ICart[]>([]);
+  const [isPending, startTransition] = useTransition();
+  const { cartItem } = useShoppingContext();
+
+  const handleOpenCartModal = () => {
+    // cartItems : [{} ,{} ,{}]
+    const dataToSend = { cartItems: cartItem };
+    startTransition(async () => {
+      const result = await createAndGetCart(dataToSend);
+
+      // hiển thị ?? => viết state [] , lưu list đó , thêm isLoading
+      setCartData(result.data);
+      console.log("data ne" + cartData);
+      if (!result.data) {
+        // toast.error(result.error);
+        console.log("fail");
+        return;
+      }
+      // toast.success("Cập nhật dịch vụ thành công!");
+    });
+    // setIsOpenCart(!isOpenCart);
+  };
+
   return (
     <nav className="bg-[#fff] shadow-lg mb-2">
       <div className="max-w-[85%] mx-auto px-4 sm:px-6 lg:px-8 py-3 border-b">
@@ -258,7 +284,10 @@ export default function Header() {
               </Button>
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button className="bg-white text-black hover:bg-slate-200 text-[18px] font-medium">
+                  <Button
+                    onClick={() => handleOpenCartModal()}
+                    className="bg-white text-black hover:bg-slate-200 text-[18px] font-medium"
+                  >
                     <div className="relative">
                       <TbShoppingCart size={25} />
                       <span className="absolute top-0 right-0 grid min-h-[10px] min-w-[18px] text-[12px] font-bold translate-x-2/4 -translate-y-2/4 place-items-center rounded-full bg-red-400 text-white">
@@ -378,6 +407,10 @@ export default function Header() {
                                   Tiền tới thanh toán
                                 </button>
                               </div>
+                              {cartData.map((item, index) => (
+                                <div key={index}>{item.itemName}</div>
+                              ))}
+                              ;
                             </div>
                           </div>
                         </div>

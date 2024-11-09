@@ -4,6 +4,7 @@ import "./globals.css";
 import { QueryProvider } from "@/providers/query-provider";
 import { Toaster } from "@/components/ui/toaster";
 import SessionProviders from "@/providers/session-provider";
+import { ShoppingContextProvider } from "@/context/shopping-cart-context";
 
 const roboto = Roboto({ weight: "400", subsets: ["vietnamese"] });
 
@@ -33,7 +34,7 @@ export default function RootLayout({
       <body className={`${roboto.className} antialiased`}>
         <SessionProviders>
           <QueryProvider>
-            {children}
+            <ShoppingContextProvider>{children}</ShoppingContextProvider>
             <Toaster />
           </QueryProvider>
         </SessionProviders>
