@@ -223,16 +223,18 @@ export default function Header() {
               </form>
             </div>
           </div>
-          <div className="mx-auto md:ml-auto md:col-span-2">
+          <div className="mx-auto sm:ml-auto sm:mr-0   md:col-span-2">
             <div className="inline-flex gap-5">
-              <Button className="bg-white text-black hover:bg-slate-200 text-[18px] font-medium">
+              <Button
+                variant="ghost"
+                className="bg-white text-black hover:bg-slate-200 text-[18px] font-medium"
+              >
                 <div className="relative">
                   <FaRegHeart size={25} />
                   <span className="absolute top-0 right-0 grid min-h-[5px] min-w-[18px] text-[12px] font-bold translate-x-2/4 -translate-y-2/4 place-items-center rounded-full bg-red-400 text-white">
                     5
                   </span>
                 </div>
-                <h3 className="hidden md:block">Yêu thích</h3>
               </Button>
               <Sheet>
                 <SheetTrigger asChild>

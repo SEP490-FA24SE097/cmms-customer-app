@@ -14,10 +14,10 @@ import {
 } from "@/lib/api/api-handler/generic";
 
 // form mẫu fetch list
-export async function getMaterials(): Promise<ApiListResponse<IMaterial>> {
+export async function getMaterials(searchParams: Record<string, string | number | boolean>): Promise<ApiListResponse<IMaterial>> {
   noStore();
 
-  const result = await fetchListData<IMaterial>("/materials");
+  const result = await fetchListData<IMaterial>("/materials",searchParams);
 
   if (!result.success) {
     return { data: [], pageCount: 0, error: result.error };

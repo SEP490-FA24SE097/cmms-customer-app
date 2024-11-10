@@ -9,10 +9,12 @@ import { IMaterial } from "../type/material-type";
 import { getMaterialById, getMaterials } from "../action/material-action";
 
 // list material
-export const useGetMaterial = () => {
+export const useGetMaterial = (
+  searchParams: Record<string, string | number | boolean>
+) => {
   return useQuery<ApiListResponse<IMaterial>>({
-    queryKey: ["MATERIAL_LIST"],
-    queryFn: () => getMaterials(),
+    queryKey: ["MATERIAL_LIST", searchParams],
+    queryFn: () => getMaterials(searchParams),
   });
 };
 

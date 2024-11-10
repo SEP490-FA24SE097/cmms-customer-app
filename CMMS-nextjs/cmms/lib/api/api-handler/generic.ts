@@ -1,20 +1,23 @@
 "use server";
 
-import  axios, { AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 import { axiosAuth } from "@/lib/api/api-interceptor/api";
 import { handleAPIError, translateError } from "./handler-api-error";
 
-export type Result<T> = {
-  success: true;
-  data: T;
-} | {
-  success: false;
-  error: string;
-};
+export type Result<T> =
+  | {
+      success: true;
+      data: T;
+    }
+  | {
+      success: false;
+      error: string;
+    };
 
 export interface ApiListResponse<T> {
   data: T[];
   pageCount?: number;
+  totalPages?: number;
   error?: string;
 }
 export interface ApiSingleResponse<T> {
@@ -22,7 +25,9 @@ export interface ApiSingleResponse<T> {
   error?: string;
 }
 
-export async function apiRequest<T>(request: () => Promise<AxiosResponse<T>>): Promise<Result<T>> {
+export async function apiRequest<T>(
+  request: () => Promise<AxiosResponse<T>>
+): Promise<Result<T>> {
   try {
     const response = await request();
     return { success: true, data: response.data };
@@ -31,7 +36,7 @@ export async function apiRequest<T>(request: () => Promise<AxiosResponse<T>>): P
     //   const errorMessage = await handleAPIError(error);
     //   return { success: false, error: errorMessage };
     // }
-   
+
     return { success: false, error: translateError(error) };
   }
 }
@@ -42,26 +47,29 @@ export async function fetchListData<T>(
 ): Promise<Result<ApiListResponse<T>>> {
   const result = await apiRequest<{
     data: T[];
-    metaData: {
-      totalItemsCount: number;
-      pageSize: number;
-      totalPagesCount: number;
+    pagination: {
+      total: number;
+      perPage: number;
+      currentPage: number;
     };
   }>(() => axiosAuth.get(url, { params: searchParams }));
 
   if (result.success) {
-    const { data, metaData } = result.data;
+    const { data, pagination } = result.data;
+    const totalPages = Math.ceil(pagination.total / pagination.perPage);
+
     return {
       success: true,
       data: {
         data: data || [],
-        pageCount: metaData?.totalPagesCount || 0,
-      }
+        totalPages, // Include totalPages in the response
+      },
     };
   }
 
   return result;
 }
+
 export async function fetchSingleData<T>(
   url: string
 ): Promise<Result<ApiSingleResponse<T>>> {
@@ -70,10 +78,9 @@ export async function fetchSingleData<T>(
   if (result.success) {
     return {
       success: true,
-      data: { data: result.data.data }
+      data: { data: result.data.data },
     };
   }
 
   return result;
 }
-
