@@ -57,80 +57,6 @@ import { createAndGetCart } from "@/lib/actions/cart/action/cart";
 import { CloudCog } from "lucide-react";
 import { ICart } from "@/lib/actions/cart/type/cart-type";
 
-const products = [
-  {
-    id: 1,
-    name: "Ocean Mist Farms Green Leaf Lettuce",
-    quantity: 5,
-    price: "$86.98",
-    imageUrl:
-      "https://storage.googleapis.com/a1aa/image/fSi9N4mCefaf2SdOSSz4v5OKThC5NnH5jFHVPpP5eKaYLcjdC.jpg",
-  },
-  {
-    id: 2,
-    name: "Organic Spring Mix",
-    quantity: 2,
-    price: "$23.90",
-    imageUrl:
-      "https://storage.googleapis.com/a1aa/image/p4pre5oJ7vQvRiJFohUgNRTaeSi06w4eZJ5pQeZSyyn5FuxOB.jpg",
-  },
-  {
-    id: 3,
-    name: "Freshness Guaranteed Mango Spears",
-    quantity: 4,
-    price: "$47.35",
-    imageUrl:
-      "https://storage.googleapis.com/a1aa/image/GdSqZDQuiPpOOp5VNByJFgVymKgMowjxPYte0pbM5thuwN2JA.jpg",
-  },
-  {
-    id: 4,
-    name: "Freshness Guaranteed Mango Spears",
-    quantity: 4,
-    price: "$47.35",
-    imageUrl:
-      "https://storage.googleapis.com/a1aa/image/GdSqZDQuiPpOOp5VNByJFgVymKgMowjxPYte0pbM5thuwN2JA.jpg",
-  },
-  {
-    id: 4,
-    name: "Freshness Guaranteed Mango Spears",
-    quantity: 4,
-    price: "$47.35",
-    imageUrl:
-      "https://storage.googleapis.com/a1aa/image/GdSqZDQuiPpOOp5VNByJFgVymKgMowjxPYte0pbM5thuwN2JA.jpg",
-  },
-  {
-    id: 4,
-    name: "Freshness Guaranteed Mango Spears",
-    quantity: 4,
-    price: "$47.35",
-    imageUrl:
-      "https://storage.googleapis.com/a1aa/image/GdSqZDQuiPpOOp5VNByJFgVymKgMowjxPYte0pbM5thuwN2JA.jpg",
-  },
-  {
-    id: 4,
-    name: "Freshness Guaranteed Mango Spears",
-    quantity: 4,
-    price: "$47.35",
-    imageUrl:
-      "https://storage.googleapis.com/a1aa/image/GdSqZDQuiPpOOp5VNByJFgVymKgMowjxPYte0pbM5thuwN2JA.jpg",
-  },
-  {
-    id: 4,
-    name: "Freshness Guaranteed Mango Spears",
-    quantity: 4,
-    price: "$47.35",
-    imageUrl:
-      "https://storage.googleapis.com/a1aa/image/GdSqZDQuiPpOOp5VNByJFgVymKgMowjxPYte0pbM5thuwN2JA.jpg",
-  },
-  {
-    id: 4,
-    name: "Freshness Guaranteed Mango Spears",
-    quantity: 4,
-    price: "$47.35",
-    imageUrl:
-      "https://storage.googleapis.com/a1aa/image/GdSqZDQuiPpOOp5VNByJFgVymKgMowjxPYte0pbM5thuwN2JA.jpg",
-  },
-];
 interface Category {
   title: string;
   icon: React.ReactNode;
@@ -154,25 +80,18 @@ const categories: Category[] = [
     items: ["Tường", "trần", "sàn", "vật tư nội thất", "vật tư ngoại thất"],
   },
 ];
-const orderSummary = {
-  subTotal: "$861.50",
-  discount: "-$3.00",
-  deliveryFee: "$8.24",
-  totalCost: "$867.00",
-};
+
 export default function Header() {
   const router = useRouter();
 
   // const [isLogin, setIsLogin] = useState(false);
 
   const { data: session } = useSession();
-  console.log(session?.user.accessToken);
+  // console.log(session?.user.accessToken);
 
   const isLogin = session?.user;
 
   const [count, setCount] = useState(1);
-  const increment = () => setCount(count + 1);
-  const decrement = () => setCount(count - 1);
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(event.target.value);
     if (!isNaN(value)) {
@@ -183,29 +102,62 @@ export default function Header() {
   };
 
   // const [isOpenCart, setIsOpenCart] = useState(false);
+  const [totalItemPrice, setTotalItemPrice] = useState(0);
   const [cartData, setCartData] = useState<ICart[]>([]);
   const [isPending, startTransition] = useTransition();
   const { cartItem } = useShoppingContext();
 
+  useEffect(() => {
+    // Calculate total itemTotalPrice whenever cartData changes
+    const total = cartData.reduce((sum, item) => sum + item.itemTotalPrice, 0);
+    setTotalItemPrice(total);
+  }, [cartData]);
+
+  const incrementQuantity = (materialId: string) => {
+    const updatedItems = cartData.map((item) =>
+      item.materialId === materialId
+        ? {
+            ...item,
+            qty: item.quantity + 1,
+            itemTotalPrice: (item.quantity + 1) * item.basePrice,
+          }
+        : item
+    );
+    setCartData(updatedItems);
+  };
+
+  const decrementQuantity = (materialId: string) => {
+    const updatedItems = cartData.map((item) =>
+      item.materialId === materialId && item.quantity > 1
+        ? {
+            ...item,
+            qty: item.quantity - 1,
+            itemTotalPrice: (item.quantity - 1) * item.basePrice,
+          }
+        : item
+    );
+    setCartData(updatedItems);
+  };
+
   const handleOpenCartModal = () => {
-    // cartItems : [{} ,{} ,{}]
     const dataToSend = { cartItems: cartItem };
+
     startTransition(async () => {
       const result = await createAndGetCart(dataToSend);
 
-      // hiển thị ?? => viết state [] , lưu list đó , thêm isLoading
-      setCartData(result.data);
-      console.log("data ne" + cartData);
-      if (!result.data) {
-        // toast.error(result.error);
-        console.log("fail");
-        return;
+      if (result && result.data) {
+        // Update cartData and reset total price based on response
+        setCartData(result.data);
+        console.log("datane" + result.data);
+      } else {
+        console.log("Failed to fetch cart data");
       }
-      // toast.success("Cập nhật dịch vụ thành công!");
     });
-    // setIsOpenCart(!isOpenCart);
   };
-
+  useEffect(() => {
+    localStorage.setItem("cartItem", JSON.stringify(cartItem));
+    handleOpenCartModal(); // Update modal data with latest cart information
+  }, [cartItem]);
   return (
     <nav className="bg-[#fff] shadow-lg mb-2">
       <div className="max-w-[85%] mx-auto px-4 sm:px-6 lg:px-8 py-3 border-b">
@@ -311,49 +263,60 @@ export default function Header() {
                               <table className="w-full text-left">
                                 <thead className="bg-gray-100">
                                   <tr>
-                                    <th className="py-2 px-4">Items Name</th>
-                                    <th className="py-2 px-4">Quantity</th>
-                                    <th className="py-2 px-4">Price</th>
+                                    <th className="py-2 px-4">Tên sản phẩm</th>
+                                    <th className="py-2 px-4">Số lượng</th>
+                                    <th className="py-2 px-4">Giá</th>
                                     <th className="py-2 px-4">Xóa</th>
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {products.map((product) => (
-                                    <tr key={product.id} className="border-b">
+                                  {cartData.map((product) => (
+                                    <tr
+                                      key={product.materialId}
+                                      className="border-b"
+                                    >
                                       <td className="py-2 px-4 flex items-center">
                                         <img
                                           src={product.imageUrl}
-                                          alt={product.name}
+                                          alt={product.itemName}
                                           className="w-20 h-20 mr-4"
                                           width="50"
                                           height="50"
                                         />
-                                        {product.name}
+                                        {product.itemName}
                                       </td>
                                       <td className="py-2 px-4">
                                         <div className="flex items-center justify-center">
                                           <button
+                                            onClick={() =>
+                                              decrementQuantity(
+                                                product.materialId
+                                              )
+                                            }
                                             className="px-2 py-2"
-                                            onClick={decrement}
                                           >
                                             -
                                           </button>
                                           <input
                                             type="text"
-                                            value={count}
-                                            onChange={handleChange}
+                                            value={product.quantity}
+                                            readOnly
                                             className="w-8 text-center border-l border-r"
                                           />
                                           <button
+                                            onClick={() =>
+                                              incrementQuantity(
+                                                product.materialId
+                                              )
+                                            }
                                             className="px-2 py-2"
-                                            onClick={increment}
                                           >
                                             +
                                           </button>
                                         </div>
                                       </td>
                                       <td className="py-2 px-4">
-                                        {product.price}
+                                        {product.basePrice}
                                       </td>
                                       <td className="px-4">
                                         <HoverCard
@@ -382,21 +345,17 @@ export default function Header() {
                             <div>
                               <div className="mt-6">
                                 <div className="flex justify-between py-1">
-                                  <span>Sub total:</span>
-                                  <span>{orderSummary.subTotal}</span>
+                                  <span>Tổng tiền:</span>
+                                  <span>{totalItemPrice}</span>
                                 </div>
                                 <div className="flex justify-between py-1">
-                                  <span>Discount:</span>
-                                  <span>{orderSummary.discount}</span>
-                                </div>
-                                <div className="flex justify-between py-1">
-                                  <span>Delivery Fee:</span>
-                                  <span>{orderSummary.deliveryFee}</span>
+                                  <span>Giảm giá:</span>
+                                  <span>0%</span>
                                 </div>
                                 <hr className="my-2" />
                                 <div className="flex justify-between py-1 font-bold">
-                                  <span>Total Cost:</span>
-                                  <span>{orderSummary.totalCost}</span>
+                                  <span>Thành tiền:</span>
+                                  <span>{totalItemPrice}</span>
                                 </div>
                               </div>
                               <div className="mt-6 flex justify-end space-x-4">
@@ -407,10 +366,6 @@ export default function Header() {
                                   Tiền tới thanh toán
                                 </button>
                               </div>
-                              {cartData.map((item, index) => (
-                                <div key={index}>{item.itemName}</div>
-                              ))}
-                              ;
                             </div>
                           </div>
                         </div>
@@ -483,6 +438,7 @@ export default function Header() {
             <li>
               <Button
                 size="lg"
+                onClick={() => router.push("/")}
                 className="text-xl font-semibold text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none py-7"
               >
                 Trang chủ
@@ -492,6 +448,7 @@ export default function Header() {
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
+                    onClick={() => router.push("/product")}
                     size="lg"
                     className="text-xl font-semibold text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none py-7"
                   >

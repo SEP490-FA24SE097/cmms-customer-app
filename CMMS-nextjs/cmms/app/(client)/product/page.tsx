@@ -82,6 +82,7 @@ import {
   useShoppingContext,
 } from "@/context/shopping-cart-context";
 import { IMaterial } from "@/lib/actions/materials/type/material-type";
+import { useRouter } from "next/navigation";
 
 const top100Films = [
   { title: "The Shawshank Redemption", year: 1994 },
@@ -120,6 +121,8 @@ const valuetext = (value: number) => {
 };
 
 export default function Listing() {
+  const router = useRouter();
+
   const [value, setValue] = useState([100000, 200000]);
   const [count, setCount] = useState(1);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -160,12 +163,14 @@ export default function Listing() {
 
   const { addCartItem } = useShoppingContext();
 
-
-
-  const handleAddToCart = (material: IMaterial) => {
+  const handleAddToCart = (material: IMaterial, variantId?: string) => {
     const materialId = material.material.id;
-    const storeId = material.material.id;
-    const data = { materialId, storeId } as MaterialStore;
+    const storeId = "c73a57e3-12b2-41dc-b150-11a91702ba0a";
+    const data = {
+      materialId,
+      storeId,
+      ...(variantId && { variantId }),
+    } as MaterialStore;
 
     addCartItem(data);
   };
@@ -224,8 +229,11 @@ export default function Listing() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink className="text-xl" href="/">
-                  Home
+                <BreadcrumbLink
+                  className="text-xl"
+                  onClick={() => router.push("/")}
+                >
+                  Trang chủ
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
@@ -425,7 +433,11 @@ export default function Listing() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pt-8">
           {data?.data.map((product, index) => (
-            <div key={product.material.id} className="">
+            <div
+              key={product.material.id}
+              onClick={() => router.push(`/product/${product.material.id}`)}
+              className="cursor-pointer"
+            >
               <Card
                 className="pt-6 max-h-[550px] overflow-hidden hover:overflow-y-auto [&::-webkit-scrollbar]:w-2 rounded-sm
                 [&::-webkit-scrollbar-track]:bg-gray-100
@@ -728,7 +740,13 @@ export default function Listing() {
                     </div>
                     <div>
                       <button
-                        onClick={() => handleAddToCart(product)}
+                        // onClick={() => handleAddToCart(product)}
+                        onClick={() =>
+                          handleAddToCart(
+                            product,
+                            product.variants[0]?.variantId
+                          )
+                        }
                         className="px-3 py-2 font-semibold text-sm bg-red-300 hover:bg-red-400 text-white rounded-md shadow-sm group-hover:scale-125 ease-in-out duration-300 "
                       >
                         <RiShoppingCart2Line size={25} />

@@ -5,7 +5,7 @@ import { QueryProvider } from "@/providers/query-provider";
 import { Toaster } from "@/components/ui/toaster";
 import SessionProviders from "@/providers/session-provider";
 import { ShoppingContextProvider } from "@/context/shopping-cart-context";
-
+import NextTopLoader from "nextjs-toploader";
 const roboto = Roboto({ weight: "400", subsets: ["vietnamese"] });
 
 // const geistSans = localFont({
@@ -32,6 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${roboto.className} antialiased`}>
+        <NextTopLoader height={5} />
         <SessionProviders>
           <QueryProvider>
             <ShoppingContextProvider>{children}</ShoppingContextProvider>

@@ -12,12 +12,14 @@ type CartItem = {
   qty: number;
   materialId: string,
   storeId: string,
+  variantId: string,
 };
 
 // type product
 export type MaterialStore = {
   materialId: string,
   storeId: string,
+  variantId: string,
 }
 
 // tạo return của hook
@@ -76,29 +78,27 @@ export const ShoppingContextProvider = ({
 //     0
 //   );
 
-  const addCartItem = (material: MaterialStore) => {
-    console.log(material);
-    if (material) {
-      const currentCartItem = cartItem.find(
-        (item) => item.materialId  === material.materialId
-      ); 
+const addCartItem = (material: MaterialStore) => {
+  if (material) {
+    const currentCartItem = cartItem.find(
+      (item) => item.materialId === material.materialId && item.variantId === material.variantId
+    );
 
-      if (currentCartItem) {
-        const newItems = cartItem.map((item) => {
-          if (material.materialId === item.materialId) {
-            return { ...item, qty: item.qty + 1 };
-          } else {
-            return item;
-          }
-        });
-
-        setCartItem(newItems);
-      } else {
-        const newItem = { ...material, qty: 1 };
-        setCartItem([...cartItem, newItem]);
-      }
+    if (currentCartItem) {
+      const newItems = cartItem.map((item) => {
+        if (item.materialId === material.materialId && item.variantId === material.variantId) {
+          return { ...item, qty: item.qty + 1 };
+        } else {
+          return item;
+        }
+      });
+      setCartItem(newItems);
+    } else {
+      const newItem = { ...material, qty: 1 };
+      setCartItem([...cartItem, newItem]);
     }
-  };
+  }
+};
 
   return (
     <ShoppingContext.Provider

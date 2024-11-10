@@ -16,10 +16,8 @@ import {
 // form mẫu fetch list
 export async function getMaterials(): Promise<ApiListResponse<IMaterial>> {
   noStore();
-  
-  const result = await fetchListData<IMaterial>(
-    "/materials?page=1&itemPerPage=10", 
-  );
+
+  const result = await fetchListData<IMaterial>("/materials");
 
   if (!result.success) {
     return { data: [], pageCount: 0, error: result.error };
@@ -28,17 +26,15 @@ export async function getMaterials(): Promise<ApiListResponse<IMaterial>> {
   return result.data;
 }
 
-
 // form mẫu fetch object => data by id
-export async function getMaterialById(id: string) : Promise<ApiSingleResponse<IMaterial>> {
+export async function getMaterialById(
+  id: string
+): Promise<ApiSingleResponse<IMaterial>> {
+  const result = await fetchSingleData<IMaterial>(`/materials/${id}`);
 
-    const result = await fetchSingleData<IMaterial>(
-        `/materials/${id}`
-    )
+  if (!result.success) {
+    return { data: null, error: result.error };
+  }
 
-    if(!result.success){
-        return {data: null, error:result.error}
-    }
-
-    return result.data
+  return result.data;
 }

@@ -48,6 +48,13 @@ import Rating from "@mui/material/Rating";
 
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { CiHeart } from "react-icons/ci";
+import { useParams } from "next/navigation";
+import { useGetMaterialById } from "@/lib/actions/materials/react-query/material-query";
+import {
+  MaterialStore,
+  useShoppingContext,
+} from "@/context/shopping-cart-context";
+import { IMaterial } from "@/lib/actions/materials/type/material-type";
 export default function DetailsPage() {
   const productData = {
     name: "Seeds of Change Organic Quinoa, Brown",
@@ -230,9 +237,42 @@ export default function DetailsPage() {
       priceIcon: "fas fa-tag",
     },
   ];
+  const { addCartItem } = useShoppingContext();
+  const handleAddToCart = () => {
+    if (!materialData) return;
+    const materialId = materialData.data?.material.id;
+    const storeId = "c73a57e3-12b2-41dc-b150-11a91702ba0a";
+    const data = {
+      materialId,
+      storeId,
+      ...(selectedVariant && { variantId: selectedVariant }),
+    } as MaterialStore;
+
+    addCartItem(data);
+  };
+  const { id } = useParams();
+  const { data: materialData, isLoading: isLoadingMaterialData } =
+    useGetMaterialById(id.toString());
+  if (!isLoadingMaterialData) <div>...Loading</div>;
+  const images = [
+    {
+      src: materialData?.data?.material.imageUrl,
+      alt: "Main product image",
+    },
+    // Spread the subImages array, if it exists
+    // ...(materialData?.data?.material.subImages || []).map(
+    //   (subImage, index) => ({
+    //     src: subImage,
+    //     alt: `Sub image ${index + 1}`,
+    //   })
+    // ),
+    ...(materialData?.data?.variants || []).map((variant, index) => ({
+      src: variant.image,
+      alt: `Variant image ${index + 1}`,
+    })),
+  ];
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
   const [count, setCount] = useState(1);
   const [comment, setComment] = useState("");
   const [name, setName] = useState("");
@@ -276,14 +316,11 @@ export default function DetailsPage() {
   };
   const increment = () => setCount(count + 1);
   const decrement = () => setCount(count - 1);
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(event.target.value);
-    if (!isNaN(value)) {
-      setCount(value);
-    } else {
-      setCount(0);
-    }
+  const handleVariantClick = (variantId: string) => {
+    setSelectedVariant(variantId);
   };
+
+  // console.log(selectedVariant);
 
   return (
     <div className="bg-gray-100">
@@ -310,12 +347,12 @@ export default function DetailsPage() {
           </Breadcrumb>
         </div>
         <div className="bg-white p-6 rounded-sm shadow-lg">
-          <div className="container mx-auto grid gap-8 md:grid-cols-2">
+          <div className="container mx-auto grid gap-8 md:grid-cols-2 ">
             <div>
-              <div className="w-full sm:h-[600px] h-[40vh] m-auto py-5 relative group">
+              <div className="w-full sm:h-[55vh] h-[40vh] m-auto py-5 relative group">
                 <div
                   style={{
-                    backgroundImage: `url(${productData.images[currentIndex].src})`,
+                    backgroundImage: `url(${images[currentIndex].src})`,
                   }}
                   onClick={handleClick}
                   className="w-full h-full rounded-xl bg-center bg-cover duration-500 cursor-pointer"
@@ -346,7 +383,7 @@ export default function DetailsPage() {
                   <div className="relative w-full max-w-4xl">
                     {/* Full-size Image */}
                     <img
-                      src={productData.images[currentIndex].src}
+                      src={images[currentIndex].src}
                       alt=""
                       className="w-full h-auto rounded-lg"
                     />
@@ -376,7 +413,7 @@ export default function DetailsPage() {
                     className="w-full max-w-sm"
                   >
                     <CarouselContent className="-ml-1">
-                      {productData.images.map((slide, slideIndex) => (
+                      {images.map((slide, slideIndex) => (
                         <CarouselItem
                           key={slideIndex}
                           className="pl-1 basis-1/4"
@@ -418,12 +455,14 @@ export default function DetailsPage() {
                   Sale Off
                 </span>
               </div>
-              <h1 className="text-3xl font-bold">{productData.name}</h1>
+              <h1 className="text-3xl font-bold">
+                {materialData?.data?.material.name}
+              </h1>
 
               <div className="flex items-center">
                 <Rating
                   name="half-rating-read"
-                  defaultValue={productData.rating}
+                  defaultValue={4}
                   precision={0.5}
                   readOnly
                 />
@@ -432,49 +471,44 @@ export default function DetailsPage() {
 
               <div className="flex items-center space-x-2">
                 <span className="text-3xl font-bold text-red-500">
-                  {productData.price}đ
+                  {materialData?.data?.material.salePrice}đ
                 </span>
                 <span className="text-gray-500 line-through">
-                  {productData.originalPrice}đ
+                  {materialData?.data?.material.salePrice}đ
                 </span>
-                <span className="text-red-500 text-sm">
-                  {productData.discount}
-                </span>
+                <span className="text-red-500 text-sm">20%</span>
               </div>
 
-              <p className="text-gray-600">{productData.description}</p>
+              <p className="text-gray-600">
+                {materialData?.data?.material.description}
+              </p>
 
               <div>
-                <span className="text-gray-600">Size / Weight:</span>
+                <span className="text-gray-600">Các loại</span>
                 <div className="flex items-center mt-2 space-x-2">
-                  {productData.sizeOptions.map((size, index) => (
-                    <button
+                  {materialData?.data?.variants.map((variant, index) => (
+                    <div
                       key={index}
-                      onClick={() => setSelectedSize(size)}
-                      className={`px-3 hover:bg-red-100 hover:text-red-600 py-1 border rounded ${
-                        selectedSize === size ? "bg-red-100 text-red-600" : ""
-                      }`}
+                      onClick={() => handleVariantClick(variant.variantId)}
+                      className={`flex items-center border p-3 mb-3 ${
+                        selectedVariant === variant.variantId
+                          ? "bg-red-100 text-red-600"
+                          : "hover:bg-red-100 hover:text-red-600"
+                      } `}
                     >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Color Options */}
-              <div>
-                <span className="text-gray-600">Màu sắc:</span>
-                <div className="flex items-center mt-2 space-x-2">
-                  {productData.colors.map((color, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setSelectedColor(color)}
-                      className={`px-3 hover:bg-red-100 hover:text-red-600 py-1 border rounded ${
-                        selectedColor === color ? "bg-red-100 text-red-600" : ""
-                      }`}
-                    >
-                      {color}
-                    </button>
+                      <img
+                        src={variant.image}
+                        alt={`Variant ${index + 1}`}
+                        className="w-16 h-10 object-cover mb-2"
+                      />
+                      <div className="flex gap-2 mt-2">
+                        {variant.attributes.map((attribute, idx) => (
+                          <button key={idx} className="flex py-1">
+                            {attribute.name}: {attribute.value}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -487,44 +521,21 @@ export default function DetailsPage() {
                   <input
                     type="text"
                     value={count}
-                    onChange={handleChange}
                     className="w-12 text-center border-l border-r"
                   />
                   <button className="px-3 py-2" onClick={increment}>
                     +
                   </button>
                 </div>
-                <button className="flex items-center px-6 py-2 bg-red-500 text-white rounded">
+                <button
+                  onClick={handleAddToCart}
+                  className="flex items-center px-6 py-2 bg-red-500 text-white rounded"
+                >
                   <i className="fas fa-shopping-cart mr-2"></i> Thêm vào vỏ hàng
                 </button>
                 <button className="px-2 py-2 border rounded hover:bg-red-500 hover:text-white transition ease-in-out duration-500 hover:-translate-y-2">
                   <CiHeart size={25} className="font-bold" />
                 </button>
-              </div>
-
-              <div className="space-y-1">
-                <p className="text-gray-600">
-                  <span className="font-semibold">Type:</span> Organic
-                </p>
-                <p className="text-gray-600">
-                  <span className="font-semibold">SKU:</span> {productData.sku}
-                </p>
-                <p className="text-gray-600">
-                  <span className="font-semibold">MFG:</span>{" "}
-                  {productData.mfgDate}
-                </p>
-                <p className="text-gray-600">
-                  <span className="font-semibold">LIFE:</span>{" "}
-                  {productData.shelfLife}
-                </p>
-                <p className="text-gray-600">
-                  <span className="font-semibold">Tags:</span>{" "}
-                  {productData.tags.join(", ")}
-                </p>
-                <p className="text-gray-600">
-                  <span className="font-semibold">Stock:</span>{" "}
-                  {productData.stock} Items In Stock
-                </p>
               </div>
             </div>
           </div>
