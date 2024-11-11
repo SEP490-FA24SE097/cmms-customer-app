@@ -4,7 +4,7 @@ import HomePage from "./home/home";
 import { getMaterials } from "@/lib/actions/materials/action/material-action";
 
 export default async function Home() {
-  const material = await getMaterials();
+
 
   // console.log(material.data);
   return (

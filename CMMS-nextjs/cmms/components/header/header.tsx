@@ -23,9 +23,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-
+import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
 import {
   Popover,
   PopoverContent,
@@ -42,21 +41,16 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useShoppingContext } from "@/context/shopping-cart-context";
 import { createAndGetCart } from "@/lib/actions/cart/action/cart";
-import { CloudCog } from "lucide-react";
 import { ICart } from "@/lib/actions/cart/type/cart-type";
-
+import { useGetBrand } from "@/lib/actions/brand/react-query/brand-query";
+import Link from "next/link";
 interface Category {
   title: string;
   icon: React.ReactNode;
@@ -85,21 +79,12 @@ export default function Header() {
   const router = useRouter();
 
   // const [isLogin, setIsLogin] = useState(false);
+  const { data: brandData, isLoading: isLoadingBrand } = useGetBrand();
 
   const { data: session } = useSession();
   // console.log(session?.user.accessToken);
 
   const isLogin = session?.user;
-
-  const [count, setCount] = useState(1);
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(event.target.value);
-    if (!isNaN(value)) {
-      setCount(value);
-    } else {
-      setCount(0);
-    }
-  };
 
   // const [isOpenCart, setIsOpenCart] = useState(false);
   const [totalItemPrice, setTotalItemPrice] = useState(0);
@@ -148,7 +133,6 @@ export default function Header() {
       if (result && result.data) {
         // Update cartData and reset total price based on response
         setCartData(result.data);
-        console.log("datane" + result.data);
       } else {
         console.log("Failed to fetch cart data");
       }
@@ -163,7 +147,7 @@ export default function Header() {
       <div className="max-w-[85%] mx-auto px-4 sm:px-6 lg:px-8 py-3 border-b">
         <div className="grid grid-cols-1 md:grid-cols-5 space-y-5 md:space-y-0 items-center justify-between md:h-16">
           <div className="flex items-center md:col-span-3">
-            <div className="flex items-center">
+            <div onClick={() => router.push("/")} className="flex items-center">
               <div className="flex-shrink-0 flex flex-row gap-2 items-center">
                 <Image
                   src="/logo.svg"
@@ -261,7 +245,7 @@ export default function Header() {
                       <div className="border-t">
                         <div className="max-w-2xl mx-auto bg-white text-black">
                           <div>
-                            <div className="h-[50vh] 2xl:h-[60vh] overflow-hidden overflow-y-auto">
+                            <div className="max-h-[50vh] 2xl:max-h-[60vh] overflow-hidden overflow-y-auto">
                               <table className="w-full text-left">
                                 <thead className="bg-gray-100">
                                   <tr>
@@ -509,81 +493,21 @@ export default function Header() {
                 <PopoverContent className="w-60">
                   <div className="max-h-[400px] overflow-y-auto">
                     <ul className="flex flex-col">
-                      <li className="border-b">
-                        <Button className="w-full text-[18px] font-normal text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none">
-                          SamSung
-                        </Button>
-                      </li>
-                      <li className="border-b">
-                        <Button className="w-full text-[18px] font-normal text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none">
-                          SamSung
-                        </Button>
-                      </li>
-                      <li className="border-b">
-                        <Button className="w-full text-[18px] font-normal text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none">
-                          SamSung
-                        </Button>
-                      </li>
-                      <li className="border-b">
-                        <Button className="w-full text-[18px] font-normal text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none">
-                          SamSung
-                        </Button>
-                      </li>
-                      <li className="border-b">
-                        <Button className="w-full text-[18px] font-normal text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none">
-                          SamSung
-                        </Button>
-                      </li>
-                      <li className="border-b">
-                        <Button className="w-full text-[18px] font-normal text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none">
-                          SamSung
-                        </Button>
-                      </li>
-                      <li className="border-b">
-                        <Button className="w-full text-[18px] font-normal text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none">
-                          SamSung
-                        </Button>
-                      </li>
-                      <li className="border-b">
-                        <Button className="w-full text-[18px] font-normal text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none">
-                          SamSung
-                        </Button>
-                      </li>
-                      <li className="border-b">
-                        <Button className="w-full text-[18px] font-normal text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none">
-                          SamSung
-                        </Button>
-                      </li>
-                      <li className="border-b">
-                        <Button className="w-full text-[18px] font-normal text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none">
-                          SamSung
-                        </Button>
-                      </li>
-                      <li className="border-b">
-                        <Button className="w-full text-[18px] font-normal text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none">
-                          SamSung
-                        </Button>
-                      </li>
-                      <li className="border-b">
-                        <Button className="w-full text-[18px] font-normal text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none">
-                          SamSung
-                        </Button>
-                      </li>
-                      <li className="border-b">
-                        <Button className="w-full text-[18px] font-normal text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none">
-                          SamSung
-                        </Button>
-                      </li>
-                      <li className="border-b">
-                        <Button className="w-full text-[18px] font-normal text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none">
-                          SamSung
-                        </Button>
-                      </li>
-                      <li className="border-b">
-                        <Button className="w-full text-[18px] font-normal text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none">
-                          SamSung
-                        </Button>
-                      </li>
+                      {isLoadingBrand ? (
+                        <div>
+                          <Skeleton className="h-4 w-[200px]" />
+                        </div>
+                      ) : (
+                        brandData?.data.map((item, index) => (
+                          <li key={index} id={item.id} className="border-b">
+                            <Link href={`/product?brandId=${item.id}`}>
+                              <Button className="w-full text-[18px] font-normal text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none">
+                                {item.name}
+                              </Button>
+                            </Link>
+                          </li>
+                        ))
+                      )}
                     </ul>
                   </div>
                 </PopoverContent>

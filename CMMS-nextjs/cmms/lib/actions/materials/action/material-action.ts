@@ -9,15 +9,20 @@ import {
   ApiListResponse,
   ApiSingleResponse,
   apiRequest,
-  fetchListData,
+  fetchListDataWithPagi,
   fetchSingleData,
 } from "@/lib/api/api-handler/generic";
 
 // form mẫu fetch list
-export async function getMaterials(searchParams: Record<string, string | number | boolean>): Promise<ApiListResponse<IMaterial>> {
+export async function getMaterials(
+  searchParams: Record<string, string | number | boolean>
+): Promise<ApiListResponse<IMaterial>> {
   noStore();
 
-  const result = await fetchListData<IMaterial>("/materials",searchParams);
+  const result = await fetchListDataWithPagi<IMaterial>(
+    "/materials",
+    searchParams
+  );
 
   if (!result.success) {
     return { data: [], pageCount: 0, error: result.error };
@@ -31,7 +36,6 @@ export async function getMaterialById(
   id: string
 ): Promise<ApiSingleResponse<IMaterial>> {
   const result = await fetchSingleData<IMaterial>(`/materials/${id}`);
-
   if (!result.success) {
     return { data: null, error: result.error };
   }

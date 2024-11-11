@@ -41,7 +41,7 @@ export async function apiRequest<T>(
   }
 }
 
-export async function fetchListData<T>(
+export async function fetchListDataWithPagi<T>(
   url: string,
   searchParams?: Record<string, any>
 ): Promise<Result<ApiListResponse<T>>> {
@@ -67,6 +67,28 @@ export async function fetchListData<T>(
     };
   }
 
+  return result;
+}
+
+export async function fetchListData<T>(
+  url: string,
+  searchParams?: Record<string, any>
+): Promise<Result<ApiListResponse<T>>> {
+  const result = await apiRequest<{
+    data: T[];
+    metaData: {
+      totalItemsCount: number;
+      pageSize: number;
+      totalPagesCount: number;
+    };
+  }>(() => axiosAuth.get(url, { params: searchParams }));
+  if (result.success) {
+    const { data, metaData } = result.data;
+    return {
+      success: true,
+      data: { data: data || [], pageCount: metaData?.totalPagesCount || 0 },
+    };
+  }
   return result;
 }
 

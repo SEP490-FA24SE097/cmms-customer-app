@@ -42,6 +42,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+
 const fakeData = [
   {
     title: "Cơ bản",

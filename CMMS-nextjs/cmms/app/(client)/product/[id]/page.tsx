@@ -56,44 +56,6 @@ import {
 } from "@/context/shopping-cart-context";
 import { IMaterial } from "@/lib/actions/materials/type/material-type";
 export default function DetailsPage() {
-  const productData = {
-    name: "Seeds of Change Organic Quinoa, Brown",
-    price: 38,
-    originalPrice: 52,
-    discount: "26% Off",
-    rating: 4,
-    description:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam rem officia, corrupti reiciendis minima nisi modi, quasi, odio minus dolore impedit fuga eum eligendi.",
-    sizeOptions: ["50g", "60g", "80g", "100g", "150g"],
-    colors: ["Xanh", "Đỏ", "Vàng", "Tím", "Hồng"],
-    sku: "FWM15VKT",
-    mfgDate: "Jun 4, 2022",
-    shelfLife: "70 days",
-    tags: ["Snack", "Organic", "Brown"],
-    stock: 8,
-    images: [
-      {
-        src: "https://storage.googleapis.com/a1aa/image/SFugHfITaRQGLyavvykKGxIs1e5hLff8trk68uBVudegeaA7E.jpg",
-        alt: "Main product image",
-      },
-      {
-        src: "https://storage.googleapis.com/a1aa/image/Pt3asJ56WfwJICsfzigVqFFzaiL2fJs87zfLHIw3c53OvGwOB.jpg",
-        alt: "Mango juice",
-      },
-      {
-        src: "https://storage.googleapis.com/a1aa/image/CVaoYsf7EaW3cyQ5PO0rJNJqHygiftgG9v4d4EXau6GwrBsTA.jpg",
-        alt: "Bananas",
-      },
-      {
-        src: "https://storage.googleapis.com/a1aa/image/C0XU1GB0Ic5RFNLgehfcGFac0chmuDqUceOX8AIB4qJeuGwOB.jpg",
-        alt: "Sliced watermelon",
-      },
-      {
-        src: "https://storage.googleapis.com/a1aa/image/teabFYGONcWDba9e5R5fWDUTmL8WZPOyrZiUSaJGhJccXDYnA.jpg",
-        alt: "Durian fruit",
-      },
-    ],
-  };
   const reviews = [
     {
       name: "Sienna",
@@ -280,14 +242,12 @@ export default function DetailsPage() {
   const [website, setWebsite] = useState("");
   const prevSlide = () => {
     const isFirstSlide = currentIndex === 0;
-    const newIndex = isFirstSlide
-      ? productData.images.length - 1
-      : currentIndex - 1;
+    const newIndex = isFirstSlide ? images.length - 1 : currentIndex - 1;
     setCurrentIndex(newIndex);
   };
 
   const nextSlide = () => {
-    const isLastSlide = currentIndex === productData.images.length - 1;
+    const isLastSlide = currentIndex === images.length - 1;
     const newIndex = isLastSlide ? 0 : currentIndex + 1;
     setCurrentIndex(newIndex);
   };
@@ -680,7 +640,7 @@ export default function DetailsPage() {
                 <form className="space-y-4">
                   <Rating
                     name="half-rating-read"
-                    defaultValue={productData.rating}
+                    defaultValue={4}
                     precision={0.5}
                   />
                   <textarea

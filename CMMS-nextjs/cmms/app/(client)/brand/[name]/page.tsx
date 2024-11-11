@@ -26,10 +26,12 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { FaRegEye } from "react-icons/fa";
 import { CiHeart } from "react-icons/ci";
 import { RiShoppingCart2Line } from "react-icons/ri";
-
+import { FaHeart } from "react-icons/fa";
 import Rating from "@mui/material/Rating";
 import {
   Dialog,
@@ -40,27 +42,36 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+
 import { Card, CardContent } from "@/components/ui/card";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-
+import Box from "@mui/material/Box";
+import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { Button } from "@/components/ui/button";
-
+import { TiDeleteOutline } from "react-icons/ti";
 import InputAdornment from "@mui/material/InputAdornment";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
+import { MdFilterList } from "react-icons/md";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import Slider from "@mui/material/Slider";
 import {
   useGetMaterial,
@@ -70,33 +81,35 @@ import {
   MaterialStore,
   useShoppingContext,
 } from "@/context/shopping-cart-context";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useGetBrand } from "@/lib/actions/brand/react-query/brand-query";
-import { useGetCategory } from "@/lib/actions/categories/react-query/category-query";
+const top100Films = [
+  { title: "The Shawshank Redemption", year: 1994 },
+  { title: "The Godfather", year: 1972 },
+  { title: "The Godfather: Part II", year: 1974 },
+  { title: "The Dark Knight", year: 2008 },
+  { title: "12 Angry Men", year: 1957 },
+  { title: "Schindler's List", year: 1993 },
+  { title: "Pulp Fiction", year: 1994 },
+];
+const colorfake = [
+  { title: "Đỏ(Red)" },
+  { title: "Đỏ(Red)" },
+  { title: "Đỏ(Red)" },
+  { title: "Đỏ(Red)" },
+  { title: "Đỏ(Red)" },
+  { title: "Đỏ(Red)" },
+];
+const filter = ["sam sung", "toshiba"];
 
-export default function Listing() {
+const valuetext = (value: number) => {
+  return `${value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}đ`;
+};
+
+export default function Brand() {
   const router = useRouter();
-  const sParams = useSearchParams();
-  const brandId = sParams.get("brandId");
-  useEffect(() => {
-    if (brandId) {
-      setSelectedBrand(brandId);
 
-      // Remove brandId from the URL
-      const params = new URLSearchParams(window.location.search);
-      params.delete("brandId");
-
-      // Use shallow routing to update the URL without refreshing the page
-      router.replace(
-        `${window.location.pathname}?${params.toString()}`,
-        undefined
-      );
-    }
-  }, [brandId, router]);
-
-  const { data: brandData, isLoading: isLoadingBrand } = useGetBrand();
-  const { data: categoryData, isLoading: isLoadingCategory } = useGetCategory();
+  const [value, setValue] = useState([100000, 200000]);
   const [count, setCount] = useState(1);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -106,78 +119,58 @@ export default function Listing() {
   >({
     page: currentPage,
     itemPerPage: 2,
-    brandId: "",
-    categoryId: "",
-    lowerPrice: "",
-    upperPrice: "",
+
+    // You can set default params here if needed
   });
-  const [selectedBrand, setSelectedBrand] = useState<string>("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [selectedSort, setSelectedSort] = useState<string>("");
-  const [value, setValue] = useState<number[]>([10000, 1000000]); // initial price range
 
   const { data, isLoading } = useGetMaterial(searchParams);
   // console.log(data);
 
   const handleSelectChange = (value: string) => {
-    setSelectedSort(value); // Update the selected sort option
-    setSearchParams((prevParams) => {
-      switch (value) {
-        case "1":
-          return {
-            ...prevParams,
-            isCreatedDateDescending: true,
-            isPriceDescending: false,
-          };
-        case "2":
-          return {
-            ...prevParams,
-            isCreatedDateDescending: false,
-            isPriceDescending: false,
-          };
-        case "4":
-          return {
-            ...prevParams,
-            isCreatedDateDescending: false,
-            isPriceDescending: true,
-          };
-        case "5":
-          return {
-            ...prevParams,
-            isCreatedDateDescending: false,
-            isPriceDescending: false,
-          };
-        default:
-          return prevParams;
-      }
-    });
+    switch (value) {
+      case "1":
+        setSearchParams((prevParams) => ({
+          ...prevParams,
+          isCreatedDateDescending: true,
+          isPriceDescending: false,
+        }));
+        break;
+      case "2":
+        setSearchParams((prevParams) => ({
+          ...prevParams,
+          isCreatedDateDescending: false,
+          isPriceDescending: false,
+        }));
+        break;
+      case "3":
+        setSearchParams((prevParams) => ({
+          ...prevParams,
+          // Set params for rating if needed
+        }));
+        break;
+      case "4":
+        setSearchParams((prevParams) => ({
+          ...prevParams,
+          isCreatedDateDescending: false,
+          isPriceDescending: true,
+        }));
+        break;
+      case "5":
+        setSearchParams((prevParams) => ({
+          ...prevParams,
+          isCreatedDateDescending: false,
+          isPriceDescending: false,
+        }));
+        break;
+      default:
+        break;
+    }
   };
   const totalPages = data?.totalPages || 1;
   useEffect(() => {
-    setSearchParams((prevParams) => ({
-      ...prevParams,
-      page: currentPage,
-      brandId: selectedBrand,
-      categoryId: selectedCategory,
-      lowerPrice: value[0],
-      upperPrice: value[1],
-    }));
-  }, [currentPage, selectedBrand, selectedCategory, value]);
+    setSearchParams((prevParams) => ({ ...prevParams, page: currentPage }));
+  }, [currentPage]);
 
-  const clearFilters = () => {
-    setSearchParams({
-      page: 1,
-      itemPerPage: 2,
-      brandId: "",
-      categoryId: "",
-      lowerPrice: "",
-      upperPrice: "",
-    });
-    setSelectedBrand("");
-    setSelectedCategory("");
-    setSelectedSort("");
-    setValue([10000, 1000000]); // Reset price range to initial values
-  };
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
@@ -211,6 +204,7 @@ export default function Listing() {
   if (!isLoadingMaterialData) <div>...Loading</div>;
   // console.log(data?.data);
   // console.log(materialData?.data);
+
   const { addCartItem } = useShoppingContext();
   const handleVariantClick = (variantId: string) => {
     setSelectedVariant(variantId);
@@ -230,7 +224,6 @@ export default function Listing() {
   const handleChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number[]);
   };
-
   const prevSlide = () => {
     const isFirstSlide = currentIndex === 0;
     const newIndex = isFirstSlide ? images.length - 1 : currentIndex - 1;
@@ -268,6 +261,14 @@ export default function Listing() {
 
   const increment = () => setCount(count + 1);
   const decrement = () => setCount(count - 1);
+  const handleChange1 = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(event.target.value);
+    if (!isNaN(value)) {
+      setCount(value);
+    } else {
+      setCount(0);
+    }
+  };
   return (
     <div className="bg-gray-100">
       <div className="max-w-[85%] mx-auto">
@@ -302,14 +303,145 @@ export default function Listing() {
           <div className="flex justify-between items-center px-5 pt-4 pb-2">
             <div className="text-xl font-bold text-red-500">Trang sản phẩm</div>
             <div className="flex items-center gap-2">
-              <Button
-                className="text-md hover:text-red-500"
-                variant="ghost"
-                onClick={clearFilters}
-              >
-                Xóa bộ lọc
-              </Button>
-              <Select value={selectedSort} onValueChange={handleSelectChange}>
+              <div>
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="outline">
+                      <MdFilterList size={20} />
+                      Bộ lọc
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left">
+                    <SheetHeader>
+                      <SheetTitle>Bộ lọc tìm kiếm</SheetTitle>
+                      <SheetDescription></SheetDescription>
+                    </SheetHeader>
+                    <div className="pt-5 space-y-5">
+                      <div>
+                        <h2 className="text-xl text-black font-semibold pb-2">
+                          Thương hiệu
+                        </h2>
+                        <Autocomplete
+                          multiple
+                          limitTags={2}
+                          id="multiple-limit-tags"
+                          options={top100Films}
+                          getOptionLabel={(option) => option.title}
+                          defaultValue={[top100Films[1], top100Films[0]]}
+                          renderInput={(params) => (
+                            <TextField {...params} label="Thương hiệu" />
+                          )}
+                          sx={{ width: "full" }}
+                          disablePortal
+                        />
+                      </div>
+                      <div>
+                        <h2 className="text-xl text-black font-semibold pb-2">
+                          Phân loại
+                        </h2>
+                        <Autocomplete
+                          multiple
+                          limitTags={2}
+                          id="multiple-limit-tags"
+                          options={top100Films}
+                          getOptionLabel={(option) => option.title}
+                          defaultValue={[top100Films[1], top100Films[0]]}
+                          renderInput={(params) => (
+                            <TextField {...params} label="Phân loại" />
+                          )}
+                          sx={{ width: "full" }}
+                          disablePortal
+                        />
+                      </div>
+                      <div>
+                        <h2 className="text-xl text-black font-semibold pb-2">
+                          Màu sắc
+                        </h2>
+                        <Autocomplete
+                          multiple
+                          limitTags={2}
+                          id="multiple-limit-tags"
+                          options={colorfake}
+                          getOptionLabel={(option) => option.title}
+                          defaultValue={[colorfake[1], colorfake[0]]}
+                          renderInput={(params) => (
+                            <TextField {...params} label="Màu sắc" />
+                          )}
+                          sx={{ width: "full" }}
+                          disablePortal
+                        />
+                      </div>
+                      <div>
+                        <h2 className="text-xl text-black font-semibold pb-2">
+                          Giá tiền
+                        </h2>
+                        <Slider
+                          min={10000}
+                          step={10000}
+                          max={1000000}
+                          getAriaLabel={() => "Khoản tiền"}
+                          value={value}
+                          onChange={handleChange}
+                          valueLabelDisplay="auto"
+                          getAriaValueText={valuetext}
+                        />
+                        <div className="flex justify-between mt-4 gap-5">
+                          <TextField
+                            label="Từ"
+                            size="small"
+                            value={value[0]}
+                            onChange={(e) =>
+                              setValue([Number(e.target.value), value[1]])
+                            }
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  đ
+                                </InputAdornment>
+                              ),
+                            }}
+                            variant="outlined"
+                          />
+                          <TextField
+                            label="Đến"
+                            size="small"
+                            value={value[1]}
+                            onChange={(e) =>
+                              setValue([value[0], Number(e.target.value)])
+                            }
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  đ
+                                </InputAdornment>
+                              ),
+                            }}
+                            variant="outlined"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <SheetClose className="mt-10">
+                      <div className="flex space-x-5">
+                        <Button
+                          className="text-lg font-semibold py-6"
+                          type="submit"
+                        >
+                          Tìm kiếm
+                        </Button>
+                        <Button
+                          className="text-lg font-semibold py-6 bg-gray-200"
+                          variant="outline"
+                          type="submit"
+                        >
+                          Xóa bộ lọc
+                        </Button>
+                      </div>
+                    </SheetClose>
+                  </SheetContent>
+                </Sheet>
+              </div>
+              <Select onValueChange={handleSelectChange}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Mặc định" />
                 </SelectTrigger>
@@ -329,96 +461,23 @@ export default function Listing() {
             </span>
             <div className="flex-grow border-t border-gray-200"></div>
           </div>
-          <div className="flex items-center justify-between px-5 py-4 ">
-            <div className="flex items-center space-x-2">
-              <Slider
-                min={10000}
-                step={10000}
-                max={1000000}
-                getAriaLabel={() => "Khoản tiền"}
-                value={value}
-                onChange={handleChange}
-                valueLabelDisplay="auto"
-              />
-              <div className="flex justify-between pl-5 gap-5">
-                <TextField
-                  label="Từ"
-                  size="small"
-                  value={value[0]}
-                  onChange={(e) => setValue([Number(e.target.value), value[1]])}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">đ</InputAdornment>
-                    ),
-                  }}
-                  variant="outlined"
-                />
-                <TextField
-                  label="Đến"
-                  size="small"
-                  value={value[1]}
-                  onChange={(e) => setValue([value[0], Number(e.target.value)])}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">đ</InputAdornment>
-                    ),
-                  }}
-                  variant="outlined"
-                />
-              </div>
-            </div>
-            <div className="flex space-x-5">
-              <div>
-                <Select
-                  value={selectedBrand} // Bind value to selectedBrand for controlled behavior
-                  onValueChange={(value) => setSelectedBrand(value)}
+          <div className="flex items-center px-5 py-4 ">
+            <div className="space-x-2">
+              {filter.map((item, index) => (
+                <Button
+                  className="bg-slate-200 rounded-full hover:bg-slate-300 h-7 text-black"
+                  key={index}
                 >
-                  <SelectTrigger className="w-full sm:w-[200px]">
-                    <SelectValue placeholder="Chọn thương hiệu" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Thương hiệu</SelectLabel>
-                      {brandData?.data.map((item, index) => (
-                        <SelectItem
-                          key={index}
-                          onClick={() => setSelectedBrand(item.id)}
-                          value={item.id}
-                        >
-                          {item.name}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Select
-                  value={selectedCategory}
-                  onValueChange={(value) => setSelectedCategory(value)}
-                >
-                  <SelectTrigger className="w-full sm:w-[200px]">
-                    <SelectValue placeholder="Chọn loại" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Sản phẩm</SelectLabel>
-                      {categoryData?.data.map((item, index) =>
-                        item.subCategories.map((subItem, subIndex) => (
-                          <SelectItem
-                            key={subIndex}
-                            onClick={() => setSelectedCategory(subItem.id)}
-                            value={subItem.id}
-                          >
-                            {subItem.name}
-                          </SelectItem>
-                        ))
-                      )}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
+                  {item} <TiDeleteOutline />
+                </Button>
+              ))}
             </div>
+            <Button
+              variant="ghost"
+              className="rounded-full hover:bg-slate-300 h-7 mx-2 text-slate-500"
+            >
+              Xóa bộ lọc
+            </Button>
           </div>
         </div>
         {isLoading ? (
@@ -570,6 +629,8 @@ export default function Listing() {
                                           </CarouselItem>
                                         ))}
                                       </CarouselContent>
+                                      <CarouselPrevious />
+                                      <CarouselNext />
                                     </Carousel>
                                     {/* {productData.images.map((slide, slideIndex) => (
                     <img
@@ -657,7 +718,7 @@ export default function Listing() {
                                                   key={idx}
                                                   className="flex py-1"
                                                 >
-                                                  {attribute.name}:
+                                                  {attribute.name}:{" "}
                                                   {attribute.value}
                                                 </button>
                                               )
@@ -693,7 +754,7 @@ export default function Listing() {
                                     onClick={handleAddToCart}
                                     className="flex items-center px-6 py-2 bg-red-500 text-white rounded"
                                   >
-                                    <i className="fas fa-shopping-cart mr-2"></i>
+                                    <i className="fas fa-shopping-cart mr-2"></i>{" "}
                                     Thêm vào vỏ hàng
                                   </button>
                                   <button className="px-2 py-2 border rounded hover:bg-red-500 hover:text-white transition ease-in-out duration-500 hover:-translate-y-2">
