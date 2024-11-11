@@ -29,7 +29,7 @@ import {
 import { FaRegEye } from "react-icons/fa";
 import { CiHeart } from "react-icons/ci";
 import { RiShoppingCart2Line } from "react-icons/ri";
-
+import { useToast } from "@/hooks/use-toast";
 import Rating from "@mui/material/Rating";
 import {
   Dialog,
@@ -46,8 +46,8 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-
-import TextField from "@mui/material/TextField";
+import { FaStore } from "react-icons/fa";
+import TextField from "@mui/material/TextField";   
 import { Button } from "@/components/ui/button";
 
 import InputAdornment from "@mui/material/InputAdornment";
@@ -67,6 +67,7 @@ import {
   useGetMaterialById,
 } from "@/lib/actions/materials/react-query/material-query";
 import {
+  CartItem,
   MaterialStore,
   useShoppingContext,
 } from "@/context/shopping-cart-context";
@@ -74,9 +75,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetBrand } from "@/lib/actions/brand/react-query/brand-query";
 import { useGetCategory } from "@/lib/actions/categories/react-query/category-query";
-
+import { useGetQuantityStore } from "@/lib/actions/material_in_store/react-query/material-qty-store-query";
 export default function Listing() {
   const router = useRouter();
+  const { toast } = useToast();
   const sParams = useSearchParams();
   const brandId = sParams.get("brandId");
   useEffect(() => {
@@ -94,13 +96,15 @@ export default function Listing() {
       );
     }
   }, [brandId, router]);
+  const [materialId, setMaterialId] = useState<string | null>("8fcded53-6a10-4219-a938-75f49fe645ec");
+  const { data: materialData, isLoading: isLoadingMaterialData } =
+    useGetMaterialById(materialId || "");
 
   const { data: brandData, isLoading: isLoadingBrand } = useGetBrand();
   const { data: categoryData, isLoading: isLoadingCategory } = useGetCategory();
   const [count, setCount] = useState(1);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useState<
     Record<string, string | number | boolean>
   >({
@@ -111,11 +115,29 @@ export default function Listing() {
     lowerPrice: "",
     upperPrice: "",
   });
+  const [selectedVariant, setSelectedVariant] = useState<string | null>(
+    materialData?.data?.variants[0]?.variantId ?? null
+  );
+  const [selectedVariantName, setSelectedVariantName] = useState<string | null>(
+    materialData?.data?.variants[0]?.sku ?? null
+  );
+  const { data: storeQuantityData, isLoading: isLoadingStoreQuantity } =
+    useGetQuantityStore(searchParams);
+  const handleVariantNameClick = (variantName: string) => {
+    setSelectedVariantName(variantName);
+  };
+  const handleStoreClick = (storeId: string, quantity: number) => {
+    setSelectedStoreId(storeId);
+    setAvailableQuantity(quantity);
+  };
   const [selectedBrand, setSelectedBrand] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedSort, setSelectedSort] = useState<string>("");
-  const [value, setValue] = useState<number[]>([10000, 1000000]); // initial price range
-
+  const [value, setValue] = useState<number[]>([0, 1000000]); // initial price range
+  const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
+  const [availableQuantity, setAvailableQuantity] = useState<number | null>(
+    null
+  );
   const { data, isLoading } = useGetMaterial(searchParams);
 
   const handleSelectChange = (value: string) => {
@@ -175,19 +197,22 @@ export default function Listing() {
     setSelectedBrand("");
     setSelectedCategory("");
     setSelectedSort("");
-    setValue([10000, 1000000]); // Reset price range to initial values
+    setValue([0, 1000000]); // Reset price range to initial values
   };
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
   };
-  const [materialId, setMaterialId] = useState<string>(
-    "8fcded53-6a10-4219-a938-75f49fe645ec"
-  );
   // id => const materialId = "8fcded53-6a10-4219-a938-75f49fe645ec"
-  const { data: materialData, isLoading: isLoadingMaterialData } =
-    useGetMaterialById(materialId);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10);
+    if (value > 0) {
+      setCount(value);
+    } else {
+      setCount(1); // Reset to 1 if input is zero or negative
+    }
+  };
   const images = [
     {
       src: materialData?.data?.material.imageUrl,
@@ -214,17 +239,63 @@ export default function Listing() {
   const handleVariantClick = (variantId: string) => {
     setSelectedVariant(variantId);
   };
+  const [cartItem, setCartItem] = useState<CartItem[]>([]);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const jsonCartData = localStorage.getItem("cartItem");
+      if (jsonCartData) {
+        try {
+          setCartItem(JSON.parse(jsonCartData));
+        } catch (error) {
+          console.error("Error parsing cart data from localStorage:", error);
+        }
+      }
+    }
+  }, []);
   const handleAddToCart = () => {
     if (!materialData) return;
+    if (!selectedStoreId) {
+      toast({
+        title: "Vui lòng chọn của hàng.",
+        style: { backgroundColor: "#3b82f6", color: "#ffffff" },
+      });
+      return;
+    }
     const materialId = materialData.data?.material.id;
-    const storeId = "c73a57e3-12b2-41dc-b150-11a91702ba0a";
+    const existingCartItem = cartItem.find(
+      (item) =>
+        item.materialId === materialId &&
+        item.variantId === selectedVariant &&
+        item.storeId === selectedStoreId
+    );
+
+    const currentCartQuantity = existingCartItem
+      ? existingCartItem.quantity
+      : 0;
+    const totalQuantity = currentCartQuantity + count;
+
+    // Check if total quantity exceeds available quantity
+    if (availableQuantity !== null && totalQuantity > availableQuantity) {
+      toast({
+        title: `Số lượng vượt quá giới hạn! Chỉ còn ${
+          availableQuantity - currentCartQuantity
+        } sản phẩm có sẵn.`,
+        variant: "destructive",
+      });
+      return;
+    }
     const data = {
       materialId,
-      storeId,
+      quantity: count,
+      ...(selectedStoreId && { storeId: selectedStoreId }),
       ...(selectedVariant && { variantId: selectedVariant }),
     } as MaterialStore;
 
-    addCartItem(data);
+    addCartItem(data, count);
+    toast({
+      title: `Đã thêm ${count} sản phẩm vào giỏ hàng.`,
+      style: { backgroundColor: "#10b981", color: "#ffffff" }, // Green background for success
+    });
   };
   const handleChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number[]);
@@ -331,7 +402,7 @@ export default function Listing() {
           <div className="flex items-center justify-between px-5 py-4 ">
             <div className="flex items-center space-x-2">
               <Slider
-                min={10000}
+                min={0}
                 step={10000}
                 max={1000000}
                 getAriaLabel={() => "Khoản tiền"}
@@ -569,6 +640,8 @@ export default function Listing() {
                                           </CarouselItem>
                                         ))}
                                       </CarouselContent>
+                                      <CarouselPrevious />
+                                      <CarouselNext />
                                     </Carousel>
                                     {/* {productData.images.map((slide, slideIndex) => (
                     <img
@@ -592,7 +665,9 @@ export default function Listing() {
                                   </span>
                                 </div>
                                 <h1 className="text-3xl font-bold">
-                                  {materialData?.data?.material.name}
+                                  {selectedVariantName
+                                    ? selectedVariantName
+                                    : materialData?.data?.material.name}
                                 </h1>
 
                                 <div className="flex items-center">
@@ -627,17 +702,18 @@ export default function Listing() {
                                   <span className="text-gray-600">
                                     Các loại
                                   </span>
-                                  <div className="flex items-center mt-2 space-x-2">
+                                  <div className="flex items-center space-x-2">
                                     {materialData?.data?.variants.map(
                                       (variant, index) => (
                                         <div
                                           key={index}
-                                          onClick={() =>
+                                          onClick={() => {
                                             handleVariantClick(
                                               variant.variantId
-                                            )
-                                          }
-                                          className={`flex items-center border p-3 mb-3 ${
+                                            );
+                                            handleVariantNameClick(variant.sku);
+                                          }}
+                                          className={`flex items-center border p-1 ${
                                             selectedVariant ===
                                             variant.variantId
                                               ? "bg-red-100 text-red-600"
@@ -647,17 +723,21 @@ export default function Listing() {
                                           <img
                                             src={variant.image}
                                             alt={`Variant ${index + 1}`}
-                                            className="w-16 h-10 object-cover mb-2"
+                                            className="w-12 h-12 object-cover"
                                           />
-                                          <div className="flex gap-2 mt-2">
+                                          <div className="flex-col mt-2">
                                             {variant.attributes.map(
                                               (attribute, idx) => (
                                                 <button
                                                   key={idx}
-                                                  className="flex py-1"
+                                                  className="flex text-[14px] items-center"
                                                 >
-                                                  {attribute.name}:
-                                                  {attribute.value}
+                                                  <div className="capitalize font-bold">
+                                                    {attribute.name}:&nbsp;
+                                                  </div>
+                                                  <div className="capitalize">
+                                                    {attribute.value}
+                                                  </div>
                                                 </button>
                                               )
                                             )}
@@ -666,6 +746,55 @@ export default function Listing() {
                                       )
                                     )}
                                   </div>
+                                </div>
+                                <div>
+                                  {storeQuantityData?.data &&
+                                  storeQuantityData.data.length > 0 ? (
+                                    <div>
+                                      <h2>
+                                        Hiện tại có{" "}
+                                        <span className="font-bold">
+                                          {storeQuantityData.data.length}
+                                        </span>{" "}
+                                        chi nhánh còn sản phẩm
+                                      </h2>
+                                      <ul className="w-[300px] max-h-[100px] overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
+                                        {storeQuantityData.data.map(
+                                          (item, index) => (
+                                            <li key={index}>
+                                              <Button
+                                                onClick={() =>
+                                                  handleStoreClick(
+                                                    item.storeId,
+                                                    item.quantity
+                                                  )
+                                                }
+                                                variant="ghost"
+                                                className={`flex justify-start ${
+                                                  selectedStoreId ===
+                                                  item.storeId
+                                                    ? "bg-red-100 text-red-600"
+                                                    : "hover:bg-red-100 hover:text-red-600"
+                                                } w-full text-blue-500`}
+                                              >
+                                                <p className="flex pl-2 items-center gap-3">
+                                                  <FaStore />
+                                                  {item.storeName}
+                                                  &nbsp;có:
+                                                  <span className="font-bold">
+                                                    {item.quantity}&nbsp;sản
+                                                    phẩm
+                                                  </span>
+                                                </p>
+                                              </Button>
+                                            </li>
+                                          )
+                                        )}
+                                      </ul>
+                                    </div>
+                                  ) : (
+                                    <p>Sản phẩm này hiện không còn hàng</p>
+                                  )}
                                 </div>
 
                                 <div className="flex items-center space-x-4">
@@ -679,6 +808,7 @@ export default function Listing() {
                                     <input
                                       type="text"
                                       value={count}
+                                      onChange={handleInputChange}
                                       className="w-12 text-center border-l border-r"
                                     />
                                     <button
@@ -688,13 +818,21 @@ export default function Listing() {
                                       +
                                     </button>
                                   </div>
-                                  <button
-                                    onClick={handleAddToCart}
-                                    className="flex items-center px-6 py-2 bg-red-500 text-white rounded"
-                                  >
-                                    <i className="fas fa-shopping-cart mr-2"></i>
-                                    Thêm vào vỏ hàng
-                                  </button>
+                                  {storeQuantityData?.data &&
+                                  storeQuantityData.data.length > 0 ? (
+                                    <button
+                                      onClick={handleAddToCart}
+                                      className="flex items-center px-6 py-2 bg-red-500 text-white rounded"
+                                    >
+                                      <i className="fas fa-shopping-cart mr-2"></i>{" "}
+                                      Thêm vào vỏ hàng
+                                    </button>
+                                  ) : (
+                                    <button className="flex items-center px-6 py-2 bg-gray-600 text-white rounded">
+                                      <i className="fas fa-shopping-cart mr-2"></i>{" "}
+                                      Thêm vào vỏ hàng
+                                    </button>
+                                  )}
                                   <button className="px-2 py-2 border rounded hover:bg-red-500 hover:text-white transition ease-in-out duration-500 hover:-translate-y-2">
                                     <CiHeart size={25} className="font-bold" />
                                   </button>

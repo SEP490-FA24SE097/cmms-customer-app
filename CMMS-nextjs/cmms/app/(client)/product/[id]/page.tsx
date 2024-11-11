@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,9 +9,9 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { RiShoppingCart2Line } from "react-icons/ri";
 import { FaHeart } from "react-icons/fa";
 import { FaRegEye } from "react-icons/fa";
+import { FaStore } from "react-icons/fa";
 import {
   Card,
   CardContent,
@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Carousel,
@@ -45,16 +46,17 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import Rating from "@mui/material/Rating";
-
+import { useToast } from "@/hooks/use-toast";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { CiHeart } from "react-icons/ci";
 import { useParams } from "next/navigation";
 import { useGetMaterialById } from "@/lib/actions/materials/react-query/material-query";
+import { useGetQuantityStore } from "@/lib/actions/material_in_store/react-query/material-qty-store-query";
 import {
+  CartItem,
   MaterialStore,
   useShoppingContext,
 } from "@/context/shopping-cart-context";
-import { IMaterial } from "@/lib/actions/materials/type/material-type";
 export default function DetailsPage() {
   const reviews = [
     {
@@ -199,23 +201,109 @@ export default function DetailsPage() {
       priceIcon: "fas fa-tag",
     },
   ];
+  const { toast } = useToast();
   const { addCartItem } = useShoppingContext();
+  const [cartItem, setCartItem] = useState<CartItem[]>([]);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const jsonCartData = localStorage.getItem("cartItem");
+      if (jsonCartData) {
+        try {
+          setCartItem(JSON.parse(jsonCartData));
+        } catch (error) {
+          console.error("Error parsing cart data from localStorage:", error);
+        }
+      }
+    }
+  }, []);
+
   const handleAddToCart = () => {
     if (!materialData) return;
+
+    if (!selectedStoreId) {
+      toast({
+        title: "Vui lòng chọn cửa hàng.",
+        style: { backgroundColor: "#3b82f6", color: "#ffffff" },
+      });
+      return;
+    }
+
     const materialId = materialData.data?.material.id;
-    const storeId = "c73a57e3-12b2-41dc-b150-11a91702ba0a";
+    console.log("Looking for:", {
+      materialId,
+      selectedVariant,
+      selectedStoreId,
+    });
+
+    cartItem.forEach((item) => {
+      console.log("Cart item:", {
+        materialId: item.materialId,
+        variantId: item.variantId,
+        storeId: item.storeId,
+      });
+
+      console.log(
+        "Match check:",
+        item.materialId === materialId,
+        item.variantId === selectedVariant,
+        item.storeId === selectedStoreId
+      );
+    });
+
+    const existingCartItem = cartItem.find(
+      (item) =>
+        item.materialId === materialId &&
+        item.variantId === selectedVariant &&
+        item.storeId === selectedStoreId
+    );
+
+    if (!existingCartItem) {
+      console.error("No matching item found in cart.");
+    } else {
+      console.log("Matching item found:", existingCartItem);
+    }
+
+    // Set the current cart quantity based on existing item or default to 0
+    const currentCartQuantity = existingCartItem
+      ? existingCartItem.quantity
+      : 0;
+
+    // Calculate the total quantity after adding
+    const totalQuantity = currentCartQuantity + count;
+
+    // Check if total quantity exceeds available quantity
+    if (availableQuantity !== null && totalQuantity > availableQuantity) {
+      toast({
+        title: `Số lượng vượt quá giới hạn! Chỉ còn ${
+          availableQuantity - currentCartQuantity
+        } sản phẩm có sẵn.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     const data = {
       materialId,
-      storeId,
+      quantity: count,
+      ...(selectedStoreId && { storeId: selectedStoreId }),
       ...(selectedVariant && { variantId: selectedVariant }),
     } as MaterialStore;
 
-    addCartItem(data);
+    // Add item to cart
+    addCartItem(data, count);
+
+    // Display success toast
+    toast({
+      title: `Đã thêm ${count} sản phẩm vào giỏ hàng.`,
+      style: { backgroundColor: "#10b981", color: "#ffffff" }, // Green background for success
+    });
   };
+
   const { id } = useParams();
   const { data: materialData, isLoading: isLoadingMaterialData } =
     useGetMaterialById(id.toString());
   if (!isLoadingMaterialData) <div>...Loading</div>;
+
   const images = [
     {
       src: materialData?.data?.material.imageUrl,
@@ -234,12 +322,21 @@ export default function DetailsPage() {
     })),
   ];
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
+  const [selectedVariant, setSelectedVariant] = useState<string | null>(
+    materialData?.data?.variants[0]?.variantId ?? null
+  );
+  const [selectedVariantName, setSelectedVariantName] = useState<string | null>(
+    materialData?.data?.variants[0]?.sku ?? null
+  );
+  const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
   const [count, setCount] = useState(1);
   const [comment, setComment] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [website, setWebsite] = useState("");
+  const [availableQuantity, setAvailableQuantity] = useState<number | null>(
+    null
+  );
   const prevSlide = () => {
     const isFirstSlide = currentIndex === 0;
     const newIndex = isFirstSlide ? images.length - 1 : currentIndex - 1;
@@ -275,12 +372,37 @@ export default function DetailsPage() {
     openModal();
   };
   const increment = () => setCount(count + 1);
-  const decrement = () => setCount(count - 1);
+  const decrement = () => {
+    if (count > 1) {
+      setCount(count - 1);
+    }
+  };
+
   const handleVariantClick = (variantId: string) => {
     setSelectedVariant(variantId);
   };
+  const handleVariantNameClick = (variantName: string) => {
+    setSelectedVariantName(variantName);
+  };
+  const handleStoreClick = (storeId: string, quantity: number) => {
+    setSelectedStoreId(storeId);
+    setAvailableQuantity(quantity);
+  };
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10);
+    if (value > 0) {
+      setCount(value);
+    } else {
+      setCount(1); // Reset to 1 if input is zero or negative
+    }
+  };
+  const searchParams = {
+    materialId: materialData?.data?.material.id,
+    variantId: selectedVariant,
+  };
 
-  // console.log(selectedVariant);
+  const { data: storeQuantityData, isLoading: isLoadingStoreQuantity } =
+    useGetQuantityStore(searchParams);
 
   return (
     <div className="bg-gray-100">
@@ -416,7 +538,9 @@ export default function DetailsPage() {
                 </span>
               </div>
               <h1 className="text-3xl font-bold">
-                {materialData?.data?.material.name}
+                {selectedVariantName
+                  ? selectedVariantName
+                  : materialData?.data?.material.name}
               </h1>
 
               <div className="flex items-center">
@@ -445,12 +569,15 @@ export default function DetailsPage() {
 
               <div>
                 <span className="text-gray-600">Các loại</span>
-                <div className="flex items-center mt-2 space-x-2">
+                <div className="flex items-center space-x-2">
                   {materialData?.data?.variants.map((variant, index) => (
                     <div
                       key={index}
-                      onClick={() => handleVariantClick(variant.variantId)}
-                      className={`flex items-center border p-3 mb-3 ${
+                      onClick={() => {
+                        handleVariantClick(variant.variantId);
+                        handleVariantNameClick(variant.sku);
+                      }}
+                      className={`flex items-center border p-1 ${
                         selectedVariant === variant.variantId
                           ? "bg-red-100 text-red-600"
                           : "hover:bg-red-100 hover:text-red-600"
@@ -459,18 +586,66 @@ export default function DetailsPage() {
                       <img
                         src={variant.image}
                         alt={`Variant ${index + 1}`}
-                        className="w-16 h-10 object-cover mb-2"
+                        className="w-12 h-12 object-cover"
                       />
-                      <div className="flex gap-2 mt-2">
+                      <div className="flex-col mt-2">
                         {variant.attributes.map((attribute, idx) => (
-                          <button key={idx} className="flex py-1">
-                            {attribute.name}: {attribute.value}
+                          <button
+                            key={idx}
+                            className="flex text-[14px] items-center"
+                          >
+                            <div className="capitalize font-bold">
+                              {attribute.name}:&nbsp;
+                            </div>
+                            <div className="capitalize">{attribute.value}</div>
                           </button>
                         ))}
                       </div>
                     </div>
                   ))}
                 </div>
+              </div>
+              <div>
+                {storeQuantityData?.data &&
+                storeQuantityData.data.length > 0 ? (
+                  <div>
+                    <h2>
+                      Hiện tại có{" "}
+                      <span className="font-bold">
+                        {storeQuantityData.data.length}
+                      </span>{" "}
+                      chi nhánh còn sản phẩm
+                    </h2>
+                    <ul className="w-[300px] max-h-[100px] overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
+                      {storeQuantityData.data.map((item, index) => (
+                        <li key={index}>
+                          <Button
+                            onClick={() =>
+                              handleStoreClick(item.storeId, item.quantity)
+                            }
+                            variant="ghost"
+                            className={`flex justify-start ${
+                              selectedStoreId === item.storeId
+                                ? "bg-red-100 text-red-600"
+                                : "hover:bg-red-100 hover:text-red-600"
+                            } w-full text-blue-500`}
+                          >
+                            <p className="flex pl-2 items-center gap-3">
+                              <FaStore />
+                              {item.storeName}
+                              &nbsp;có:
+                              <span className="font-bold">
+                                {item.quantity}&nbsp;sản phẩm
+                              </span>
+                            </p>
+                          </Button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : (
+                  <p>Sản phẩm này hiện không còn hàng</p>
+                )}
               </div>
 
               <div className="flex items-center space-x-4">
@@ -481,18 +656,28 @@ export default function DetailsPage() {
                   <input
                     type="text"
                     value={count}
+                    onChange={handleInputChange}
                     className="w-12 text-center border-l border-r"
                   />
                   <button className="px-3 py-2" onClick={increment}>
                     +
                   </button>
                 </div>
-                <button
-                  onClick={handleAddToCart}
-                  className="flex items-center px-6 py-2 bg-red-500 text-white rounded"
-                >
-                  <i className="fas fa-shopping-cart mr-2"></i> Thêm vào vỏ hàng
-                </button>
+                {storeQuantityData?.data &&
+                storeQuantityData.data.length > 0 ? (
+                  <button
+                    onClick={handleAddToCart}
+                    className="flex items-center px-6 py-2 bg-red-500 text-white rounded"
+                  >
+                    <i className="fas fa-shopping-cart mr-2"></i> Thêm vào vỏ
+                    hàng
+                  </button>
+                ) : (
+                  <button className="flex items-center px-6 py-2 bg-gray-600 text-white rounded">
+                    <i className="fas fa-shopping-cart mr-2"></i> Thêm vào vỏ
+                    hàng
+                  </button>
+                )}
                 <button className="px-2 py-2 border rounded hover:bg-red-500 hover:text-white transition ease-in-out duration-500 hover:-translate-y-2">
                   <CiHeart size={25} className="font-bold" />
                 </button>

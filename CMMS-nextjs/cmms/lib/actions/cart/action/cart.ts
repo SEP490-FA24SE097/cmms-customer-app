@@ -16,7 +16,7 @@ export async function createAndGetCart(
   data: any
 ): Promise<ApiListResponse<ICart>> {
   noStore();
-  //   console.log(data);
+  // console.log(data);
 
   // const fakeData = {
   //   cartItems: [

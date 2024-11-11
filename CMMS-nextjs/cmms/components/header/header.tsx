@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useTransition } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -45,7 +46,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useShoppingContext } from "@/context/shopping-cart-context";
 import { createAndGetCart } from "@/lib/actions/cart/action/cart";
@@ -89,40 +89,22 @@ export default function Header() {
   // const [isOpenCart, setIsOpenCart] = useState(false);
   const [totalItemPrice, setTotalItemPrice] = useState(0);
   const [cartData, setCartData] = useState<ICart[]>([]);
+  const [cartQty1, setCartQty] = useState<number>();
   const [isPending, startTransition] = useTransition();
-  const { cartItem } = useShoppingContext();
+  const {
+    cartQty,
+    cartItem,
+    inscreateQty,
+    decreateQty,
+    removeCartItem,
+    updateQuantity,
+  } = useShoppingContext();
 
   useEffect(() => {
     // Calculate total itemTotalPrice whenever cartData changes
     const total = cartData.reduce((sum, item) => sum + item.itemTotalPrice, 0);
     setTotalItemPrice(total);
   }, [cartData]);
-
-  const incrementQuantity = (materialId: string) => {
-    const updatedItems = cartData.map((item) =>
-      item.materialId === materialId
-        ? {
-            ...item,
-            qty: item.quantity + 1,
-            itemTotalPrice: (item.quantity + 1) * item.basePrice,
-          }
-        : item
-    );
-    setCartData(updatedItems);
-  };
-
-  const decrementQuantity = (materialId: string) => {
-    const updatedItems = cartData.map((item) =>
-      item.materialId === materialId && item.quantity > 1
-        ? {
-            ...item,
-            qty: item.quantity - 1,
-            itemTotalPrice: (item.quantity - 1) * item.basePrice,
-          }
-        : item
-    );
-    setCartData(updatedItems);
-  };
 
   const handleOpenCartModal = () => {
     const dataToSend = { cartItems: cartItem };
@@ -140,6 +122,7 @@ export default function Header() {
   };
   useEffect(() => {
     localStorage.setItem("cartItem", JSON.stringify(cartItem));
+    setCartQty(cartQty);
     handleOpenCartModal(); // Update modal data with latest cart information
   }, [cartItem]);
   return (
@@ -148,19 +131,20 @@ export default function Header() {
         <div className="grid grid-cols-1 md:grid-cols-5 space-y-5 md:space-y-0 items-center justify-between md:h-16">
           <div className="flex items-center md:col-span-3">
             <div className="flex items-center">
-              <div className="flex-shrink-0 flex flex-row gap-2 items-center">
-                <Link href="/">
-                  <Image
-                    src="/logo.svg"
-                    width={80}
-                    height={80}
-                    alt="Picture of the author"
-                  />
-                  <h1 className="text-[15px] text-black font-bold lg:text-3xl">
-                    CMMS
-                  </h1>
-                </Link>
-              </div>
+              <Link
+                className="flex-shrink-0 flex flex-row gap-2 items-center"
+                href="/"
+              >
+                <Image
+                  src="/logo.svg"
+                  width={80}
+                  height={80}
+                  alt="Picture of the author"
+                />
+                <h1 className="text-[15px] text-black font-bold lg:text-3xl">
+                  CMMS
+                </h1>
+              </Link>
             </div>
             <div className="max-w-lg mr-auto ml-8">
               <form className="flex gap-2">
@@ -227,9 +211,11 @@ export default function Header() {
                   >
                     <div className="relative">
                       <TbShoppingCart size={25} />
-                      <span className="absolute top-0 right-0 grid min-h-[10px] min-w-[18px] text-[12px] font-bold translate-x-2/4 -translate-y-2/4 place-items-center rounded-full bg-red-400 text-white">
-                        4
-                      </span>
+                      {cartQty1 === 0 ? undefined : (
+                        <span className="absolute top-0 right-0 grid min-h-[10px] min-w-[18px] text-[12px] font-bold translate-x-2/4 -translate-y-2/4 place-items-center rounded-full bg-red-400 text-white">
+                          {cartQty1}
+                        </span>
+                      )}
                     </div>
                     <h3 className="hidden md:block">Vỏ hàng</h3>
                     <IoIosArrowDown className="hidden md:block" />
@@ -258,7 +244,7 @@ export default function Header() {
                                   {cartData.map((product) => (
                                     <tr
                                       key={product.materialId}
-                                      className="border-b"
+                                      className={`border-b`}
                                     >
                                       <td className="py-2 px-4 flex items-center">
                                         <img
@@ -269,13 +255,19 @@ export default function Header() {
                                           height="50"
                                         />
                                         {product.itemName}
+                                        {product.isChangeQuantity && (
+                                          <span className="ml-2 text-sm text-red-500">
+                                            Không đủ sản phẩm
+                                          </span>
+                                        )}
                                       </td>
                                       <td className="py-2 px-4">
                                         <div className="flex items-center justify-center">
                                           <button
                                             onClick={() =>
-                                              decrementQuantity(
-                                                product.materialId
+                                              decreateQty(
+                                                product.materialId,
+                                                product.variantId
                                               )
                                             }
                                             className="px-2 py-2"
@@ -285,13 +277,20 @@ export default function Header() {
                                           <input
                                             type="text"
                                             value={product.quantity}
-                                            readOnly
+                                            onChange={(e) =>
+                                              updateQuantity(
+                                                product.materialId,
+                                                product.variantId,
+                                                Number(e.target.value)
+                                              )
+                                            }
                                             className="w-8 text-center border-l border-r"
                                           />
                                           <button
                                             onClick={() =>
-                                              incrementQuantity(
-                                                product.materialId
+                                              inscreateQty(
+                                                product.materialId,
+                                                product.variantId
                                               )
                                             }
                                             className="px-2 py-2"
@@ -301,7 +300,7 @@ export default function Header() {
                                         </div>
                                       </td>
                                       <td className="py-2 px-4">
-                                        {product.basePrice}
+                                        {product.itemTotalPrice}
                                       </td>
                                       <td className="px-4">
                                         <HoverCard
@@ -310,7 +309,13 @@ export default function Header() {
                                         >
                                           <HoverCardTrigger>
                                             <RiDeleteBin6Line
-                                              className="text-red-400 hover:text-red-500"
+                                              onClick={() =>
+                                                removeCartItem(
+                                                  product.materialId,
+                                                  product.variantId
+                                                )
+                                              }
+                                              className="text-red-400 hover:text-red-500 cursor-pointer"
                                               size={25}
                                             />
                                           </HoverCardTrigger>
@@ -374,7 +379,7 @@ export default function Header() {
                         />
                         <AvatarFallback className="w-5 h-5">CN</AvatarFallback>
                       </Avatar>
-                      <h3 className="hidden sm:block">Cuong</h3>
+                      <h3 className="hidden sm:block">Tài khoản</h3>
                       <IoIosArrowDown className="hidden sm:block" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -421,19 +426,20 @@ export default function Header() {
         <div className="flex items-center justify-center h-14">
           <ul className="flex">
             <li>
-              <Button
-                size="lg"
-                onClick={() => router.push("/")}
-                className="text-xl font-semibold text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none py-7"
-              >
-                Trang chủ
-              </Button>
+              <Link href="/">
+                <Button
+                  size="lg"
+                  className="text-xl font-semibold text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none py-7"
+                >
+                  Trang chủ
+                </Button>
+              </Link>
             </li>
             <li>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
-                    onClick={() => router.push("/product")}
+                    // onClick={() => router.push("/product")}
                     size="lg"
                     className="text-xl font-semibold text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none py-7"
                   >
