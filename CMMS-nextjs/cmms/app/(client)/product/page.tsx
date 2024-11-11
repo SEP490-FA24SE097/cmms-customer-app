@@ -117,7 +117,6 @@ export default function Listing() {
   const [value, setValue] = useState<number[]>([10000, 1000000]); // initial price range
 
   const { data, isLoading } = useGetMaterial(searchParams);
-  // console.log(data);
 
   const handleSelectChange = (value: string) => {
     setSelectedSort(value); // Update the selected sort option
@@ -783,12 +782,14 @@ export default function Listing() {
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
-                  href={currentPage > 1 ? `#${currentPage - 1}` : undefined}
+                  onClick={() =>
+                    currentPage > 1 && handlePageChange(currentPage - 1)
+                  }
                   aria-disabled={currentPage === 1}
                   className={
                     currentPage === 1
                       ? "pointer-events-none opacity-50"
-                      : undefined
+                      : "cursor-pointer"
                   }
                 >
                   Previous Page
@@ -799,6 +800,7 @@ export default function Listing() {
                   <PaginationLink
                     isActive={currentPage === index + 1}
                     onClick={() => handlePageChange(index + 1)}
+                    className="cursor-pointer"
                   >
                     {index + 1}
                   </PaginationLink>
@@ -806,14 +808,15 @@ export default function Listing() {
               ))}
               <PaginationItem>
                 <PaginationNext
-                  href={
-                    currentPage < totalPages ? `#${currentPage + 1}` : undefined
+                  onClick={() =>
+                    currentPage < totalPages &&
+                    handlePageChange(currentPage + 1)
                   }
                   aria-disabled={currentPage === totalPages}
                   className={
                     currentPage === totalPages
                       ? "pointer-events-none opacity-50"
-                      : undefined
+                      : "cursor-pointer"
                   }
                 >
                   Next Page

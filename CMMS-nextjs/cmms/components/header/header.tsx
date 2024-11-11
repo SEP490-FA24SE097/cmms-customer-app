@@ -45,12 +45,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useShoppingContext } from "@/context/shopping-cart-context";
 import { createAndGetCart } from "@/lib/actions/cart/action/cart";
 import { ICart } from "@/lib/actions/cart/type/cart-type";
 import { useGetBrand } from "@/lib/actions/brand/react-query/brand-query";
-import Link from "next/link";
 interface Category {
   title: string;
   icon: React.ReactNode;
@@ -147,20 +147,19 @@ export default function Header() {
       <div className="max-w-[85%] mx-auto px-4 sm:px-6 lg:px-8 py-3 border-b">
         <div className="grid grid-cols-1 md:grid-cols-5 space-y-5 md:space-y-0 items-center justify-between md:h-16">
           <div className="flex items-center md:col-span-3">
-            <div onClick={() => router.push("/")} className="flex items-center">
+            <div className="flex items-center">
               <div className="flex-shrink-0 flex flex-row gap-2 items-center">
-                <Image
-                  src="/logo.svg"
-                  width={80}
-                  height={80}
-                  alt="Picture of the author"
-                />
-                <a
-                  href=""
-                  className="text-[15px] text-black font-bold lg:text-3xl"
-                >
-                  CMMS
-                </a>
+                <Link href="/">
+                  <Image
+                    src="/logo.svg"
+                    width={80}
+                    height={80}
+                    alt="Picture of the author"
+                  />
+                  <h1 className="text-[15px] text-black font-bold lg:text-3xl">
+                    CMMS
+                  </h1>
+                </Link>
               </div>
             </div>
             <div className="max-w-lg mr-auto ml-8">
