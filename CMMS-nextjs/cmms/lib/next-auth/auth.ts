@@ -52,11 +52,11 @@ export const authOptions: NextAuthConfig = {
 
           if (result.success) {
             const { data } = result.data;
-            console.log("vinh check", result.data);
+            // console.log("vinh check", result.data);
             return { ...data };
           }
         } catch (error) {
-          console.log("vinh check err", error);
+          // console.log("vinh check err", error);
           return null;
         }
       },

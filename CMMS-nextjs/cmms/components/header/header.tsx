@@ -80,7 +80,7 @@ export default function Header() {
   const { data: brandData, isLoading: isLoadingBrand } = useGetBrand();
 
   const { data: session } = useSession();
-  console.log(session?.user);
+  // console.log(session?.user);
 
   const isLogin = session?.user;
 
@@ -118,6 +118,7 @@ export default function Header() {
       }
     });
   };
+
   useEffect(() => {
     localStorage.setItem("cartItem", JSON.stringify(cartItem));
     setCartQty(cartQty);
@@ -239,94 +240,102 @@ export default function Header() {
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {cartData.map((product) => (
-                                    <tr
-                                      key={product.materialId}
-                                      className="border-b"
-                                    >
-                                      <td className="py-2 px-4 flex items-center">
-                                        <img
-                                          src={product.imageUrl}
-                                          alt={product.itemName}
-                                          className="w-20 h-20 mr-4"
-                                          width="50"
-                                          height="50"
-                                        />
-                                        {product.itemName}
-                                        {product.isChangeQuantity && (
-                                          <span className="ml-2 text-sm text-red-500">
-                                            Không đủ sản phẩm
-                                          </span>
-                                        )}
-                                      </td>
-                                      <td className="py-2 px-4">
-                                        <div className="flex items-center justify-center">
-                                          <button
-                                            onClick={() =>
-                                              decreateQty(
-                                                product.materialId,
-                                                product.variantId ?? null
-                                              )
-                                            }
-                                            className="px-2 py-2"
-                                          >
-                                            -
-                                          </button>
-                                          <input
-                                            type="text"
-                                            value={product.quantity}
-                                            onChange={(e) =>
-                                              updateQuantity(
-                                                product.materialId,
-                                                product.variantId ?? null,
-                                                Number(e.target.value)
-                                              )
-                                            }
-                                            className="w-8 text-center border-l border-r"
-                                          />
-                                          <button
-                                            onClick={() =>
-                                              inscreateQty(
-                                                product.materialId,
-                                                product.variantId ?? null
-                                              )
-                                            }
-                                            className="px-2 py-2"
-                                          >
-                                            +
-                                          </button>
-                                        </div>
-                                      </td>
-                                      <td className="py-2 px-4">
-                                        {product.itemTotalPrice}
-                                      </td>
-                                      <td className="px-4">
-                                        <HoverCard
-                                          openDelay={50}
-                                          closeDelay={100}
+                                  {cartData.length === 0 ? (
+                                    <div>
+                                      Bạn không có sản phẩm nào trong vỏ hàng
+                                    </div>
+                                  ) : (
+                                    <>
+                                      {cartData.map((product) => (
+                                        <tr
+                                          key={product.materialId}
+                                          className="border-b"
                                         >
-                                          <HoverCardTrigger>
-                                            <RiDeleteBin6Line
-                                              onClick={() =>
-                                                removeCartItem(
-                                                  product.materialId,
-                                                  product.variantId ?? null
-                                                )
-                                              }
-                                              className="text-red-400 hover:text-red-500 cursor-pointer"
-                                              size={25}
+                                          <td className="py-2 px-4 flex items-center">
+                                            <img
+                                              src={product.imageUrl}
+                                              alt={product.itemName}
+                                              className="w-20 h-20 mr-4"
+                                              width="50"
+                                              height="50"
                                             />
-                                          </HoverCardTrigger>
-                                          <HoverCardContent
-                                            side="top"
-                                            className="w-fit p-2 bg-slate-950 text-white border-none"
-                                          >
-                                            Xóa
-                                          </HoverCardContent>
-                                        </HoverCard>
-                                      </td>
-                                    </tr>
-                                  ))}
+                                            {product.itemName}
+                                            {product.isChangeQuantity && (
+                                              <span className="ml-2 text-sm text-red-500">
+                                                Không đủ sản phẩm
+                                              </span>
+                                            )}
+                                          </td>
+                                          <td className="py-2 px-4">
+                                            <div className="flex items-center justify-center">
+                                              <button
+                                                onClick={() =>
+                                                  decreateQty(
+                                                    product.materialId,
+                                                    product.variantId ?? null
+                                                  )
+                                                }
+                                                className="px-2 py-2"
+                                              >
+                                                -
+                                              </button>
+                                              <input
+                                                type="text"
+                                                value={product.quantity}
+                                                onChange={(e) =>
+                                                  updateQuantity(
+                                                    product.materialId,
+                                                    product.variantId ?? null,
+                                                    Number(e.target.value)
+                                                  )
+                                                }
+                                                className="w-8 text-center border-l border-r"
+                                              />
+                                              <button
+                                                onClick={() =>
+                                                  inscreateQty(
+                                                    product.materialId,
+                                                    product.variantId ?? null
+                                                  )
+                                                }
+                                                className="px-2 py-2"
+                                              >
+                                                +
+                                              </button>
+                                            </div>
+                                          </td>
+                                          <td className="py-2 px-4">
+                                            {product.itemTotalPrice}
+                                          </td>
+                                          <td className="px-4">
+                                            <HoverCard
+                                              openDelay={50}
+                                              closeDelay={100}
+                                            >
+                                              <HoverCardTrigger>
+                                                <RiDeleteBin6Line
+                                                  onClick={() =>
+                                                    removeCartItem(
+                                                      product.materialId,
+                                                      product.variantId ?? null
+                                                    )
+                                                  }
+                                                  className="text-red-400 hover:text-red-500 cursor-pointer"
+                                                  size={25}
+                                                />
+                                              </HoverCardTrigger>
+                                              <HoverCardContent
+                                                side="top"
+                                                className="w-fit p-2 bg-slate-950 text-white border-none"
+                                              >
+                                                Xóa
+                                              </HoverCardContent>
+                                            </HoverCard>
+                                          </td>
+                                        </tr>
+                                      ))}
+                                    </>
+                                  )}
                                 </tbody>
                               </table>
                             </div>
@@ -350,9 +359,11 @@ export default function Header() {
                                 <button className="bg-gray-200 text-gray-700 py-2 px-4 rounded">
                                   Trở về
                                 </button>
-                                <button className="bg-red-500 text-white py-2 px-4 rounded">
-                                  Tiền tới thanh toán
-                                </button>
+                                <Link href="/cart">
+                                  <button className="bg-red-500 text-white py-2 px-4 rounded">
+                                    Tiền tới thanh toán
+                                  </button>
+                                </Link>
                               </div>
                             </div>
                           </div>

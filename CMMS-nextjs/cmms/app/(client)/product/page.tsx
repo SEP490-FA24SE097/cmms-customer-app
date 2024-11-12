@@ -106,6 +106,7 @@ export default function Listing() {
 
   const { data: brandData, isLoading: isLoadingBrand } = useGetBrand();
   const { data: categoryData, isLoading: isLoadingCategory } = useGetCategory();
+  console.log(categoryData?.data);
   const [count, setCount] = useState(1);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -123,6 +124,9 @@ export default function Listing() {
   const [selectedVariantName, setSelectedVariantName] = useState<string | null>(
     null
   );
+  const [selectedVariantValue, setSelectedVariantValue] = useState<
+    number | null
+  >(null);
   const searchParamsquantity = {
     materialId: materialId,
     variantId: selectedVariant,
@@ -131,6 +135,9 @@ export default function Listing() {
     useGetQuantityStore(searchParamsquantity);
   const handleVariantNameClick = (variantName: string) => {
     setSelectedVariantName(variantName);
+  };
+  const handleVariantValueClick = (variantValue: number) => {
+    setSelectedVariantValue(variantValue);
   };
   const handleStoreClick = (storeId: string, quantity: number) => {
     setSelectedStoreId(storeId);
@@ -218,23 +225,25 @@ export default function Listing() {
       setCount(1); // Reset to 1 if input is zero or negative
     }
   };
-  const images = [
-    {
-      src: materialData?.data?.material.imageUrl,
-      alt: "Main product image",
-    },
-    // Spread the subImages array, if it exists
-    // ...(materialData?.data?.material.subImages || []).map(
-    //   (subImage, index) => ({
-    //     src: subImage,
-    //     alt: `Sub image ${index + 1}`,
-    //   })
-    // ),
-    ...(materialData?.data?.variants || []).map((variant, index) => ({
-      src: variant.image,
-      alt: `Variant image ${index + 1}`,
-    })),
-  ];
+  const images = materialData?.data?.material
+    ? [
+        {
+          src: materialData?.data?.material.imageUrl,
+          alt: "Main product image",
+        },
+        // Spread the subImages array, if it exists
+        // ...(materialData?.data?.material.subImages || []).map(
+        //   (subImage, index) => ({
+        //     src: subImage,
+        //     alt: `Sub image ${index + 1}`,
+        //   })
+        // ),
+        ...(materialData?.data?.variants || []).map((variant, index) => ({
+          src: variant.image,
+          alt: `Variant image ${index + 1}`,
+        })),
+      ]
+    : [];
 
   if (!isLoading) <div>...Loading</div>;
   if (!isLoadingMaterialData) <div>...Loading</div>;
@@ -559,6 +568,12 @@ export default function Listing() {
                                 handleVariantClick(
                                   product.variants[0]?.variantId
                                 );
+                                handleVariantNameClick(
+                                  product.variants[0]?.sku
+                                );
+                                handleVariantValueClick(
+                                  product.variants[0]?.price
+                                );
                               }}
                               className="text-stone-500 hover:text-black hover:bg-white"
                             >
@@ -581,7 +596,8 @@ export default function Listing() {
                                 <div className="w-full sm:h-[55vh] h-[40vh] m-auto py-5 relative group">
                                   {isLoadingMaterialData ? (
                                     <Skeleton className="h-[350px] w-[450px] rounded-xl" />
-                                  ) : (
+                                  ) : images.length > 0 &&
+                                    images[currentIndex] ? (
                                     <div
                                       style={{
                                         backgroundImage: `url(${images[currentIndex].src})`,
@@ -604,6 +620,8 @@ export default function Listing() {
                                         <FaChevronRight size={30} />
                                       </div>
                                     </div>
+                                  ) : (
+                                    <p>No image available</p>
                                   )}
                                 </div>
 
@@ -683,7 +701,8 @@ export default function Listing() {
                                 <h1 className="text-3xl font-bold">
                                   {selectedVariantName
                                     ? selectedVariantName
-                                    : materialData?.data?.material.name}
+                                    : materialData?.data?.material?.name ||
+                                      "Product Name Not Available"}
                                 </h1>
 
                                 <div className="flex items-center">
@@ -700,10 +719,21 @@ export default function Listing() {
 
                                 <div className="flex items-center space-x-2">
                                   <span className="text-3xl font-bold text-red-500">
-                                    {materialData?.data?.material.salePrice}đ
+                                    {selectedVariantValue
+                                      ? selectedVariantValue
+                                      : materialData?.data?.material
+                                          ?.salePrice ||
+                                        "Product Price Not Available"}
+                                    đ
                                   </span>
+
                                   <span className="text-gray-500 line-through">
-                                    {materialData?.data?.material.salePrice}đ
+                                    {selectedVariantValue
+                                      ? selectedVariantValue
+                                      : materialData?.data?.material
+                                          ?.salePrice ||
+                                        "Product Price Not Available"}
+                                    đ
                                   </span>
                                   <span className="text-red-500 text-sm">
                                     20%
@@ -711,7 +741,8 @@ export default function Listing() {
                                 </div>
 
                                 <p className="text-gray-600">
-                                  {materialData?.data?.material.description}
+                                  {materialData?.data?.material?.description ||
+                                    "Product Description Not Available"}
                                 </p>
 
                                 <div>
@@ -719,47 +750,57 @@ export default function Listing() {
                                     Các loại
                                   </span>
                                   <div className="flex items-center space-x-2">
-                                    {materialData?.data?.variants.map(
-                                      (variant, index) => (
-                                        <div
-                                          key={index}
-                                          onClick={() => {
-                                            handleVariantClick(
+                                    {materialData?.data?.variants &&
+                                    materialData.data.variants.length > 0 ? (
+                                      materialData.data.variants.map(
+                                        (variant, index) => (
+                                          <div
+                                            key={index}
+                                            onClick={() => {
+                                              handleVariantClick(
+                                                variant.variantId
+                                              );
+                                              handleVariantNameClick(
+                                                variant.sku
+                                              );
+                                              handleVariantValueClick(
+                                                variant.price
+                                              );
+                                            }}
+                                            className={`flex items-center border p-1 ${
+                                              selectedVariant ===
                                               variant.variantId
-                                            );
-                                            handleVariantNameClick(variant.sku);
-                                          }}
-                                          className={`flex items-center border p-1 ${
-                                            selectedVariant ===
-                                            variant.variantId
-                                              ? "bg-red-100 text-red-600"
-                                              : "hover:bg-red-100 hover:text-red-600"
-                                          } `}
-                                        >
-                                          <img
-                                            src={variant.image}
-                                            alt={`Variant ${index + 1}`}
-                                            className="w-12 h-12 object-cover"
-                                          />
-                                          <div className="flex-col mt-2">
-                                            {variant.attributes.map(
-                                              (attribute, idx) => (
-                                                <button
-                                                  key={idx}
-                                                  className="flex text-[14px] items-center"
-                                                >
-                                                  <div className="capitalize font-bold">
-                                                    {attribute.name}:&nbsp;
-                                                  </div>
-                                                  <div className="capitalize">
-                                                    {attribute.value}
-                                                  </div>
-                                                </button>
-                                              )
-                                            )}
+                                                ? "bg-red-100 text-red-600"
+                                                : "hover:bg-red-100 hover:text-red-600"
+                                            } `}
+                                          >
+                                            <img
+                                              src={variant.image}
+                                              alt={`Variant ${index + 1}`}
+                                              className="w-12 h-12 object-cover"
+                                            />
+                                            <div className="flex-col mt-2">
+                                              {variant.attributes.map(
+                                                (attribute, idx) => (
+                                                  <button
+                                                    key={idx}
+                                                    className="flex text-[14px] items-center"
+                                                  >
+                                                    <div className="capitalize font-bold">
+                                                      {attribute.name}:&nbsp;
+                                                    </div>
+                                                    <div className="capitalize">
+                                                      {attribute.value}
+                                                    </div>
+                                                  </button>
+                                                )
+                                              )}
+                                            </div>
                                           </div>
-                                        </div>
+                                        )
                                       )
+                                    ) : (
+                                      <p>No variants available</p>
                                     )}
                                   </div>
                                 </div>
