@@ -28,8 +28,8 @@ export default function LoginPage() {
   const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   const LoginSchema = z.object({
-    userName: z.string().min(1, "User name is required"),
-    password: z.string().min(1, "Password is required"),
+    userName: z.string().min(6, "User name is required"),
+    password: z.string().min(6, "Password is required"),
   });
 
   const form = useForm({

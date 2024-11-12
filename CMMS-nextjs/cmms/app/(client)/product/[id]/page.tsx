@@ -298,9 +298,17 @@ export default function DetailsPage() {
     })),
   ];
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedVariant, setSelectedVariant] = useState<string | null>(
-    materialData?.data?.variants[0]?.variantId ?? null
-  );
+  const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
+
+  // Once materialData is available and variants are not null, set the selectedVariant to the first variantId
+  useEffect(() => {
+    if (materialData?.data?.variants && materialData.data.variants.length > 0) {
+      setSelectedVariant(materialData.data.variants[0].variantId);
+    } else {
+      setSelectedVariant(null); // Handle the case when variants are null or empty
+    }
+  }, [materialData]); // Re-run when materialData changes
+
   const [selectedVariantName, setSelectedVariantName] = useState<string | null>(
     materialData?.data?.variants[0]?.sku ?? null
   );

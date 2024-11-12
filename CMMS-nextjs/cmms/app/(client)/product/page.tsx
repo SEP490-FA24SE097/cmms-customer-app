@@ -120,7 +120,6 @@ export default function Listing() {
     upperPrice: "",
   });
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
-  console.log("variantID " + selectedVariant);
   const [selectedVariantName, setSelectedVariantName] = useState<string | null>(
     null
   );
@@ -146,7 +145,6 @@ export default function Listing() {
     null
   );
   const { data, isLoading } = useGetMaterial(searchParams);
-  console.log(data);
   const handleSelectChange = (value: string) => {
     setSelectedSort(value); // Update the selected sort option
     setSearchParams((prevParams) => {

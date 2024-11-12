@@ -76,13 +76,11 @@ const categories: Category[] = [
 ];
 
 export default function Header() {
-  const router = useRouter();
-
   // const [isLogin, setIsLogin] = useState(false);
   const { data: brandData, isLoading: isLoadingBrand } = useGetBrand();
 
   const { data: session } = useSession();
-  // console.log(session?.user.accessToken);
+  console.log(session?.user);
 
   const isLogin = session?.user;
 
