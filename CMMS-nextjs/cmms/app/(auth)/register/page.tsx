@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,11 +10,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const [isChecked, setIsChecked] = useState(false);
+
+  const handleCheckboxChange = () => {
+    setIsChecked((isChecked) => !isChecked);
+  };
 
   return (
     <main className="bg-[#26313c] h-screen flex items-center justify-center p-10">
       <div className="grid w-full h-full grid-cols-1 bg-white md:grid-cols-2 box-animate">
-        <div className="bg-[#16202a] text-white flex items-center justify-center flex-col">
+        <div className="bg-[#16202a] text-white flex items-center justify-center flex-col pb-10">
           <Avatar>
             <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
             <AvatarFallback>CN</AvatarFallback>
@@ -53,15 +59,32 @@ export default function RegisterPage() {
               id="password"
               placeholder="Password"
             />
-
-            <div className="flex justify-between">
-              <div>
-                <Checkbox />
-                <h1>Tài khoản doanh nghiệp</h1>
-              </div>
-              <Button className="flex ml-auto text-white" variant="link">
-                Đăng nhập
-              </Button>
+            {/* Toggle visibility of the Label and Input based on checkbox state */}
+            <div
+              className={`overflow-hidden transition-all duration-1000 ease-in-out ${
+                isChecked ? "max-h-40" : "max-h-0"
+              }`}
+            >
+              {isChecked && (
+                <div>
+                  <Label htmlFor="tax-code">Mã số thuế</Label>
+                  <Input
+                    className="mt-2 mb-1 bg-transparent"
+                    id="tax-code"
+                    placeholder="Mã số Thuế"
+                  />
+                </div>
+              )}
+            </div>
+            <div className="flex gap-3 items-center mt-2">
+              <Checkbox
+                checked={isChecked}
+                onCheckedChange={handleCheckboxChange}
+                className="border-white checked:bg-blue-500 checked:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              />
+              <h1 className="text-[14px] italic underline underline-offset-2 decoration-1">
+                Tài khoản doanh nghiệp
+              </h1>
             </div>
 
             <Button

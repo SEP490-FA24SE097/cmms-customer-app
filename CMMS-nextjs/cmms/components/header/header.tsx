@@ -365,9 +365,9 @@ export default function Header() {
                 </SheetContent>
               </Sheet>
               {!isLogin ? (
-                <Button variant="outline" onClick={() => router.push("/login")}>
-                  Đăng nhập
-                </Button>
+                <Link href="/login">
+                  <Button variant="outline">Đăng nhập</Button>
+                </Link>
               ) : (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
