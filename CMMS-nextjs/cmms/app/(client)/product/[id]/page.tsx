@@ -204,18 +204,6 @@ export default function DetailsPage() {
   const { toast } = useToast();
   const { addCartItem } = useShoppingContext();
   const [cartItem, setCartItem] = useState<CartItem[]>([]);
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const jsonCartData = localStorage.getItem("cartItem");
-      if (jsonCartData) {
-        try {
-          setCartItem(JSON.parse(jsonCartData));
-        } catch (error) {
-          console.error("Error parsing cart data from localStorage:", error);
-        }
-      }
-    }
-  }, []);
 
   const handleAddToCart = () => {
     if (!materialData) return;
@@ -229,55 +217,44 @@ export default function DetailsPage() {
     }
 
     const materialId = materialData.data?.material.id;
-    console.log("Looking for:", {
-      materialId,
-      selectedVariant,
-      selectedStoreId,
-    });
 
-    cartItem.forEach((item) => {
-      console.log("Cart item:", {
-        materialId: item.materialId,
-        variantId: item.variantId,
-        storeId: item.storeId,
-      });
-
-      console.log(
-        "Match check:",
-        item.materialId === materialId,
-        item.variantId === selectedVariant,
-        item.storeId === selectedStoreId
-      );
-    });
-
-    const existingCartItem = cartItem.find(
-      (item) =>
+    // Retrieve cart from localStorage and parse it
+    const cart = JSON.parse(localStorage.getItem("cartItem") || "[]");
+    // Check if there is an item with the same materialId and variantId but a different storeId
+    const existingInOtherStore = cart.some(
+      (item: any) =>
         item.materialId === materialId &&
         item.variantId === selectedVariant &&
-        item.storeId === selectedStoreId
+        item.storeId !== selectedStoreId
     );
 
-    if (!existingCartItem) {
-      console.error("No matching item found in cart.");
-    } else {
-      console.log("Matching item found:", existingCartItem);
-    }
-
-    // Set the current cart quantity based on existing item or default to 0
-    const currentCartQuantity = existingCartItem
-      ? existingCartItem.quantity
-      : 0;
-
-    // Calculate the total quantity after adding
-    const totalQuantity = currentCartQuantity + count;
-
-    // Check if total quantity exceeds available quantity
-    if (availableQuantity !== null && totalQuantity > availableQuantity) {
+    if (existingInOtherStore) {
       toast({
-        title: `Số lượng vượt quá giới hạn! Chỉ còn ${
-          availableQuantity - currentCartQuantity
-        } sản phẩm có sẵn.`,
-        variant: "destructive",
+        title: "Bạn đã có sản phẩm này ở cửa hàng khác.",
+        style: { backgroundColor: "#f87171", color: "#ffffff" }, // Red background for error
+      });
+      return;
+    }
+    // Find the existing quantity in the cart for the specific combination of materialId, storeId, and variantId
+    const currentCartQuantity = cart.reduce((acc: any, item: any) => {
+      const matchesMaterial = item.materialId === materialId;
+      const matchesStore = item.storeId === selectedStoreId;
+      const matchesVariant =
+        item.variantId === selectedVariant ||
+        (!selectedVariant && !item.variantId);
+
+      return matchesMaterial && matchesStore && matchesVariant
+        ? acc + item.quantity
+        : acc;
+    }, 0);
+    // Check if adding `count` would exceed store's available quantity
+    if (
+      availableQuantity !== null &&
+      currentCartQuantity + count > availableQuantity
+    ) {
+      toast({
+        title: "Vượt quá số lượng có sẵn.",
+        style: { backgroundColor: "#f87171", color: "#ffffff" }, // Red background for error
       });
       return;
     }
@@ -285,8 +262,8 @@ export default function DetailsPage() {
     const data = {
       materialId,
       quantity: count,
-      ...(selectedStoreId && { storeId: selectedStoreId }),
-      ...(selectedVariant && { variantId: selectedVariant }),
+      storeId: selectedStoreId,
+      variantId: selectedVariant,
     } as MaterialStore;
 
     // Add item to cart
@@ -403,7 +380,6 @@ export default function DetailsPage() {
 
   const { data: storeQuantityData, isLoading: isLoadingStoreQuantity } =
     useGetQuantityStore(searchParams);
-
   return (
     <div className="bg-gray-100">
       <div className="max-w-[85%] mx-auto lg:w-[70%]">
