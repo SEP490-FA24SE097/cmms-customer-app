@@ -47,7 +47,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { FaStore } from "react-icons/fa";
-import TextField from "@mui/material/TextField";   
+import TextField from "@mui/material/TextField";
 import { Button } from "@/components/ui/button";
 
 import InputAdornment from "@mui/material/InputAdornment";
@@ -96,9 +96,13 @@ export default function Listing() {
       );
     }
   }, [brandId, router]);
-  const [materialId, setMaterialId] = useState<string | null>("8fcded53-6a10-4219-a938-75f49fe645ec");
+  const [materialId, setMaterialId] = useState<string | null>(null);
   const { data: materialData, isLoading: isLoadingMaterialData } =
-    useGetMaterialById(materialId || "");
+    useGetMaterialById(materialId ?? "");
+
+  const handleMateridIdClick = (productMaterialId: string) => {
+    setMaterialId(productMaterialId);
+  };
 
   const { data: brandData, isLoading: isLoadingBrand } = useGetBrand();
   const { data: categoryData, isLoading: isLoadingCategory } = useGetCategory();
@@ -115,14 +119,17 @@ export default function Listing() {
     lowerPrice: "",
     upperPrice: "",
   });
-  const [selectedVariant, setSelectedVariant] = useState<string | null>(
-    materialData?.data?.variants[0]?.variantId ?? null
-  );
+  const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
+  console.log("variantID " + selectedVariant);
   const [selectedVariantName, setSelectedVariantName] = useState<string | null>(
-    materialData?.data?.variants[0]?.sku ?? null
+    null
   );
+  const searchParamsquantity = {
+    materialId: materialId,
+    variantId: selectedVariant,
+  };
   const { data: storeQuantityData, isLoading: isLoadingStoreQuantity } =
-    useGetQuantityStore(searchParams);
+    useGetQuantityStore(searchParamsquantity);
   const handleVariantNameClick = (variantName: string) => {
     setSelectedVariantName(variantName);
   };
@@ -139,7 +146,7 @@ export default function Listing() {
     null
   );
   const { data, isLoading } = useGetMaterial(searchParams);
-
+  console.log(data);
   const handleSelectChange = (value: string) => {
     setSelectedSort(value); // Update the selected sort option
     setSearchParams((prevParams) => {
@@ -239,64 +246,78 @@ export default function Listing() {
   const handleVariantClick = (variantId: string) => {
     setSelectedVariant(variantId);
   };
-  const [cartItem, setCartItem] = useState<CartItem[]>([]);
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const jsonCartData = localStorage.getItem("cartItem");
-      if (jsonCartData) {
-        try {
-          setCartItem(JSON.parse(jsonCartData));
-        } catch (error) {
-          console.error("Error parsing cart data from localStorage:", error);
-        }
-      }
-    }
-  }, []);
+
   const handleAddToCart = () => {
     if (!materialData) return;
+
     if (!selectedStoreId) {
       toast({
-        title: "Vui lòng chọn của hàng.",
+        title: "Vui lòng chọn cửa hàng.",
         style: { backgroundColor: "#3b82f6", color: "#ffffff" },
       });
       return;
     }
+
     const materialId = materialData.data?.material.id;
-    const existingCartItem = cartItem.find(
-      (item) =>
+
+    // Retrieve cart from localStorage and parse it
+    const cart = JSON.parse(localStorage.getItem("cartItem") || "[]");
+    // Check if there is an item with the same materialId and variantId but a different storeId
+    const existingInOtherStore = cart.some(
+      (item: any) =>
         item.materialId === materialId &&
         item.variantId === selectedVariant &&
-        item.storeId === selectedStoreId
+        item.storeId !== selectedStoreId
     );
 
-    const currentCartQuantity = existingCartItem
-      ? existingCartItem.quantity
-      : 0;
-    const totalQuantity = currentCartQuantity + count;
-
-    // Check if total quantity exceeds available quantity
-    if (availableQuantity !== null && totalQuantity > availableQuantity) {
+    if (existingInOtherStore) {
       toast({
-        title: `Số lượng vượt quá giới hạn! Chỉ còn ${
-          availableQuantity - currentCartQuantity
-        } sản phẩm có sẵn.`,
-        variant: "destructive",
+        title: "Bạn đã có sản phẩm này ở cửa hàng khác.",
+        style: { backgroundColor: "#f87171", color: "#ffffff" }, // Red background for error
       });
       return;
     }
+    // Find the existing quantity in the cart for the specific combination of materialId, storeId, and variantId
+    const currentCartQuantity = cart.reduce((acc: any, item: any) => {
+      const matchesMaterial = item.materialId === materialId;
+      const matchesStore = item.storeId === selectedStoreId;
+      const matchesVariant =
+        item.variantId === selectedVariant ||
+        (!selectedVariant && !item.variantId);
+
+      return matchesMaterial && matchesStore && matchesVariant
+        ? acc + item.quantity
+        : acc;
+    }, 0);
+    // Check if adding `count` would exceed store's available quantity
+    if (
+      availableQuantity !== null &&
+      currentCartQuantity + count > availableQuantity
+    ) {
+      toast({
+        title: "Vượt quá số lượng có sẵn.",
+        style: { backgroundColor: "#f87171", color: "#ffffff" }, // Red background for error
+      });
+      return;
+    }
+
     const data = {
       materialId,
       quantity: count,
-      ...(selectedStoreId && { storeId: selectedStoreId }),
-      ...(selectedVariant && { variantId: selectedVariant }),
+      storeId: selectedStoreId,
+      variantId: selectedVariant,
     } as MaterialStore;
 
+    // Add item to cart
     addCartItem(data, count);
+
+    // Display success toast
     toast({
       title: `Đã thêm ${count} sản phẩm vào giỏ hàng.`,
       style: { backgroundColor: "#10b981", color: "#ffffff" }, // Green background for success
     });
   };
+
   const handleChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number[]);
   };
@@ -536,7 +557,10 @@ export default function Listing() {
                               variant="ghost"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setMaterialId(product.material.id);
+                                handleMateridIdClick(product.material.id);
+                                handleVariantClick(
+                                  product.variants[0]?.variantId
+                                );
                               }}
                               className="text-stone-500 hover:text-black hover:bg-white"
                             >
@@ -557,28 +581,32 @@ export default function Listing() {
                             <div className="container mx-auto grid gap-8 md:grid-cols-2 ">
                               <div>
                                 <div className="w-full sm:h-[55vh] h-[40vh] m-auto py-5 relative group">
-                                  <div
-                                    style={{
-                                      backgroundImage: `url(${images[currentIndex].src})`,
-                                    }}
-                                    onClick={handleClick}
-                                    className="w-full h-full rounded-xl bg-center bg-cover duration-500 cursor-pointer"
-                                  >
-                                    {/* Left Arrow */}
+                                  {isLoadingMaterialData ? (
+                                    <Skeleton className="h-[350px] w-[450px] rounded-xl" />
+                                  ) : (
                                     <div
-                                      className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] left-10 text-xl rounded-full p-2 bg-black/20 text-white cursor-pointer"
-                                      onClick={prevSlide}
+                                      style={{
+                                        backgroundImage: `url(${images[currentIndex].src})`,
+                                      }}
+                                      onClick={handleClick}
+                                      className="w-full h-full rounded-xl bg-center bg-cover duration-500 cursor-pointer"
                                     >
-                                      <FaChevronLeft size={30} />
+                                      {/* Left Arrow */}
+                                      <div
+                                        className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] left-10 text-xl rounded-full p-2 bg-black/20 text-white cursor-pointer"
+                                        onClick={prevSlide}
+                                      >
+                                        <FaChevronLeft size={30} />
+                                      </div>
+                                      {/* Right Arrow */}
+                                      <div
+                                        className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] right-10 text-xl rounded-full p-2 bg-black/20 text-white cursor-pointer"
+                                        onClick={nextSlide}
+                                      >
+                                        <FaChevronRight size={30} />
+                                      </div>
                                     </div>
-                                    {/* Right Arrow */}
-                                    <div
-                                      className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] right-10 text-xl rounded-full p-2 bg-black/20 text-white cursor-pointer"
-                                      onClick={nextSlide}
-                                    >
-                                      <FaChevronRight size={30} />
-                                    </div>
-                                  </div>
+                                  )}
                                 </div>
 
                                 {/* Full-size Image Modal */}
@@ -643,16 +671,6 @@ export default function Listing() {
                                       <CarouselPrevious />
                                       <CarouselNext />
                                     </Carousel>
-                                    {/* {productData.images.map((slide, slideIndex) => (
-                    <img
-                      src={slide.src}
-                      key={slideIndex}
-                      onClick={() => goToSlide(slideIndex)}
-                      className={`border-2 h-20 w-20 rounded-sm cursor-pointer ${
-                        currentIndex === slideIndex ? " border-red-300" : ""
-                      }`}
-                    />
-                  ))} */}
                                   </div>
                                 </div>
                               </div>

@@ -26,11 +26,15 @@ export type MaterialStore = {
 interface ShoppingContextType {
   cartQty: number;
   cartItem: CartItem[];
-  inscreateQty: (materialId: string, variantId: string) => void;
-  decreateQty: (materialId: string, variantId: string) => void;
   addCartItem: (item: MaterialStore, quantity: number) => void;
-  removeCartItem: (materialId: string, variantId: string) => void;
-  updateQuantity: (materialId: string, variantId: string, qty: number) => void;
+  inscreateQty: (materialId: string, variantId: string | null) => void;
+  decreateQty: (materialId: string, variantId: string | null) => void;
+  removeCartItem: (materialId: string, variantId: string | null) => void;
+  updateQuantity: (
+    materialId: string,
+    variantId: string | null,
+    qty: number
+  ) => void;
 }
 
 // Create Shopping context
@@ -97,21 +101,23 @@ export const ShoppingContextProvider = ({
     }
   };
 
-  const inscreateQty = (materialId: string, variantId: string) => {
+  const inscreateQty = (materialId: string, variantId: string | null) => {
     setCartItem((currentCart) =>
       currentCart.map((item) =>
-        item.materialId === materialId && item.variantId === variantId
+        item.materialId === materialId &&
+        (item.variantId === variantId || variantId === null)
           ? { ...item, quantity: item.quantity + 1 }
           : item
       )
     );
   };
 
-  const decreateQty = (materialId: string, variantId: string) => {
+  const decreateQty = (materialId: string, variantId: string | null) => {
     setCartItem((currentCart) =>
       currentCart
         .map((item) =>
-          item.materialId === materialId && item.variantId === variantId
+          item.materialId === materialId &&
+          (item.variantId === variantId || variantId === null)
             ? {
                 ...item,
                 quantity: item.quantity > 1 ? item.quantity - 1 : item.quantity,
@@ -122,24 +128,31 @@ export const ShoppingContextProvider = ({
     );
   };
 
-  const removeCartItem = (materialId: string, variantId: string) => {
+  const removeCartItem = (materialId: string, variantId: string | null) => {
     setCartItem((currentCart) =>
       currentCart.filter(
         (item) =>
-          !(item.materialId === materialId && item.variantId === variantId)
+          !(
+            item.materialId === materialId &&
+            (item.variantId === variantId || variantId === null)
+          )
       )
     );
   };
 
   const updateQuantity = (
     materialId: string,
-    variantId: string,
+    variantId: string | null,
     qty: number
   ) => {
+    // Ensure the quantity is valid and greater than or equal to 1
     if (qty < 1) return;
+
     setCartItem((currentCart) =>
       currentCart.map((item) =>
-        item.materialId === materialId && item.variantId === variantId
+        // Check for both materialId and variantId (or handle null variantId)
+        item.materialId === materialId &&
+        (item.variantId === variantId || variantId === null)
           ? { ...item, quantity: qty }
           : item
       )

@@ -244,7 +244,7 @@ export default function Header() {
                                   {cartData.map((product) => (
                                     <tr
                                       key={product.materialId}
-                                      className={`border-b`}
+                                      className="border-b"
                                     >
                                       <td className="py-2 px-4 flex items-center">
                                         <img
@@ -267,7 +267,7 @@ export default function Header() {
                                             onClick={() =>
                                               decreateQty(
                                                 product.materialId,
-                                                product.variantId
+                                                product.variantId ?? null
                                               )
                                             }
                                             className="px-2 py-2"
@@ -280,7 +280,7 @@ export default function Header() {
                                             onChange={(e) =>
                                               updateQuantity(
                                                 product.materialId,
-                                                product.variantId,
+                                                product.variantId ?? null,
                                                 Number(e.target.value)
                                               )
                                             }
@@ -290,7 +290,7 @@ export default function Header() {
                                             onClick={() =>
                                               inscreateQty(
                                                 product.materialId,
-                                                product.variantId
+                                                product.variantId ?? null
                                               )
                                             }
                                             className="px-2 py-2"
@@ -312,7 +312,7 @@ export default function Header() {
                                               onClick={() =>
                                                 removeCartItem(
                                                   product.materialId,
-                                                  product.variantId
+                                                  product.variantId ?? null
                                                 )
                                               }
                                               className="text-red-400 hover:text-red-500 cursor-pointer"

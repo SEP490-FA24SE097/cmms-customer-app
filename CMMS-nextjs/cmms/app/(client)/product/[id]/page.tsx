@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Carousel,
@@ -203,7 +203,6 @@ export default function DetailsPage() {
   ];
   const { toast } = useToast();
   const { addCartItem } = useShoppingContext();
-  const [cartItem, setCartItem] = useState<CartItem[]>([]);
 
   const handleAddToCart = () => {
     if (!materialData) return;
@@ -305,6 +304,9 @@ export default function DetailsPage() {
   const [selectedVariantName, setSelectedVariantName] = useState<string | null>(
     materialData?.data?.variants[0]?.sku ?? null
   );
+  const [selectedVariantPrice, setSelectedVariantPrice] = useState<
+    number | null
+  >(materialData?.data?.variants[0]?.price ?? null);
   const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
   const [count, setCount] = useState(1);
   const [comment, setComment] = useState("");
@@ -361,6 +363,9 @@ export default function DetailsPage() {
   const handleVariantNameClick = (variantName: string) => {
     setSelectedVariantName(variantName);
   };
+  const handleVariantPriceClick = (variantPrice: number) => {
+    setSelectedVariantPrice(variantPrice);
+  };
   const handleStoreClick = (storeId: string, quantity: number) => {
     setSelectedStoreId(storeId);
     setAvailableQuantity(quantity);
@@ -373,13 +378,13 @@ export default function DetailsPage() {
       setCount(1); // Reset to 1 if input is zero or negative
     }
   };
-  const searchParams = {
+  const searchParamsquantity = {
     materialId: materialData?.data?.material.id,
     variantId: selectedVariant,
   };
 
   const { data: storeQuantityData, isLoading: isLoadingStoreQuantity } =
-    useGetQuantityStore(searchParams);
+    useGetQuantityStore(searchParamsquantity);
   return (
     <div className="bg-gray-100">
       <div className="max-w-[85%] mx-auto lg:w-[70%]">
@@ -408,28 +413,32 @@ export default function DetailsPage() {
           <div className="container mx-auto grid gap-8 md:grid-cols-2 ">
             <div>
               <div className="w-full sm:h-[55vh] h-[40vh] m-auto py-5 relative group">
-                <div
-                  style={{
-                    backgroundImage: `url(${images[currentIndex].src})`,
-                  }}
-                  onClick={handleClick}
-                  className="w-full h-full rounded-xl bg-center bg-cover duration-500 cursor-pointer"
-                >
-                  {/* Left Arrow */}
+                {isLoadingMaterialData ? (
+                  <Skeleton className="h-[350px] w-[450px] rounded-xl" />
+                ) : (
                   <div
-                    className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] left-10 text-xl rounded-full p-2 bg-black/20 text-white cursor-pointer"
-                    onClick={prevSlide}
+                    style={{
+                      backgroundImage: `url(${images[currentIndex].src})`,
+                    }}
+                    onClick={handleClick}
+                    className="w-full h-full rounded-xl bg-center bg-cover duration-500 cursor-pointer"
                   >
-                    <FaChevronLeft size={30} />
+                    {/* Left Arrow */}
+                    <div
+                      className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] left-10 text-xl rounded-full p-2 bg-black/20 text-white cursor-pointer"
+                      onClick={prevSlide}
+                    >
+                      <FaChevronLeft size={30} />
+                    </div>
+                    {/* Right Arrow */}
+                    <div
+                      className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] right-10 text-xl rounded-full p-2 bg-black/20 text-white cursor-pointer"
+                      onClick={nextSlide}
+                    >
+                      <FaChevronRight size={30} />
+                    </div>
                   </div>
-                  {/* Right Arrow */}
-                  <div
-                    className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] right-10 text-xl rounded-full p-2 bg-black/20 text-white cursor-pointer"
-                    onClick={nextSlide}
-                  >
-                    <FaChevronRight size={30} />
-                  </div>
-                </div>
+                )}
               </div>
 
               {/* Full-size Image Modal */}
@@ -531,10 +540,16 @@ export default function DetailsPage() {
 
               <div className="flex items-center space-x-2">
                 <span className="text-3xl font-bold text-red-500">
-                  {materialData?.data?.material.salePrice}đ
+                  {selectedVariantPrice
+                    ? selectedVariantPrice
+                    : materialData?.data?.material.salePrice}
+                  đ
                 </span>
                 <span className="text-gray-500 line-through">
-                  {materialData?.data?.material.salePrice}đ
+                  {selectedVariantPrice
+                    ? selectedVariantPrice
+                    : materialData?.data?.material.salePrice}
+                  đ
                 </span>
                 <span className="text-red-500 text-sm">20%</span>
               </div>
@@ -550,6 +565,7 @@ export default function DetailsPage() {
                     <div
                       key={index}
                       onClick={() => {
+                        handleVariantPriceClick(variant.price);
                         handleVariantClick(variant.variantId);
                         handleVariantNameClick(variant.sku);
                       }}
