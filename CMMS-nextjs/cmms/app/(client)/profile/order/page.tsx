@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { LuEye } from "react-icons/lu";
 import {
@@ -193,67 +194,72 @@ export default function Order() {
                             <div className="max-w-2xl mx-auto bg-white text-black">
                               <div>
                                 <div className="h-[50vh] 2xl:h-[60vh] overflow-hidden overflow-y-auto">
-                                <table className="w-full text-left">
-                                <thead className="bg-gray-100">
-                                  <tr>
-                                    <th className="py-2 px-4">Items Name</th>
-                                    <th className="py-2 px-4">Quantity</th>
-                                    <th className="py-2 px-4">Price</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {products.map((product) => (
-                                    <tr key={product.id} className="border-b">
-                                      <td className="py-2 px-4 flex items-center">
-                                        <img
-                                          src={product.imageUrl}
-                                          alt={product.name}
-                                          className="w-20 h-20 mr-4"
-                                          width="50"
-                                          height="50"
-                                        />
-                                        {product.name}
-                                      </td>
-                                      <td className="py-2 px-4">
-                                        {product.quantity}x
-                                      </td>
-                                      <td className="py-2 px-4">
-                                        {product.price}
-                                      </td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
+                                  <table className="w-full text-left">
+                                    <thead className="bg-gray-100">
+                                      <tr>
+                                        <th className="py-2 px-4">
+                                          Items Name
+                                        </th>
+                                        <th className="py-2 px-4">Quantity</th>
+                                        <th className="py-2 px-4">Price</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {products.map((product) => (
+                                        <tr
+                                          key={product.id}
+                                          className="border-b"
+                                        >
+                                          <td className="py-2 px-4 flex items-center">
+                                            <img
+                                              src={product.imageUrl}
+                                              alt={product.name}
+                                              className="w-20 h-20 mr-4"
+                                              width="50"
+                                              height="50"
+                                            />
+                                            {product.name}
+                                          </td>
+                                          <td className="py-2 px-4">
+                                            {product.quantity}x
+                                          </td>
+                                          <td className="py-2 px-4">
+                                            {product.price}
+                                          </td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
                                 </div>
-                              <div>
-                                <div className="mt-6">
-                                  <div className="flex justify-between py-1">
-                                    <span>Sub total:</span>
-                                    <span>{orderSummary.subTotal}</span>
+                                <div>
+                                  <div className="mt-6">
+                                    <div className="flex justify-between py-1">
+                                      <span>Sub total:</span>
+                                      <span>{orderSummary.subTotal}</span>
+                                    </div>
+                                    <div className="flex justify-between py-1">
+                                      <span>Discount:</span>
+                                      <span>{orderSummary.discount}</span>
+                                    </div>
+                                    <div className="flex justify-between py-1">
+                                      <span>Delivery Fee:</span>
+                                      <span>{orderSummary.deliveryFee}</span>
+                                    </div>
+                                    <hr className="my-2" />
+                                    <div className="flex justify-between py-1 font-bold">
+                                      <span>Total Cost:</span>
+                                      <span>{orderSummary.totalCost}</span>
+                                    </div>
                                   </div>
-                                  <div className="flex justify-between py-1">
-                                    <span>Discount:</span>
-                                    <span>{orderSummary.discount}</span>
-                                  </div>
-                                  <div className="flex justify-between py-1">
-                                    <span>Delivery Fee:</span>
-                                    <span>{orderSummary.deliveryFee}</span>
-                                  </div>
-                                  <hr className="my-2" />
-                                  <div className="flex justify-between py-1 font-bold">
-                                    <span>Total Cost:</span>
-                                    <span>{orderSummary.totalCost}</span>
+                                  <div className="mt-6 flex justify-end space-x-4">
+                                    <button className="bg-gray-200 text-gray-700 py-2 px-4 rounded">
+                                      Report Order
+                                    </button>
+                                    <button className="bg-red-500 text-white py-2 px-4 rounded">
+                                      Cancel Order
+                                    </button>
                                   </div>
                                 </div>
-                                <div className="mt-6 flex justify-end space-x-4">
-                                  <button className="bg-gray-200 text-gray-700 py-2 px-4 rounded">
-                                    Report Order
-                                  </button>
-                                  <button className="bg-red-500 text-white py-2 px-4 rounded">
-                                    Cancel Order
-                                  </button>
-                                </div>
-                              </div>
                               </div>
                             </div>
                           </div>

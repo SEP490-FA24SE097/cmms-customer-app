@@ -28,7 +28,10 @@ export default function LoginPage() {
   const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   const LoginSchema = z.object({
-    userName: z.string().min(6, "User name is required"),
+    userName: z
+      .string()
+      .min(6, "Username must be more than 6 characters")
+      .max(28, "Username must be less than 29 characters"),
     password: z.string().min(6, "Password is required"),
   });
 
@@ -66,7 +69,7 @@ export default function LoginPage() {
       toast({
         title: "Lỗi",
         description: "Có lỗi xảy ra rồi",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
@@ -128,6 +131,7 @@ export default function LoginPage() {
                         {...field}
                         className="block w-full px-4 py-3 pr-10 bg-gray-900 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition duration-150 ease-in-out"
                         placeholder="Nhập mật khẩu"
+                        type="password"
                       />
                     </FormControl>
                     <FormMessage className="text-red-500 text-sm mt-1" />

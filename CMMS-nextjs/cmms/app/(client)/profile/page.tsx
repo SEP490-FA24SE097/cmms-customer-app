@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { FaRegUserCircle } from "react-icons/fa";
 import EditProfile from "./editprofile/page";
@@ -24,22 +25,32 @@ export default function ProfilePage() {
                   className="w-full text-xl py-7 flex justify-start bg-slate-300 font-bold"
                   onClick={() => router.push("/profile/editprofile")}
                 >
-                  <FaRegUserCircle  size={30}/> Thông tin
-                </Button >
+                  <FaRegUserCircle size={30} /> Thông tin
+                </Button>
               </li>
               <li>
-                <Button variant="ghost" className="w-full text-xl py-7 flex justify-start">
+                <Button
+                  variant="ghost"
+                  className="w-full text-xl py-7 flex justify-start"
+                >
                   <MdOutlineShoppingBag size={30} /> Lịch sử đơn hàng
                 </Button>
               </li>
               <li>
-                <Button variant="ghost" className="w-full text-xl py-7 flex justify-start" onClick={() => router.push("/profile/changepassword")}>
-                  <CiLock size={30}/> Đổi mật khẩu
+                <Button
+                  variant="ghost"
+                  className="w-full text-xl py-7 flex justify-start"
+                  onClick={() => router.push("/profile/changepassword")}
+                >
+                  <CiLock size={30} /> Đổi mật khẩu
                 </Button>
               </li>
               <li>
-                <Button variant="ghost" className="w-full text-xl py-7 flex justify-start">
-                  <CiLogout size={30}/> Đăng xuất
+                <Button
+                  variant="ghost"
+                  className="w-full text-xl py-7 flex justify-start"
+                >
+                  <CiLogout size={30} /> Đăng xuất
                 </Button>
               </li>
             </ul>
@@ -47,7 +58,7 @@ export default function ProfilePage() {
           <div className="col-span-3 bg-white w-full h-auto rounded-sm p-5 shadow-lg">
             {/* <EditProfile /> */}
             {/* <ChangePassword /> */}
-            <Order/>
+            <Order />
           </div>
         </div>
       </div>

@@ -31,12 +31,22 @@ export async function apiRequest<T>(
   try {
     const response = await request();
     return { success: true, data: response.data };
-  } catch (error) {
-    // if (axios.isAxiosError(error)) {
-    //   const errorMessage = await handleAPIError(error);
-    //   return { success: false, error: errorMessage };
-    // }
-
+  } catch (error: any) {
+    if (axios.isAxiosError(error) && error.response) {
+      try {
+        // Attempt to parse the response body as text if available
+        const errorMessage = typeof error.response.data === 'string'
+          ? error.response.data // If it's text, use as is
+          : JSON.stringify(error.response.data); // If JSON, stringify it
+          
+        return { success: false, error: errorMessage };
+      } catch (parseError) {
+        console.error("Error parsing response body:", parseError);
+        return { success: false, error: "Failed to parse error response." };
+      }
+    }
+    
+    // For other types of errors, use a generic message or translateError
     return { success: false, error: translateError(error) };
   }
 }
