@@ -1,4 +1,5 @@
 import NextAuth from "next-auth";
+import { user } from "./respon-user";
 
 declare module "next-auth" {
   /**
@@ -17,6 +18,7 @@ declare module "next-auth" {
       //   roleId: number;
       accessToken: string;
       refreshToken: string;
+      user: user;
       //   emailVerified?: Date | null;
     };
   }

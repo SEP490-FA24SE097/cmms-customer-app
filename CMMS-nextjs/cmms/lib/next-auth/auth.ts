@@ -4,6 +4,7 @@ import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { apiRequest } from "../api/api-handler/generic";
+import { user } from "@/types/respon-user";
 
 interface UserJWT extends JWT {
   id: string;
@@ -14,6 +15,7 @@ interface UserJWT extends JWT {
   //   gender: string;
   //   avatarUrl: string;
   //   roleId: number;
+  user: user;
   accessToken: string;
   refreshToken: string;
   emailVerified: Date | null;
@@ -81,6 +83,7 @@ export const authOptions: NextAuthConfig = {
           //   gender,
           //   avatarUrl,
           //   roleId,
+          user,
           accessToken,
           refreshToken,
         } = token;
@@ -93,6 +96,7 @@ export const authOptions: NextAuthConfig = {
           //   gender,
           //   avatarUrl,
           //   roleId,
+          user,
           accessToken,
           refreshToken,
         });
