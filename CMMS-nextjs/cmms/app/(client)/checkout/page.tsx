@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, startTransition } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Check, ChevronsUpDown } from "lucide-react";
@@ -9,7 +9,8 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
-import FormLabel from "@mui/material/FormLabel";
+import { useSession } from "next-auth/react";
+import { any, z } from "zod";
 import {
   Command,
   CommandEmpty,
@@ -24,122 +25,190 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
-const frameworks = [
-  {
-    value: "next.js",
-    label: "Next.js",
-  },
-  {
-    value: "sveltekit",
-    label: "SvelteKit",
-  },
-  {
-    value: "nuxt.js",
-    label: "Nuxt.js",
-  },
-  {
-    value: "remix",
-    label: "Remix",
-  },
-  {
-    value: "astro",
-    label: "Astro",
-  },
-];
-const products = [
-  {
-    id: 1,
-    quantity: 2,
-    name: "KHAKI PANTS - CREAM",
-    size: "S",
-    price: "1.160.000đ",
-    imageUrl:
-      "https://vlxdgiatot.com/wp-content/uploads/2024/09/NEM-CAO-SU-THIEN-NHIEN-GREEN-TEA.png",
-  },
-  {
-    id: 2,
-    quantity: 1,
-    name: "KHAKI PANTS - BLACK",
-    size: "S",
-    price: "580.000đ",
-    imageUrl:
-      "https://vlxdgiatot.com/wp-content/uploads/2024/10/enjoy-light-grey-36-enjoy-roller-blind-1.jpg",
-  },
-  {
-    id: 3,
-    quantity: 1,
-    name: "PUFF SWEATSHORTS",
-    size: "S",
-    price: "395.000đ",
-    imageUrl:
-      "https://vlxdgiatot.com/wp-content/uploads/2023/05/VAN-PHONG-VIATRIS-VIEW.jpg",
-  },
-  {
-    id: 4,
-    quantity: 1,
-    name: "PATCH TEE - BLACK",
-    size: "M",
-    price: "420.000đ",
-    imageUrl:
-      "https://vlxdgiatot.com/wp-content/uploads/2024/05/AM-SIEU-TOC-WMF-STELIO-0413020012.jpg",
-  },
-  {
-    id: 5,
-    quantity: 1,
-    name: "TOWN TEE - BLACK",
-    size: "S",
-    price: "395.000đ",
-    imageUrl:
-      "https://vlxdgiatot.com/wp-content/uploads/2024/10/enjoy-thunder-grey-36-enjoy-roller-blind-a2.jpg",
-  },
-  {
-    id: 3,
-    quantity: 1,
-    name: "PUFF SWEATSHORTS",
-    size: "S",
-    price: "395.000đ",
-    imageUrl:
-      "https://vlxdgiatot.com/wp-content/uploads/2023/05/VAN-PHONG-VIATRIS-VIEW.jpg",
-  },
-  {
-    id: 4,
-    quantity: 1,
-    name: "PATCH TEE - BLACK",
-    size: "M",
-    price: "420.000đ",
-    imageUrl:
-      "https://vlxdgiatot.com/wp-content/uploads/2024/05/AM-SIEU-TOC-WMF-STELIO-0413020012.jpg",
-  },
-  {
-    id: 5,
-    quantity: 1,
-    name: "TOWN TEE - BLACK",
-    size: "S",
-    price: "395.000đ",
-    imageUrl:
-      "https://vlxdgiatot.com/wp-content/uploads/2024/10/enjoy-thunder-grey-36-enjoy-roller-blind-a2.jpg",
-  },
-];
+import { createAndGetCart } from "@/lib/actions/cart/action/cart";
+import { ICart } from "@/lib/actions/cart/type/cart-type";
+import { useShoppingContext } from "@/context/shopping-cart-context";
+import Link from "next/link";
+import axios from "axios";
+import { createPayment } from "@/lib/actions/payment/payment";
+import { useToast } from "@/hooks/use-toast";
+
+type Location = {
+  value: string;
+  label: string;
+};
 
 export default function CheckoutPage() {
-  const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("");
-  const [open2, setOpen2] = React.useState(false);
-  const [value2, setValue2] = React.useState("");
-  const [open3, setOpen3] = React.useState(false);
-  const [value3, setValue3] = React.useState("");
-  const [selectedValue, setSelectedValue] = useState("cod");
+  const { data: session } = useSession();
+  const { toast } = useToast();
+  const [name, setName] = useState<string | null>(
+    session?.user.user.fullName || null
+  );
+  const [email, setEmail] = useState<string | null>(
+    session?.user.user.email || null
+  );
+  const [phone, setPhone] = useState<string | null>(
+    session?.user.user.phoneNumber || null
+  );
+  const [address, setAddress] = useState<string | null>(
+    session?.user.user.address || null
+  );
+  const [note, setNote] = useState<string | null>(
+    session?.user.user.note || null
+  );
+  const [paymentType, setPaymentType] = useState<number>(3);
+  const [cartData, setCartData] = useState<ICart[]>([]);
+  const [cartQty1, setCartQty] = useState<number>();
+  const { cartQty, cartItem } = useShoppingContext();
 
-  const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedValue(event.target.value);
+  const [provinces, setProvinces] = useState<Location[]>([]);
+  const [districts, setDistricts] = useState<Location[]>([]);
+  const [wards, setWards] = useState<Location[]>([]);
+
+  const [selectedProvince, setSelectedProvince] = useState<string>("");
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+  const [selectedWard, setSelectedWard] = useState<string>("");
+
+  const [openProvince, setOpenProvince] = useState(false);
+  const [openDistrict, setOpenDistrict] = useState(false);
+  const [openWard, setOpenWard] = useState(false);
+  const fullAddress = `${address ?? ""}, ${
+    selectedWard
+      ? wards.find((ward) => ward.value === selectedWard)?.label + ", "
+      : ""
+  }${
+    selectedDistrict
+      ? districts.find((district) => district.value === selectedDistrict)
+          ?.label + ", "
+      : ""
+  }${
+    selectedProvince
+      ? provinces.find((province) => province.value === selectedProvince)?.label
+      : ""
+  }`.trim();
+
+  // console.log(paymentType);
+  const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPhone(event.target.value);
+  };
+  const handleAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setAddress(event.target.value);
+  };
+  const handleNoteChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNote(event.target.value);
   };
 
-  const handleButtonClick = (value: string) => {
-    setSelectedValue(value);
+  useEffect(() => {
+    axios
+      .get("https://provinces.open-api.vn/api/p/")
+      .then((response) =>
+        setProvinces(
+          response.data.map((item: any) => ({
+            value: item.code,
+            label: item.name,
+          }))
+        )
+      )
+      .catch((error) => console.error("Error fetching provinces:", error));
+  }, []);
+
+  // Fetch districts based on selected province
+  useEffect(() => {
+    if (selectedProvince) {
+      axios
+        .get(`https://provinces.open-api.vn/api/p/${selectedProvince}?depth=2`)
+        .then((response) =>
+          setDistricts(
+            response.data.districts.map((item: any) => ({
+              value: item.code,
+              label: item.name,
+            }))
+          )
+        )
+        .catch((error) => console.error("Error fetching districts:", error));
+    } else {
+      setDistricts([]);
+    }
+    setSelectedDistrict("");
+    setSelectedWard("");
+  }, [selectedProvince]);
+
+  // Fetch wards based on selected district
+  useEffect(() => {
+    if (selectedDistrict) {
+      axios
+        .get(`https://provinces.open-api.vn/api/d/${selectedDistrict}?depth=2`)
+        .then((response) =>
+          setWards(
+            response.data.wards.map((item: any) => ({
+              value: item.code,
+              label: item.name,
+            }))
+          )
+        )
+        .catch((error) => console.error("Error fetching wards:", error));
+    } else {
+      setWards([]);
+    }
+    setSelectedWard("");
+  }, [selectedDistrict]);
+
+  const handlePaymentClick = async () => {
+    const paymentData = {
+      note: note,
+      address: fullAddress,
+      paymentType: paymentType,
+      cartItems: cartItem,
+    };
+    console.log(paymentData);
+
+    // If validation passes, proceed with the API call
+    try {
+      const response = await createPayment(paymentData);
+      toast({
+        title: "Thành công",
+        description: "Thanh toán đã được thực hiện thành công.",
+        variant: "default",
+      });
+      console.log("Payment Response:", response);
+    } catch (error) {
+      toast({
+        title: "Lỗi",
+        description: "Thanh toán thất bại. Vui lòng thử lại.",
+        variant: "destructive",
+      });
+      console.error("Payment failed:", error);
+    }
+  };
+  const handleOpenCartModal = () => {
+    const dataToSend = { cartItems: cartItem };
+
+    startTransition(async () => {
+      const result = await createAndGetCart(dataToSend);
+
+      if (result && result.data) {
+        // Update cartData and reset total price based on response
+        setCartData(result.data);
+      } else {
+        console.log("Failed to fetch cart data");
+      }
+    });
+  };
+  useEffect(() => {
+    localStorage.setItem("cartItem", JSON.stringify(cartItem));
+    setCartQty(cartQty);
+    handleOpenCartModal();
+  }, [cartItem]);
+  const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPaymentType(Number(event.target.value));
+  };
+
+  const handleButtonClick = (value: number) => {
+    setPaymentType(value);
   };
   return (
     <div className="bg-gray-100 py-5">
-      <div className="max-w-[70%] mx-auto">
+      <div className="max-w-[85%] 2xl:max-w-[70%] mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-center">Checkout</h1>
         <div className="grid xl:flex gap-10">
           <div className="bg-white lg:w-2/3 py-5 shadow-xl px-8 rounded-md">
@@ -156,6 +225,8 @@ export default function CheckoutPage() {
                     className="w-full"
                     type="email"
                     id="email"
+                    readOnly
+                    value={email ?? ""}
                     placeholder="Email"
                   />
                 </div>
@@ -167,15 +238,19 @@ export default function CheckoutPage() {
                     className="w-full"
                     type="text"
                     id="name"
+                    readOnly
+                    value={name ?? ""}
                     placeholder="Họ và tên"
                   />
                 </div>
                 <div className="grid mt-4 items-center gap-1.5">
-                  <Label className="text-[16px]">Số điện thoại</Label>
+                  <Label className="text-[16px]">Số điện thoại nhận hàng</Label>
                   <Input
                     className="w-full"
                     type="tel"
                     id="phone"
+                    value={phone ?? ""}
+                    onChange={handlePhoneChange}
                     placeholder="Số điện thoại"
                   />
                 </div>
@@ -185,53 +260,51 @@ export default function CheckoutPage() {
                     className="w-full"
                     type="text"
                     id="adress"
+                    value={address ?? ""}
+                    onChange={handleAddressChange}
                     placeholder="Địa chỉ"
                   />
                 </div>
-                <div className="grid mt-4 items-center gap-1.5">
+                <div className="grid items-center gap-1.5">
                   <Label className="text-[16px]">Tỉnh thành</Label>
-                  <Popover open={open} onOpenChange={setOpen}>
+                  <Popover open={openProvince} onOpenChange={setOpenProvince}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         role="combobox"
-                        aria-expanded={open}
+                        aria-expanded={openProvince}
                         className="w-full justify-between"
                       >
-                        {value
-                          ? frameworks.find(
-                              (framework) => framework.value === value
+                        {selectedProvince
+                          ? provinces.find(
+                              (province) => province.value === selectedProvince
                             )?.label
-                          : "Select framework..."}
+                          : "Chọn tỉnh..."}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[240px] sm:w-[500px] lg:w-[200px] xl:w-[400px] p-0">
                       <Command>
-                        <CommandInput placeholder="Tìm kiếm..." />
+                        <CommandInput placeholder="Tìm kiếm tỉnh..." />
                         <CommandList>
-                          <CommandEmpty>Không tìm thấy!!</CommandEmpty>
+                          <CommandEmpty>Không tìm thấy!</CommandEmpty>
                           <CommandGroup>
-                            {frameworks.map((framework) => (
+                            {provinces.map((province) => (
                               <CommandItem
-                                key={framework.value}
-                                value={framework.value}
-                                onSelect={(currentValue) => {
-                                  setValue(
-                                    currentValue === value ? "" : currentValue
-                                  );
-                                  setOpen(false);
+                                key={province.value}
+                                onSelect={() => {
+                                  setSelectedProvince(province.value);
+                                  setOpenProvince(false);
                                 }}
                               >
                                 <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    value === framework.value
+                                  className={
+                                    selectedProvince === province.value
                                       ? "opacity-100"
                                       : "opacity-0"
-                                  )}
+                                  }
                                 />
-                                {framework.label}
+                                {province.label}
                               </CommandItem>
                             ))}
                           </CommandGroup>
@@ -240,50 +313,49 @@ export default function CheckoutPage() {
                     </PopoverContent>
                   </Popover>
                 </div>
-                <div className="grid mt-4 items-center gap-1.5">
+
+                {/* District Selector */}
+                <div className="grid items-center gap-1.5">
                   <Label className="text-[16px]">Quận huyện</Label>
-                  <Popover open={open2} onOpenChange={setOpen2}>
+                  <Popover open={openDistrict} onOpenChange={setOpenDistrict}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         role="combobox"
-                        aria-expanded={open2}
+                        aria-expanded={openDistrict}
                         className="w-full justify-between"
+                        disabled={!selectedProvince}
                       >
-                        {value2
-                          ? frameworks.find(
-                              (framework) => framework.value === value2
+                        {selectedDistrict
+                          ? districts.find(
+                              (district) => district.value === selectedDistrict
                             )?.label
-                          : "Select framework..."}
+                          : "Chọn quận/huyện..."}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[240px] sm:w-[500px] lg:w-[200px] xl:w-[400px] p-0">
                       <Command>
-                        <CommandInput placeholder="Tìm kiếm..." />
+                        <CommandInput placeholder="Tìm kiếm quận/huyện..." />
                         <CommandList>
-                          <CommandEmpty>Không tìm thấy!!</CommandEmpty>
+                          <CommandEmpty>Không tìm thấy!</CommandEmpty>
                           <CommandGroup>
-                            {frameworks.map((framework) => (
+                            {districts.map((district) => (
                               <CommandItem
-                                key={framework.value}
-                                value={framework.value}
-                                onSelect={(currentValue) => {
-                                  setValue2(
-                                    currentValue === value2 ? "" : currentValue
-                                  );
-                                  setOpen2(false);
+                                key={district.value}
+                                onSelect={() => {
+                                  setSelectedDistrict(district.value);
+                                  setOpenDistrict(false);
                                 }}
                               >
                                 <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    value2 === framework.value
+                                  className={
+                                    selectedDistrict === district.value
                                       ? "opacity-100"
                                       : "opacity-0"
-                                  )}
+                                  }
                                 />
-                                {framework.label}
+                                {district.label}
                               </CommandItem>
                             ))}
                           </CommandGroup>
@@ -292,50 +364,48 @@ export default function CheckoutPage() {
                     </PopoverContent>
                   </Popover>
                 </div>
-                <div className="grid mt-4 items-center gap-1.5">
+
+                {/* Ward Selector */}
+                <div className="grid items-center gap-1.5">
                   <Label className="text-[16px]">Phường xã</Label>
-                  <Popover open={open3} onOpenChange={setOpen3}>
+                  <Popover open={openWard} onOpenChange={setOpenWard}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         role="combobox"
-                        aria-expanded={open3}
+                        aria-expanded={openWard}
                         className="w-full justify-between"
+                        disabled={!selectedDistrict}
                       >
-                        {value3
-                          ? frameworks.find(
-                              (framework) => framework.value === value3
-                            )?.label
-                          : "Select framework..."}
+                        {selectedWard
+                          ? wards.find((ward) => ward.value === selectedWard)
+                              ?.label
+                          : "Chọn phường/xã..."}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[240px] sm:w-[500px] lg:w-[200px] xl:w-[400px] p-0">
                       <Command>
-                        <CommandInput placeholder="Tìm kiếm..." />
+                        <CommandInput placeholder="Tìm kiếm phường/xã..." />
                         <CommandList>
-                          <CommandEmpty>Không tìm thấy!!</CommandEmpty>
+                          <CommandEmpty>Không tìm thấy!</CommandEmpty>
                           <CommandGroup>
-                            {frameworks.map((framework) => (
+                            {wards.map((ward) => (
                               <CommandItem
-                                key={framework.value}
-                                value={framework.value}
-                                onSelect={(currentValue) => {
-                                  setValue3(
-                                    currentValue === value3 ? "" : currentValue
-                                  );
-                                  setOpen3(false);
+                                key={ward.value}
+                                onSelect={() => {
+                                  setSelectedWard(ward.value);
+                                  setOpenWard(false);
                                 }}
                               >
                                 <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    value3 === framework.value
+                                  className={
+                                    selectedWard === ward.value
                                       ? "opacity-100"
                                       : "opacity-0"
-                                  )}
+                                  }
                                 />
-                                {framework.label}
+                                {ward.label}
                               </CommandItem>
                             ))}
                           </CommandGroup>
@@ -346,11 +416,15 @@ export default function CheckoutPage() {
                 </div>
                 <div className="grid mt-4 items-center gap-1.5">
                   <Label className="text-[16px]">Ghi chú</Label>
-                  <Textarea placeholder="Type your message here." />
+                  <Textarea
+                    value={note ?? ""}
+                    onChange={handleNoteChange}
+                    placeholder="Nhập ghi chú vào đây."
+                  />
                 </div>
               </div>
               <div className="xl:w-1/2">
-                <h2 className="text-2xl font-bold border-b pb-3">Vận chuyển</h2>
+                <h2 className="text-xl font-bold border-b pb-3">Vận chuyển</h2>
                 <div className="mt-4">
                   <Button
                     variant="outline"
@@ -371,7 +445,7 @@ export default function CheckoutPage() {
                     <FormControl className="w-full mt-4">
                       <RadioGroup
                         aria-labelledby="demo-radio-buttons-group-label"
-                        value={selectedValue}
+                        value={paymentType}
                         name="radio-buttons-group"
                         className="gap-4"
                         onChange={handleRadioChange}
@@ -379,10 +453,10 @@ export default function CheckoutPage() {
                         <Button
                           variant="outline"
                           className="flex w-full justify-between text-xl h-14"
-                          onClick={() => handleButtonClick("cod")}
+                          onClick={() => handleButtonClick(3)}
                         >
                           <FormControlLabel
-                            value="cod"
+                            value={3}
                             control={<Radio />}
                             label="Thanh toán khi giao hàng (COD)"
                             className="w-full"
@@ -392,10 +466,23 @@ export default function CheckoutPage() {
                         <Button
                           variant="outline"
                           className="flex w-full justify-between text-xl h-14"
-                          onClick={() => handleButtonClick("zalo")}
+                          onClick={() => handleButtonClick(2)}
                         >
                           <FormControlLabel
-                            value="zalo"
+                            value="2"
+                            control={<Radio />}
+                            label="Thanh toán ghi nợ"
+                            className="w-full"
+                          />
+                          <img src="/money.png" className="w-10 h-10" alt="" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="flex w-full justify-between text-xl h-14"
+                          onClick={() => handleButtonClick(4)}
+                        >
+                          <FormControlLabel
+                            value="4"
                             control={<Radio />}
                             label="Thanh toán qua Zalo"
                             className="w-full"
@@ -409,7 +496,7 @@ export default function CheckoutPage() {
                         <Button
                           variant="outline"
                           className="flex w-full justify-between text-xl h-14"
-                          onClick={() => handleButtonClick("momo")}
+                          onClick={() => handleButtonClick(5)}
                         >
                           <FormControlLabel
                             value="momo"
@@ -435,15 +522,18 @@ export default function CheckoutPage() {
             <div className="flex justify-center items-center">
               <div className="w-full mx-auto ">
                 <h2 className="text-lg font-semibold my-4">
-                  Đơn hàng ({products.length} sản phẩm)
+                  Đơn hàng ({cartQty1} sản phẩm)
                 </h2>
-                <div className="grid gap-4 overflow-y-auto h-96">
-                  {products.map((product) => (
-                    <div key={product.id} className="flex items-center p-2">
+                <div className="grid gap-4 overflow-y-auto max-h-96">
+                  {cartData.map((product) => (
+                    <div
+                      key={product.materialId}
+                      className="flex items-center p-2"
+                    >
                       <div className="relative">
                         <img
                           src={product.imageUrl}
-                          alt={`Image of ${product.name}`}
+                          alt={`Image of ${product.itemName}`}
                           className="w-20 h-20 object-cover mr-2"
                         />
                         <span className="absolute -top-2 -right-2 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-sm mr-2">
@@ -451,12 +541,12 @@ export default function CheckoutPage() {
                         </span>
                       </div>
                       <div className="flex-1">
-                        <div className="text-sm">{product.name}</div>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-sm">{product.itemName}</div>
+                        {/* <div className="text-xs text-gray-500">
                           Size: {product.size}
-                        </div>
+                        </div> */}
                       </div>
-                      <div className="text-sm">{product.price}</div>
+                      <div className="text-sm">{product.itemTotalPrice}</div>
                     </div>
                   ))}
                 </div>
@@ -492,10 +582,13 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <a href="#" className="text-blue-500 text-sm">
+                    <Link href="/cart" className="text-blue-500 text-sm">
                       &lt; Quay về giỏ hàng
-                    </a>
-                    <button className="bg-blue-500 text-white px-4 py-2 rounded">
+                    </Link>
+                    <button
+                      onClick={handlePaymentClick}
+                      className="bg-blue-500 text-white px-4 py-2 rounded"
+                    >
                       ĐẶT HÀNG
                     </button>
                   </div>

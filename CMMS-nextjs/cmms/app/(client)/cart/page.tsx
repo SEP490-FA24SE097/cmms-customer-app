@@ -14,6 +14,7 @@ import Link from "next/link";
 import { ICart } from "@/lib/actions/cart/type/cart-type";
 import { useShoppingContext } from "@/context/shopping-cart-context";
 import { createAndGetCart } from "@/lib/actions/cart/action/cart";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CartPage() {
   const [totalItemPrice, setTotalItemPrice] = useState(0);
@@ -24,6 +25,7 @@ export default function CartPage() {
   const shipping = 0;
   const tax = 0.0;
   const total = subtotal + shipping + tax;
+  const { toast } = useToast();
   const {
     cartQty,
     cartItem,
@@ -32,6 +34,28 @@ export default function CartPage() {
     removeCartItem,
     updateQuantity,
   } = useShoppingContext();
+
+  const showWarningToast = () => {
+    toast({
+      title: "Không đủ sản phẩm",
+      description: "Vui lòng xóa sản phẩm không đủ và không thể chuyển trang",
+      variant: "destructive", // This sets the toast style to destructive (error style)
+      duration: 3000, // 3 seconds duration
+    });
+  };
+
+  // Check if there is any item with insufficient quantity
+  const hasInsufficientQuantity = cartData.some(
+    (item) => item.isChangeQuantity
+  );
+
+  // Prevent checkout if any item has insufficient quantity
+  const handleCheckoutClick = (e: React.MouseEvent) => {
+    if (hasInsufficientQuantity) {
+      e.preventDefault();
+      showWarningToast();
+    }
+  };
   useEffect(() => {
     // Calculate total itemTotalPrice whenever cartData changes
     const total = cartData.reduce((sum, item) => sum + item.itemTotalPrice, 0);
@@ -196,6 +220,7 @@ export default function CartPage() {
                           type="text"
                           placeholder="Code giảm giá"
                         />
+
                         <Button className="bg-red-300 font-bold text-white px-4 py-2">
                           Áp dụng
                         </Button>
@@ -223,8 +248,12 @@ export default function CartPage() {
                         <span>Total</span>
                         <span>{total}đ</span>
                       </div>
-                      <Button className="bg-red-300 text-2xl text-white w-full py-7 mt-4">
-                        Tiến hành thanh toán
+                      <Button
+                        disabled={hasInsufficientQuantity}
+                        onClick={handleCheckoutClick}
+                        className="bg-red-300 text-2xl text-white w-full py-7 mt-4"
+                      >
+                        <Link href="/checkout">Tiến hành thanh toán</Link>
                       </Button>
                     </div>
                   </div>

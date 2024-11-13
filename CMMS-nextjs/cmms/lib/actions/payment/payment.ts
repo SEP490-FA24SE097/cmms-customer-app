@@ -8,11 +8,12 @@ import {
   fetchListData,
   fetchSingleData,
 } from "@/lib/api/api-handler/generic";
-import { api } from "@/lib/api/api-interceptor/api";
+import { axiosAuth } from "@/lib/api/api-interceptor/api";
 
-export async function createAccount<T>(data: any): Promise<ApiListResponse<T>> {
+export async function createPayment<T>(data: any): Promise<ApiListResponse<T>> {
   noStore();
-  const result = await apiRequest(() => api.post("/auth/signUp", data));
+  const result = await apiRequest(() => axiosAuth.post("/payment", data));
+  console.log(result);
   if (!result.success) {
     return { data: [], error: result.error };
   }
