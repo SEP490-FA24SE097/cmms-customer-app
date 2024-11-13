@@ -8,7 +8,7 @@ import { CiHeart } from "react-icons/ci";
 import { Button } from "@/components/ui/button";
 import { RiShoppingCart2Line } from "react-icons/ri";
 import { FaHeart } from "react-icons/fa";
-
+import { FaStore } from "react-icons/fa";
 import {
   Dialog,
   DialogContent,
@@ -27,9 +27,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   HoverCard,
   HoverCardContent,
@@ -42,6 +39,20 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import {
+  useGetMaterial,
+  useGetMaterialById,
+} from "@/lib/actions/materials/react-query/material-query";
+import { IMaterial } from "@/lib/actions/materials/type/material-type";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useRouter } from "next/navigation";
+import { useGetQuantityStore } from "@/lib/actions/material_in_store/react-query/material-qty-store-query";
+import { useToast } from "@/hooks/use-toast";
+import {
+  MaterialStore,
+  useShoppingContext,
+} from "@/context/shopping-cart-context";
+import Link from "next/link";
 
 const fakeData = [
   {
@@ -75,245 +86,177 @@ const fakeData = [
     items: ["Bumpers", "Hoods", "Grilles", "Fog Lights", "Door Handles"],
   },
 ];
-const fakeProducts = [
-  {
-    category: "vat_tu_noi_that",
-    discount: "Up to 35% off",
-    isFavorite: false,
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/kTGOfrYVKoTrQyvha64sqOyzbE5EXYyDfkfFuc2T26QN74WnA.jpg",
-    title: 'Apple iMac 27", 1TB HDD, Retina 5K Display, M3 Max',
-    rating: 5.0,
-    reviews: 455,
-    delivery: "Fast Delivery",
-    price: "1,699,699",
-    shippingIcon: "fas fa-shipping-fast",
-    priceIcon: "fas fa-tag",
-  },
-  {
-    category: "gach",
-    discount: "Up to 15% off",
-    isFavorite: true,
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/HK1eMFUFPXWtOSupifnfYkSQgwdMqxyU1FzRvDN4kjyR74WnA.jpg",
-    title: "Apple iPhone 15 Pro Max, 256GB, Blue Titanium",
-    rating: 4.5,
-    reviews: 1233,
-    delivery: "Best Seller",
-    price: "1,199,199",
-    shippingIcon: "fas fa-crown",
-    priceIcon: "fas fa-tag",
-  },
-  {
-    category: "vat_tu_noi_that",
-    discount: "Up to 35% off",
-    isFavorite: false,
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/7FaRzFXljfSIZSMnL8Ny6WNdTbyIgMoteB0uhfFJ0QrS74WnA.jpg",
-    title: "iPad Pro 13-Inch (M4): XDR Display, 512GB",
-    rating: 4,
-    reviews: 879,
-    delivery: "Shipping Today",
-    price: "799,199",
-    shippingIcon: "fas fa-shipping-fast",
-    priceIcon: "fas fa-tag",
-  },
-  {
-    category: "gach",
-    discount: "Up to 10% off",
-    isFavorite: false,
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/w9j3qd5LMxLjG1P0FaAkJoBScpkxfJJfw5edDawzmJlK74WnA.jpg",
-    title: "PlayStation®5 Console – 1TB, PRO Controller",
-    rating: 4.5,
-    reviews: 2957,
-    delivery: "Fast Delivery",
-    price: "499,199",
-    shippingIcon: "fas fa-shipping-fast",
-    priceIcon: "fas fa-tag",
-  },
-  {
-    category: "san",
-    discount: "Up to 35% off",
-    isFavorite: true,
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/kTGOfrYVKoTrQyvha64sqOyzbE5EXYyDfkfFuc2T26QN74WnA.jpg",
-    title: 'Apple iMac 27", 1TB HDD, Retina 5K Display, M3 Max',
-    rating: 3.0,
-    reviews: 455,
-    delivery: "Fast Delivery",
-    price: "1,699,199",
-    shippingIcon: "fas fa-shipping-fast",
-    priceIcon: "fas fa-tag",
-  },
-  {
-    category: "vat_tu_noi_that",
-    discount: "Up to 15% off",
-    isFavorite: false,
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/HK1eMFUFPXWtOSupifnfYkSQgwdMqxyU1FzRvDN4kjyR74WnA.jpg",
-    title: "Apple iPhone 15 Pro Max, 256GB, Blue Titanium",
-    rating: 4.5,
-    reviews: 1233,
-    delivery: "Best Seller",
-    price: "1,199,199",
-    shippingIcon: "fas fa-crown",
-    priceIcon: "fas fa-tag",
-  },
-  {
-    category: "vat_tu_noi_that",
-    discount: "Up to 35% off",
-    isFavorite: false,
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/7FaRzFXljfSIZSMnL8Ny6WNdTbyIgMoteB0uhfFJ0QrS74WnA.jpg",
-    title: "iPad Pro 13-Inch (M4): XDR Display, 512GB",
-    rating: 4,
-    reviews: 879,
-    delivery: "Shipping Today",
-    price: "799,199",
-    shippingIcon: "fas fa-shipping-fast",
-    priceIcon: "fas fa-tag",
-  },
-  {
-    category: "san",
-    discount: "Up to 10% off",
-    isFavorite: false,
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/w9j3qd5LMxLjG1P0FaAkJoBScpkxfJJfw5edDawzmJlK74WnA.jpg",
-    title: "PlayStation®5 Console – 1TB, PRO Controller",
-    rating: 3.5,
-    reviews: 2957,
-    delivery: "Fast Delivery",
-    price: "499,199",
-    shippingIcon: "fas fa-shipping-fast",
-    priceIcon: "fas fa-tag",
-  },
-];
 const fakeCategories = [
   { name: "Tất cả", key: "all" },
-  { name: "Vật tư nội thất", key: "vat_tu_noi_that" },
-  { name: "Sàn", key: "san" },
+  { name: "Vật tư nội thất", key: "danh mục 1" },
+  { name: "Sàn", key: "danh mục 2" },
   { name: "Gạch", key: "gach" },
 ];
-const topSelling = [
-  {
-    title: "Nestle Original Coffee-Mate Coffee Creamer",
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/oIEjoUxsE8IzBhehnDS6SMfqhsr9OhqbFi4rlpyTm7LGigrTA.jpg",
-    rating: 4.0,
-    price: "$32.85",
-    oldPrice: "$33.8",
-  },
-  {
-    title: "Nestle Original Coffee-Mate Coffee Creamer",
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/eUse4NslW1nQrUZF55JJdN37zVnQifglErfXZgZkypf7QEcdC.jpg",
-    rating: 4.0,
-    price: "$32.85",
-    oldPrice: "$33.8",
-  },
-  {
-    title: "Nestle Original Coffee-Mate Coffee Creamer",
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/fLeb6HEdUwhdb0AfUyDafZt5QPY4hjEI57vCWAGl9bOjICuOB.jpg",
-    rating: 4.0,
-    price: "$32.85",
-    oldPrice: "$33.8",
-  },
-];
-
-const trendingProducts = [
-  {
-    title: "Organic Cage-Free Grade A Large Brown Eggs",
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/MppG6HpIa1IzMpJ8iu5Yg3g71d4k6U2L0znUNhHOQiQgI46E.jpg",
-    rating: 4.0,
-    price: "$32.85",
-    oldPrice: "$33.8",
-  },
-  {
-    title: "Seeds of Change Organic Quinoa, Brown, & Red Rice",
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/UKuFf2QirtWmCaZOGghKqh3FOPirfxmO5pwDax7qa6UEigrTA.jpg",
-    rating: 4.0,
-    price: "$32.85",
-    oldPrice: "$33.8",
-  },
-  {
-    title: "Naturally Flavored Cinnamon Vanilla Light Roast Coffee",
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/BREdiMbk087GHNKoz3eYUfcsT9PkgP00MJNHo7NmaueHEBXnA.jpg",
-    rating: 4.0,
-    price: "$32.85",
-    oldPrice: "$33.8",
-  },
-];
-const productData = {
-  name: "Seeds of Change Organic Quinoa, Brown",
-  price: 38,
-  originalPrice: 52,
-  discount: "26% Off",
-  rating: 4,
-  description:
-    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam rem officia, corrupti reiciendis minima nisi modi, quasi, odio minus dolore impedit fuga eum eligendi.",
-  sizeOptions: ["50g", "60g", "80g", "100g", "150g"],
-  colors: ["Xanh", "Đỏ", "Vàng", "Tím", "Hồng"],
-  sku: "FWM15VKT",
-  mfgDate: "Jun 4, 2022",
-  shelfLife: "70 days",
-  tags: ["Snack", "Organic", "Brown"],
-  stock: 8,
-  images: [
-    {
-      src: "https://storage.googleapis.com/a1aa/image/SFugHfITaRQGLyavvykKGxIs1e5hLff8trk68uBVudegeaA7E.jpg",
-      alt: "Main product image",
-    },
-    {
-      src: "https://storage.googleapis.com/a1aa/image/Pt3asJ56WfwJICsfzigVqFFzaiL2fJs87zfLHIw3c53OvGwOB.jpg",
-      alt: "Mango juice",
-    },
-    {
-      src: "https://storage.googleapis.com/a1aa/image/CVaoYsf7EaW3cyQ5PO0rJNJqHygiftgG9v4d4EXau6GwrBsTA.jpg",
-      alt: "Bananas",
-    },
-    {
-      src: "https://storage.googleapis.com/a1aa/image/C0XU1GB0Ic5RFNLgehfcGFac0chmuDqUceOX8AIB4qJeuGwOB.jpg",
-      alt: "Sliced watermelon",
-    },
-    {
-      src: "https://storage.googleapis.com/a1aa/image/teabFYGONcWDba9e5R5fWDUTmL8WZPOyrZiUSaJGhJccXDYnA.jpg",
-      alt: "Durian fruit",
-    },
-  ],
+const materialsDataParams = {
+  isCreatedDateDescending: true,
 };
-const recentlyAdded = [
-  {
-    title: "Pepperidge Farm Farmhouse Hearty White Bread",
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/84eyYaZTWF3rLiECFOoPYrecF5J7YBJ3PKfSE0lKTlzXEBXnA.jpg",
-    rating: 4.0,
-    price: "$32.85",
-    oldPrice: "$33.8",
-  },
-  {
-    title: "Organic Frozen Triple Berry Blend",
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/vvKCkp9SJq5NOtemfMlAPRM9nx2el8r8lBSaCe6Ek0woICuOB.jpg",
-    rating: 4.0,
-    price: "$32.85",
-    oldPrice: "$33.8",
-  },
-  {
-    title: "Oroweat Country Buttermilk Bread",
-    imgSrc:
-      "https://storage.googleapis.com/a1aa/image/nluiZf4n6dTFN6kJNjhRWpeOf57Fy7seOHKZMZwEAjMwICuOB.jpg",
-    rating: 4.0,
-    price: "$32.85",
-    oldPrice: "$33.8",
-  },
-];
+
+const materialsDataWithPriceParams = {
+  isPriceDescending: true,
+  isCreatedDateDescending: false,
+};
+
+const paginatedMaterialsParams = {
+  page: 1,
+  itemPerPage: 3,
+  categoryId: "85a4f0e6-3f44-42ba-b2fe-3cff6fdc99be",
+};
 const HomePage: React.FC = () => {
+  const router = useRouter();
+  const { toast } = useToast();
+  const { addCartItem } = useShoppingContext();
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const [materialId, setMaterialId] = useState<string | null>(null);
+  const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
+  const [selectedVariantName, setSelectedVariantName] = useState<string | null>(
+    null
+  );
+  const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
+  const [availableQuantity, setAvailableQuantity] = useState<number | null>(
+    null
+  );
+  const [selectedVariantValue, setSelectedVariantValue] = useState<
+    number | null
+  >(null);
+
+  const searchParamsquantity = {
+    materialId: materialId,
+    variantId: selectedVariant,
+  };
+  const { data: materialData, isLoading: isLoadingMaterialData } =
+    useGetMaterialById(materialId ?? "");
+
+  const { data: dataMaterials, isLoading: isLoadingMaterials } =
+    useGetMaterial(materialsDataParams);
+  const {
+    data: dataMaterialsWithPrice,
+    isLoading: isLoadingMaterialsWithPrice,
+  } = useGetMaterial(materialsDataWithPriceParams);
+  const {
+    data: dataPaginatedMaterials,
+    isLoading: isLoadingPaginatedMaterials,
+  } = useGetMaterial(paginatedMaterialsParams);
+  const { data: storeQuantityData, isLoading: isLoadingStoreQuantity } =
+    useGetQuantityStore(searchParamsquantity);
+  const handleVariantNameClick = (variantName: string) => {
+    setSelectedVariantName(variantName);
+  };
+  const handleVariantValueClick = (variantValue: number) => {
+    setSelectedVariantValue(variantValue);
+  };
+  const handleStoreClick = (storeId: string, quantity: number) => {
+    setSelectedStoreId(storeId);
+    setAvailableQuantity(quantity);
+  };
+  const handleMateridIdClick = (productMaterialId: string) => {
+    setMaterialId(productMaterialId);
+  };
+  const handleVariantClick = (variantId: string) => {
+    setSelectedVariant(variantId);
+  };
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10);
+    if (value > 0) {
+      setCount(value);
+    } else {
+      setCount(1); // Reset to 1 if input is zero or negative
+    }
+  };
+  const handleAddToCart = () => {
+    if (!materialData) return;
+
+    if (!selectedStoreId) {
+      toast({
+        title: "Vui lòng chọn cửa hàng.",
+        style: { backgroundColor: "#3b82f6", color: "#ffffff" },
+      });
+      return;
+    }
+
+    const materialId = materialData.data?.material.id;
+
+    // Retrieve cart from localStorage and parse it
+    const cart = JSON.parse(localStorage.getItem("cartItem") || "[]");
+    // Check if there is an item with the same materialId and variantId but a different storeId
+    const existingInOtherStore = cart.some(
+      (item: any) =>
+        item.materialId === materialId &&
+        item.variantId === selectedVariant &&
+        item.storeId !== selectedStoreId
+    );
+
+    if (existingInOtherStore) {
+      toast({
+        title: "Bạn đã có sản phẩm này ở cửa hàng khác.",
+        style: { backgroundColor: "#f87171", color: "#ffffff" }, // Red background for error
+      });
+      return;
+    }
+    // Find the existing quantity in the cart for the specific combination of materialId, storeId, and variantId
+    const currentCartQuantity = cart.reduce((acc: any, item: any) => {
+      const matchesMaterial = item.materialId === materialId;
+      const matchesStore = item.storeId === selectedStoreId;
+      const matchesVariant =
+        item.variantId === selectedVariant ||
+        (!selectedVariant && !item.variantId);
+
+      return matchesMaterial && matchesStore && matchesVariant
+        ? acc + item.quantity
+        : acc;
+    }, 0);
+    // Check if adding `count` would exceed store's available quantity
+    if (
+      availableQuantity !== null &&
+      currentCartQuantity + count > availableQuantity
+    ) {
+      toast({
+        title: "Vượt quá số lượng có sẵn.",
+        style: { backgroundColor: "#f87171", color: "#ffffff" }, // Red background for error
+      });
+      return;
+    }
+
+    const data = {
+      materialId,
+      quantity: count,
+      storeId: selectedStoreId,
+      variantId: selectedVariant,
+    } as MaterialStore;
+
+    // Add item to cart
+    addCartItem(data, count);
+
+    // Display success toast
+    toast({
+      title: `Đã thêm ${count} sản phẩm vào giỏ hàng.`,
+      style: { backgroundColor: "#10b981", color: "#ffffff" }, // Green background for success
+    });
+  };
+  const images = materialData?.data?.material
+    ? [
+        {
+          src: materialData?.data?.material.imageUrl,
+          alt: "Main product image",
+        },
+        // Spread the subImages array, if it exists
+        // ...(materialData?.data?.material.subImages || []).map(
+        //   (subImage, index) => ({
+        //     src: subImage,
+        //     alt: `Sub image ${index + 1}`,
+        //   })
+        // ),
+        ...(materialData?.data?.variants || []).map((variant, index) => ({
+          src: variant.image,
+          alt: `Variant image ${index + 1}`,
+        })),
+      ]
+    : [];
 
   const prevSlide = () => {
     const isFirstSlide = currentIndex === 0;
@@ -363,24 +306,17 @@ const HomePage: React.FC = () => {
     }
     openModal();
   };
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+
   const [count, setCount] = useState(1);
   const increment = () => setCount(count + 1);
   const decrement = () => setCount(count - 1);
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(event.target.value);
-    if (!isNaN(value)) {
-      setCount(value);
-    } else {
-      setCount(0);
-    }
-  };
   // Filter products based on selected category
   const filteredProducts =
     selectedCategory === "all"
-      ? fakeProducts
-      : fakeProducts.filter((product) => product.category === selectedCategory);
+      ? dataMaterialsWithPrice?.data
+      : dataMaterialsWithPrice?.data.filter(
+          (product) => product.material.category === selectedCategory
+        );
   return (
     <section className="bg-gray-100 pb-10">
       <div className="w-full sm:h-[700px] h-[40vh] m-auto py-5 relative group">
@@ -437,9 +373,9 @@ const HomePage: React.FC = () => {
                       <li key={itemIndex}>{item}</li>
                     ))}
                   </ul>
-                  <a className="text-blue-600" href="#">
+                  <Link className="text-blue-600" href="/product">
                     Shop All
-                  </a>
+                  </Link>
                 </div>
               </div>
             ))}
@@ -460,33 +396,64 @@ const HomePage: React.FC = () => {
             }}
             className="w-full max-w-full"
           >
-            <CarouselContent className="-ml-1">
-              {fakeProducts.map((product, index) => (
-                <CarouselItem
-                  key={index}
-                  className="pl-1 md:basis-1/2 lg:basis-1/3 xl:basis-1/4"
-                >
-                  <div className="p-2">
+            {isLoadingMaterials ? (
+              <div className="flex space-x-10 m-5">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <div key={index} className="flex flex-col space-y-3">
+                    <Skeleton className="h-[350px] w-[280px] rounded-xl" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-[250px]" />
+                      <Skeleton className="h-4 w-[200px]" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <CarouselContent className="-ml-1">
+                {dataMaterials?.data.map((product, index) => (
+                  <CarouselItem
+                    key={product.material.id}
+                    onClick={() =>
+                      router.push(`/product/${product.material.id}`)
+                    }
+                    className="pl-1 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 cursor-pointer"
+                  >
                     <Card
-                      className="pt-6 max-h-[550px] overflow-hidden hover:overflow-y-auto [&::-webkit-scrollbar]:w-2 rounded-xl
-  [&::-webkit-scrollbar-track]:bg-gray-100
-  [&::-webkit-scrollbar-thumb]:bg-gray-300 cursor-pointer group"
+                      className="pt-6 max-h-[550px] overflow-hidden hover:overflow-y-auto [&::-webkit-scrollbar]:w-2 rounded-sm
+                [&::-webkit-scrollbar-track]:bg-gray-100
+                [&::-webkit-scrollbar-thumb]:bg-gray-300 cursor-pointer group"
                     >
                       <CardContent className="flex flex-col items-center">
                         <img
-                          src={product.imgSrc}
-                          alt={product.title}
+                          src={product.material.imageUrl}
+                          alt={product.material.name}
                           className="w-full h-64 lg:h-60 2xl:h-72 object-cover mb-4 group-hover:scale-110 ease-in-out duration-300"
                         />
                         <div className="flex w-full justify-between">
                           <div className="bg-blue-400 px-2 py-1 rounded-sm my-1">
-                            {product.discount}
+                            {/* {product.discount} */} 20%
                           </div>
-                          <div className="flex items-center gap-2 mr-2">
+                          <div
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex items-center gap-2 mr-2"
+                          >
                             <Dialog>
                               <DialogTrigger asChild>
                                 <Button
                                   variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleMateridIdClick(product.material.id);
+                                    handleVariantClick(
+                                      product.variants[0]?.variantId
+                                    );
+                                    handleVariantNameClick(
+                                      product.variants[0]?.sku
+                                    );
+                                    handleVariantValueClick(
+                                      product.variants[0]?.price
+                                    );
+                                  }}
                                   className="text-stone-500 hover:text-black hover:bg-white"
                                 >
                                   <HoverCard>
@@ -506,28 +473,35 @@ const HomePage: React.FC = () => {
                                 <div className="container mx-auto grid gap-8 md:grid-cols-2 ">
                                   <div>
                                     <div className="w-full sm:h-[55vh] h-[40vh] m-auto py-5 relative group">
-                                      <div
-                                        style={{
-                                          backgroundImage: `url(${productData.images[currentIndex].src})`,
-                                        }}
-                                        onClick={handleClick}
-                                        className="w-full h-full rounded-xl bg-center bg-cover duration-500 cursor-pointer"
-                                      >
-                                        {/* Left Arrow */}
+                                      {isLoadingMaterialData ? (
+                                        <Skeleton className="h-[350px] w-[450px] rounded-xl" />
+                                      ) : images.length > 0 &&
+                                        images[currentIndex] ? (
                                         <div
-                                          className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] left-10 text-xl rounded-full p-2 bg-black/20 text-white cursor-pointer"
-                                          onClick={prevSlide}
+                                          style={{
+                                            backgroundImage: `url(${images[currentIndex].src})`,
+                                          }}
+                                          onClick={handleClick}
+                                          className="w-full h-full rounded-xl bg-center bg-cover duration-500 cursor-pointer"
                                         >
-                                          <FaChevronLeft size={30} />
+                                          {/* Left Arrow */}
+                                          <div
+                                            className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] left-10 text-xl rounded-full p-2 bg-black/20 text-white cursor-pointer"
+                                            onClick={prevSlide}
+                                          >
+                                            <FaChevronLeft size={30} />
+                                          </div>
+                                          {/* Right Arrow */}
+                                          <div
+                                            className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] right-10 text-xl rounded-full p-2 bg-black/20 text-white cursor-pointer"
+                                            onClick={nextSlide}
+                                          >
+                                            <FaChevronRight size={30} />
+                                          </div>
                                         </div>
-                                        {/* Right Arrow */}
-                                        <div
-                                          className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] right-10 text-xl rounded-full p-2 bg-black/20 text-white cursor-pointer"
-                                          onClick={nextSlide}
-                                        >
-                                          <FaChevronRight size={30} />
-                                        </div>
-                                      </div>
+                                      ) : (
+                                        <p>No image available</p>
+                                      )}
                                     </div>
 
                                     {/* Full-size Image Modal */}
@@ -539,10 +513,7 @@ const HomePage: React.FC = () => {
                                         <div className="relative w-full max-w-4xl">
                                           {/* Full-size Image */}
                                           <img
-                                            src={
-                                              productData.images[currentIndex]
-                                                .src
-                                            }
+                                            src={images[currentIndex].src}
                                             alt=""
                                             className="w-full h-auto rounded-lg"
                                           />
@@ -572,28 +543,25 @@ const HomePage: React.FC = () => {
                                           className="w-full max-w-sm"
                                         >
                                           <CarouselContent className="-ml-1">
-                                            {productData.images.map(
-                                              (slide, slideIndex) => (
-                                                <CarouselItem
+                                            {images.map((slide, slideIndex) => (
+                                              <CarouselItem
+                                                key={slideIndex}
+                                                className="pl-1 basis-1/4"
+                                              >
+                                                <img
+                                                  src={slide.src}
                                                   key={slideIndex}
-                                                  className="pl-1 basis-1/4"
-                                                >
-                                                  <img
-                                                    src={slide.src}
-                                                    key={slideIndex}
-                                                    onClick={() =>
-                                                      goToSlide(slideIndex)
-                                                    }
-                                                    className={`border-2 h-20 w-20 rounded-sm cursor-pointer ${
-                                                      currentIndex ===
-                                                      slideIndex
-                                                        ? " border-red-300"
-                                                        : ""
-                                                    }`}
-                                                  />
-                                                </CarouselItem>
-                                              )
-                                            )}
+                                                  onClick={() =>
+                                                    goToSlide(slideIndex)
+                                                  }
+                                                  className={`border-2 h-20 w-20 rounded-sm cursor-pointer ${
+                                                    currentIndex === slideIndex
+                                                      ? " border-red-300"
+                                                      : ""
+                                                  }`}
+                                                />
+                                              </CarouselItem>
+                                            ))}
                                           </CarouselContent>
                                           <CarouselPrevious />
                                           <CarouselNext />
@@ -610,13 +578,16 @@ const HomePage: React.FC = () => {
                                       </span>
                                     </div>
                                     <h1 className="text-3xl font-bold">
-                                      {productData.name}
+                                      {selectedVariantName
+                                        ? selectedVariantName
+                                        : materialData?.data?.material?.name ||
+                                          "Product Name Not Available"}
                                     </h1>
 
                                     <div className="flex items-center">
                                       <Rating
                                         name="half-rating-read"
-                                        defaultValue={productData.rating}
+                                        defaultValue={4}
                                         precision={0.5}
                                         readOnly
                                       />
@@ -627,69 +598,142 @@ const HomePage: React.FC = () => {
 
                                     <div className="flex items-center space-x-2">
                                       <span className="text-3xl font-bold text-red-500">
-                                        {productData.price}đ
+                                        {selectedVariantValue
+                                          ? selectedVariantValue
+                                          : materialData?.data?.material
+                                              ?.salePrice ||
+                                            "Product Price Not Available"}
+                                        đ
                                       </span>
+
                                       <span className="text-gray-500 line-through">
-                                        {productData.originalPrice}đ
+                                        {selectedVariantValue
+                                          ? selectedVariantValue
+                                          : materialData?.data?.material
+                                              ?.salePrice ||
+                                            "Product Price Not Available"}
+                                        đ
                                       </span>
                                       <span className="text-red-500 text-sm">
-                                        {productData.discount}
+                                        20%
                                       </span>
                                     </div>
 
                                     <p className="text-gray-600">
-                                      {productData.description}
+                                      {materialData?.data?.material
+                                        ?.description ||
+                                        "Product Description Not Available"}
                                     </p>
 
                                     <div>
                                       <span className="text-gray-600">
-                                        Size / Weight:
+                                        Các loại
                                       </span>
-                                      <div className="flex items-center mt-2 space-x-2">
-                                        {productData.sizeOptions.map(
-                                          (size, index) => (
-                                            <button
-                                              key={index}
-                                              onClick={() =>
-                                                setSelectedSize(size)
-                                              }
-                                              className={`px-3 hover:bg-red-100 hover:text-red-600 py-1 border rounded ${
-                                                selectedSize === size
-                                                  ? "bg-red-100 text-red-600"
-                                                  : ""
-                                              }`}
-                                            >
-                                              {size}
-                                            </button>
+                                      <div className="flex items-center space-x-2">
+                                        {materialData?.data?.variants &&
+                                        materialData.data.variants.length >
+                                          0 ? (
+                                          materialData.data.variants.map(
+                                            (variant, index) => (
+                                              <div
+                                                key={index}
+                                                onClick={() => {
+                                                  handleVariantClick(
+                                                    variant.variantId
+                                                  );
+                                                  handleVariantNameClick(
+                                                    variant.sku
+                                                  );
+                                                  handleVariantValueClick(
+                                                    variant.price
+                                                  );
+                                                }}
+                                                className={`flex items-center border p-1 ${
+                                                  selectedVariant ===
+                                                  variant.variantId
+                                                    ? "bg-red-100 text-red-600"
+                                                    : "hover:bg-red-100 hover:text-red-600"
+                                                } `}
+                                              >
+                                                <img
+                                                  src={variant.image}
+                                                  alt={`Variant ${index + 1}`}
+                                                  className="w-12 h-12 object-cover"
+                                                />
+                                                <div className="flex-col mt-2">
+                                                  {variant.attributes.map(
+                                                    (attribute, idx) => (
+                                                      <button
+                                                        key={idx}
+                                                        className="flex text-[14px] items-center"
+                                                      >
+                                                        <div className="capitalize font-bold">
+                                                          {attribute.name}
+                                                          :&nbsp;
+                                                        </div>
+                                                        <div className="capitalize">
+                                                          {attribute.value}
+                                                        </div>
+                                                      </button>
+                                                    )
+                                                  )}
+                                                </div>
+                                              </div>
+                                            )
                                           )
+                                        ) : (
+                                          <p>No variants available</p>
                                         )}
                                       </div>
                                     </div>
-
-                                    {/* Color Options */}
                                     <div>
-                                      <span className="text-gray-600">
-                                        Màu sắc:
-                                      </span>
-                                      <div className="flex items-center mt-2 space-x-2">
-                                        {productData.colors.map(
-                                          (color, index) => (
-                                            <button
-                                              key={index}
-                                              onClick={() =>
-                                                setSelectedColor(color)
-                                              }
-                                              className={`px-3 hover:bg-red-100 hover:text-red-600 py-1 border rounded ${
-                                                selectedColor === color
-                                                  ? "bg-red-100 text-red-600"
-                                                  : ""
-                                              }`}
-                                            >
-                                              {color}
-                                            </button>
-                                          )
-                                        )}
-                                      </div>
+                                      {storeQuantityData?.data &&
+                                      storeQuantityData.data.length > 0 ? (
+                                        <div>
+                                          <h2>
+                                            Hiện tại có{" "}
+                                            <span className="font-bold">
+                                              {storeQuantityData.data.length}
+                                            </span>{" "}
+                                            chi nhánh còn sản phẩm
+                                          </h2>
+                                          <ul className="w-[300px] max-h-[100px] overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
+                                            {storeQuantityData.data.map(
+                                              (item, index) => (
+                                                <li key={index}>
+                                                  <Button
+                                                    onClick={() =>
+                                                      handleStoreClick(
+                                                        item.storeId,
+                                                        item.quantity
+                                                      )
+                                                    }
+                                                    variant="ghost"
+                                                    className={`flex justify-start ${
+                                                      selectedStoreId ===
+                                                      item.storeId
+                                                        ? "bg-red-100 text-red-600"
+                                                        : "hover:bg-red-100 hover:text-red-600"
+                                                    } w-full text-blue-500`}
+                                                  >
+                                                    <p className="flex pl-2 items-center gap-3">
+                                                      <FaStore />
+                                                      {item.storeName}
+                                                      &nbsp;có:
+                                                      <span className="font-bold">
+                                                        {item.quantity}
+                                                        &nbsp;sản phẩm
+                                                      </span>
+                                                    </p>
+                                                  </Button>
+                                                </li>
+                                              )
+                                            )}
+                                          </ul>
+                                        </div>
+                                      ) : (
+                                        <p>Sản phẩm này hiện không còn hàng</p>
+                                      )}
                                     </div>
 
                                     <div className="flex items-center space-x-4">
@@ -703,7 +747,7 @@ const HomePage: React.FC = () => {
                                         <input
                                           type="text"
                                           value={count}
-                                          onChange={handleChange}
+                                          onChange={handleInputChange}
                                           className="w-12 text-center border-l border-r"
                                         />
                                         <button
@@ -713,10 +757,21 @@ const HomePage: React.FC = () => {
                                           +
                                         </button>
                                       </div>
-                                      <button className="flex items-center px-6 py-2 bg-red-500 text-white rounded">
-                                        <i className="fas fa-shopping-cart mr-2"></i>{" "}
-                                        Thêm vào vỏ hàng
-                                      </button>
+                                      {storeQuantityData?.data &&
+                                      storeQuantityData.data.length > 0 ? (
+                                        <button
+                                          onClick={handleAddToCart}
+                                          className="flex items-center px-6 py-2 bg-red-500 text-white rounded"
+                                        >
+                                          <i className="fas fa-shopping-cart mr-2"></i>{" "}
+                                          Thêm vào vỏ hàng
+                                        </button>
+                                      ) : (
+                                        <button className="flex items-center px-6 py-2 bg-gray-600 text-white rounded">
+                                          <i className="fas fa-shopping-cart mr-2"></i>{" "}
+                                          Thêm vào vỏ hàng
+                                        </button>
+                                      )}
                                       <button className="px-2 py-2 border rounded hover:bg-red-500 hover:text-white transition ease-in-out duration-500 hover:-translate-y-2">
                                         <CiHeart
                                           size={25}
@@ -733,15 +788,10 @@ const HomePage: React.FC = () => {
 
                             <HoverCard>
                               <HoverCardTrigger>
-                                {product.isFavorite && (
-                                  <CiHeart
-                                    className="text-stone-500 hover:text-black"
-                                    size={25}
-                                  />
-                                )}
-                                {!product.isFavorite && (
-                                  <FaHeart className="text-red-300" size={25} />
-                                )}
+                                <CiHeart
+                                  className="text-stone-500 hover:text-black"
+                                  size={25}
+                                />
                               </HoverCardTrigger>
                               <HoverCardContent
                                 side="top"
@@ -753,44 +803,52 @@ const HomePage: React.FC = () => {
                           </div>
                         </div>
                         <h2 className="text-lg font-semibold text-start w-full my-2 lg:h-[55px] hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
-                          {product.title}
+                          {product.material.name}
                         </h2>
                         <div className="flex w-full justify-start items-center gap-4">
                           <Rating
                             name="product-rating"
-                            value={product.rating}
+                            value={4} //{product.rating}
                             precision={0.5}
                             className="text-xl 2xl:text-2xl"
                             readOnly
                           />
                           <span className="text-black text-sm font-semibold">
-                            {product.rating}
+                            {/* {product.rating} */} 4
                           </span>
                           <span className="text-gray-600 text-sm">
-                            ({product.reviews} reviews)
+                            {/* ({product.reviews} reviews) */}
+                            (10 reviews)
                           </span>
                         </div>
                         <div className="flex w-full justify-between items-center mt-3">
                           <div className="flex gap-2">
                             <div className="text-xl sm:text-[16px] 2xl:text-xl font-normal text-stone-400 line-through">
-                              {product.price}đ
+                              {product.material.salePrice}đ
                             </div>
                             <div className="text-xl sm:text-[16px] 2xl:text-xl font-semibold">
-                              {product.price}đ
+                              {product.material.salePrice}đ
                             </div>
                           </div>
                           <div>
-                            <button className="px-3 py-2 font-semibold text-sm bg-red-300 hover:bg-red-400 text-white rounded-md shadow-sm group-hover:scale-125 ease-in-out duration-300 ">
+                            <button
+                              // onClick={() => handleAddToCart(product)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleAddToCart();
+                              }}
+                              className="px-3 py-2 font-semibold text-sm bg-red-300 hover:bg-red-400 text-white rounded-md shadow-sm group-hover:scale-125 ease-in-out duration-300 "
+                            >
                               <RiShoppingCart2Line size={25} />
                             </button>
                           </div>
                         </div>
                       </CardContent>
                     </Card>
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+            )}
             <CarouselPrevious />
             <CarouselNext />
           </Carousel>
@@ -827,33 +885,62 @@ const HomePage: React.FC = () => {
           }}
           className="w-full max-w-full"
         >
-          <CarouselContent className="-ml-1">
-            {filteredProducts.map((product, index) => (
-              <CarouselItem
-                key={index}
-                className="pl-1 md:basis-1/2 lg:basis-1/3 xl:basis-1/4"
-              >
-                <div className="p-2">
+          {isLoadingMaterialsWithPrice ? (
+            <div className="flex space-x-10 m-5">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className="flex flex-col space-y-3">
+                  <Skeleton className="h-[350px] w-[280px] rounded-xl" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-[250px]" />
+                    <Skeleton className="h-4 w-[200px]" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <CarouselContent className="-ml-1">
+              {filteredProducts?.map((product, index) => (
+                <CarouselItem
+                  key={product.material.id}
+                  onClick={() => router.push(`/product/${product.material.id}`)}
+                  className="pl-1 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 cursor-pointer"
+                >
                   <Card
-                    className="pt-6 max-h-[550px] overflow-hidden hover:overflow-y-auto [&::-webkit-scrollbar]:w-2 rounded-xl
-  [&::-webkit-scrollbar-track]:bg-gray-100
-  [&::-webkit-scrollbar-thumb]:bg-gray-300 cursor-pointer group"
+                    className="pt-6 max-h-[550px] overflow-hidden hover:overflow-y-auto [&::-webkit-scrollbar]:w-2 rounded-sm
+                [&::-webkit-scrollbar-track]:bg-gray-100
+                [&::-webkit-scrollbar-thumb]:bg-gray-300 cursor-pointer group"
                   >
                     <CardContent className="flex flex-col items-center">
                       <img
-                        src={product.imgSrc}
-                        alt={product.title}
+                        src={product.material.imageUrl}
+                        alt={product.material.name}
                         className="w-full h-64 lg:h-60 2xl:h-72 object-cover mb-4 group-hover:scale-110 ease-in-out duration-300"
                       />
                       <div className="flex w-full justify-between">
                         <div className="bg-blue-400 px-2 py-1 rounded-sm my-1">
-                          {product.discount}
+                          {/* {product.discount} */} 20%
                         </div>
-                        <div className="flex items-center gap-2 mr-2">
+                        <div
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center gap-2 mr-2"
+                        >
                           <Dialog>
                             <DialogTrigger asChild>
                               <Button
                                 variant="ghost"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleMateridIdClick(product.material.id);
+                                  handleVariantClick(
+                                    product.variants[0]?.variantId
+                                  );
+                                  handleVariantNameClick(
+                                    product.variants[0]?.sku
+                                  );
+                                  handleVariantValueClick(
+                                    product.variants[0]?.price
+                                  );
+                                }}
                                 className="text-stone-500 hover:text-black hover:bg-white"
                               >
                                 <HoverCard>
@@ -873,28 +960,35 @@ const HomePage: React.FC = () => {
                               <div className="container mx-auto grid gap-8 md:grid-cols-2 ">
                                 <div>
                                   <div className="w-full sm:h-[55vh] h-[40vh] m-auto py-5 relative group">
-                                    <div
-                                      style={{
-                                        backgroundImage: `url(${productData.images[currentIndex].src})`,
-                                      }}
-                                      onClick={handleClick}
-                                      className="w-full h-full rounded-xl bg-center bg-cover duration-500 cursor-pointer"
-                                    >
-                                      {/* Left Arrow */}
+                                    {isLoadingMaterialData ? (
+                                      <Skeleton className="h-[350px] w-[450px] rounded-xl" />
+                                    ) : images.length > 0 &&
+                                      images[currentIndex] ? (
                                       <div
-                                        className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] left-10 text-xl rounded-full p-2 bg-black/20 text-white cursor-pointer"
-                                        onClick={prevSlide}
+                                        style={{
+                                          backgroundImage: `url(${images[currentIndex].src})`,
+                                        }}
+                                        onClick={handleClick}
+                                        className="w-full h-full rounded-xl bg-center bg-cover duration-500 cursor-pointer"
                                       >
-                                        <FaChevronLeft size={30} />
+                                        {/* Left Arrow */}
+                                        <div
+                                          className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] left-10 text-xl rounded-full p-2 bg-black/20 text-white cursor-pointer"
+                                          onClick={prevSlide}
+                                        >
+                                          <FaChevronLeft size={30} />
+                                        </div>
+                                        {/* Right Arrow */}
+                                        <div
+                                          className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] right-10 text-xl rounded-full p-2 bg-black/20 text-white cursor-pointer"
+                                          onClick={nextSlide}
+                                        >
+                                          <FaChevronRight size={30} />
+                                        </div>
                                       </div>
-                                      {/* Right Arrow */}
-                                      <div
-                                        className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] right-10 text-xl rounded-full p-2 bg-black/20 text-white cursor-pointer"
-                                        onClick={nextSlide}
-                                      >
-                                        <FaChevronRight size={30} />
-                                      </div>
-                                    </div>
+                                    ) : (
+                                      <p>No image available</p>
+                                    )}
                                   </div>
 
                                   {/* Full-size Image Modal */}
@@ -906,9 +1000,7 @@ const HomePage: React.FC = () => {
                                       <div className="relative w-full max-w-4xl">
                                         {/* Full-size Image */}
                                         <img
-                                          src={
-                                            productData.images[currentIndex].src
-                                          }
+                                          src={images[currentIndex].src}
                                           alt=""
                                           className="w-full h-auto rounded-lg"
                                         />
@@ -938,27 +1030,25 @@ const HomePage: React.FC = () => {
                                         className="w-full max-w-sm"
                                       >
                                         <CarouselContent className="-ml-1">
-                                          {productData.images.map(
-                                            (slide, slideIndex) => (
-                                              <CarouselItem
+                                          {images.map((slide, slideIndex) => (
+                                            <CarouselItem
+                                              key={slideIndex}
+                                              className="pl-1 basis-1/4"
+                                            >
+                                              <img
+                                                src={slide.src}
                                                 key={slideIndex}
-                                                className="pl-1 basis-1/4"
-                                              >
-                                                <img
-                                                  src={slide.src}
-                                                  key={slideIndex}
-                                                  onClick={() =>
-                                                    goToSlide(slideIndex)
-                                                  }
-                                                  className={`border-2 h-20 w-20 rounded-sm cursor-pointer ${
-                                                    currentIndex === slideIndex
-                                                      ? " border-red-300"
-                                                      : ""
-                                                  }`}
-                                                />
-                                              </CarouselItem>
-                                            )
-                                          )}
+                                                onClick={() =>
+                                                  goToSlide(slideIndex)
+                                                }
+                                                className={`border-2 h-20 w-20 rounded-sm cursor-pointer ${
+                                                  currentIndex === slideIndex
+                                                    ? " border-red-300"
+                                                    : ""
+                                                }`}
+                                              />
+                                            </CarouselItem>
+                                          ))}
                                         </CarouselContent>
                                         <CarouselPrevious />
                                         <CarouselNext />
@@ -975,13 +1065,16 @@ const HomePage: React.FC = () => {
                                     </span>
                                   </div>
                                   <h1 className="text-3xl font-bold">
-                                    {productData.name}
+                                    {selectedVariantName
+                                      ? selectedVariantName
+                                      : materialData?.data?.material?.name ||
+                                        "Product Name Not Available"}
                                   </h1>
 
                                   <div className="flex items-center">
                                     <Rating
                                       name="half-rating-read"
-                                      defaultValue={productData.rating}
+                                      defaultValue={4}
                                       precision={0.5}
                                       readOnly
                                     />
@@ -992,69 +1085,141 @@ const HomePage: React.FC = () => {
 
                                   <div className="flex items-center space-x-2">
                                     <span className="text-3xl font-bold text-red-500">
-                                      {productData.price}đ
+                                      {selectedVariantValue
+                                        ? selectedVariantValue
+                                        : materialData?.data?.material
+                                            ?.salePrice ||
+                                          "Product Price Not Available"}
+                                      đ
                                     </span>
+
                                     <span className="text-gray-500 line-through">
-                                      {productData.originalPrice}đ
+                                      {selectedVariantValue
+                                        ? selectedVariantValue
+                                        : materialData?.data?.material
+                                            ?.salePrice ||
+                                          "Product Price Not Available"}
+                                      đ
                                     </span>
                                     <span className="text-red-500 text-sm">
-                                      {productData.discount}
+                                      20%
                                     </span>
                                   </div>
 
                                   <p className="text-gray-600">
-                                    {productData.description}
+                                    {materialData?.data?.material
+                                      ?.description ||
+                                      "Product Description Not Available"}
                                   </p>
 
                                   <div>
                                     <span className="text-gray-600">
-                                      Size / Weight:
+                                      Các loại
                                     </span>
-                                    <div className="flex items-center mt-2 space-x-2">
-                                      {productData.sizeOptions.map(
-                                        (size, index) => (
-                                          <button
-                                            key={index}
-                                            onClick={() =>
-                                              setSelectedSize(size)
-                                            }
-                                            className={`px-3 hover:bg-red-100 hover:text-red-600 py-1 border rounded ${
-                                              selectedSize === size
-                                                ? "bg-red-100 text-red-600"
-                                                : ""
-                                            }`}
-                                          >
-                                            {size}
-                                          </button>
+                                    <div className="flex items-center space-x-2">
+                                      {materialData?.data?.variants &&
+                                      materialData.data.variants.length > 0 ? (
+                                        materialData.data.variants.map(
+                                          (variant, index) => (
+                                            <div
+                                              key={index}
+                                              onClick={() => {
+                                                handleVariantClick(
+                                                  variant.variantId
+                                                );
+                                                handleVariantNameClick(
+                                                  variant.sku
+                                                );
+                                                handleVariantValueClick(
+                                                  variant.price
+                                                );
+                                              }}
+                                              className={`flex items-center border p-1 ${
+                                                selectedVariant ===
+                                                variant.variantId
+                                                  ? "bg-red-100 text-red-600"
+                                                  : "hover:bg-red-100 hover:text-red-600"
+                                              } `}
+                                            >
+                                              <img
+                                                src={variant.image}
+                                                alt={`Variant ${index + 1}`}
+                                                className="w-12 h-12 object-cover"
+                                              />
+                                              <div className="flex-col mt-2">
+                                                {variant.attributes.map(
+                                                  (attribute, idx) => (
+                                                    <button
+                                                      key={idx}
+                                                      className="flex text-[14px] items-center"
+                                                    >
+                                                      <div className="capitalize font-bold">
+                                                        {attribute.name}
+                                                        :&nbsp;
+                                                      </div>
+                                                      <div className="capitalize">
+                                                        {attribute.value}
+                                                      </div>
+                                                    </button>
+                                                  )
+                                                )}
+                                              </div>
+                                            </div>
+                                          )
                                         )
+                                      ) : (
+                                        <p>No variants available</p>
                                       )}
                                     </div>
                                   </div>
-
-                                  {/* Color Options */}
                                   <div>
-                                    <span className="text-gray-600">
-                                      Màu sắc:
-                                    </span>
-                                    <div className="flex items-center mt-2 space-x-2">
-                                      {productData.colors.map(
-                                        (color, index) => (
-                                          <button
-                                            key={index}
-                                            onClick={() =>
-                                              setSelectedColor(color)
-                                            }
-                                            className={`px-3 hover:bg-red-100 hover:text-red-600 py-1 border rounded ${
-                                              selectedColor === color
-                                                ? "bg-red-100 text-red-600"
-                                                : ""
-                                            }`}
-                                          >
-                                            {color}
-                                          </button>
-                                        )
-                                      )}
-                                    </div>
+                                    {storeQuantityData?.data &&
+                                    storeQuantityData.data.length > 0 ? (
+                                      <div>
+                                        <h2>
+                                          Hiện tại có{" "}
+                                          <span className="font-bold">
+                                            {storeQuantityData.data.length}
+                                          </span>{" "}
+                                          chi nhánh còn sản phẩm
+                                        </h2>
+                                        <ul className="w-[300px] max-h-[100px] overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
+                                          {storeQuantityData.data.map(
+                                            (item, index) => (
+                                              <li key={index}>
+                                                <Button
+                                                  onClick={() =>
+                                                    handleStoreClick(
+                                                      item.storeId,
+                                                      item.quantity
+                                                    )
+                                                  }
+                                                  variant="ghost"
+                                                  className={`flex justify-start ${
+                                                    selectedStoreId ===
+                                                    item.storeId
+                                                      ? "bg-red-100 text-red-600"
+                                                      : "hover:bg-red-100 hover:text-red-600"
+                                                  } w-full text-blue-500`}
+                                                >
+                                                  <p className="flex pl-2 items-center gap-3">
+                                                    <FaStore />
+                                                    {item.storeName}
+                                                    &nbsp;có:
+                                                    <span className="font-bold">
+                                                      {item.quantity}
+                                                      &nbsp;sản phẩm
+                                                    </span>
+                                                  </p>
+                                                </Button>
+                                              </li>
+                                            )
+                                          )}
+                                        </ul>
+                                      </div>
+                                    ) : (
+                                      <p>Sản phẩm này hiện không còn hàng</p>
+                                    )}
                                   </div>
 
                                   <div className="flex items-center space-x-4">
@@ -1068,7 +1233,7 @@ const HomePage: React.FC = () => {
                                       <input
                                         type="text"
                                         value={count}
-                                        onChange={handleChange}
+                                        onChange={handleInputChange}
                                         className="w-12 text-center border-l border-r"
                                       />
                                       <button
@@ -1078,10 +1243,21 @@ const HomePage: React.FC = () => {
                                         +
                                       </button>
                                     </div>
-                                    <button className="flex items-center px-6 py-2 bg-red-500 text-white rounded">
-                                      <i className="fas fa-shopping-cart mr-2"></i>{" "}
-                                      Thêm vào vỏ hàng
-                                    </button>
+                                    {storeQuantityData?.data &&
+                                    storeQuantityData.data.length > 0 ? (
+                                      <button
+                                        onClick={handleAddToCart}
+                                        className="flex items-center px-6 py-2 bg-red-500 text-white rounded"
+                                      >
+                                        <i className="fas fa-shopping-cart mr-2"></i>{" "}
+                                        Thêm vào vỏ hàng
+                                      </button>
+                                    ) : (
+                                      <button className="flex items-center px-6 py-2 bg-gray-600 text-white rounded">
+                                        <i className="fas fa-shopping-cart mr-2"></i>{" "}
+                                        Thêm vào vỏ hàng
+                                      </button>
+                                    )}
                                     <button className="px-2 py-2 border rounded hover:bg-red-500 hover:text-white transition ease-in-out duration-500 hover:-translate-y-2">
                                       <CiHeart
                                         size={25}
@@ -1098,15 +1274,10 @@ const HomePage: React.FC = () => {
 
                           <HoverCard>
                             <HoverCardTrigger>
-                              {product.isFavorite && (
-                                <CiHeart
-                                  className="text-stone-500 hover:text-black"
-                                  size={25}
-                                />
-                              )}
-                              {!product.isFavorite && (
-                                <FaHeart className="text-red-300" size={25} />
-                              )}
+                              <CiHeart
+                                className="text-stone-500 hover:text-black"
+                                size={25}
+                              />
                             </HoverCardTrigger>
                             <HoverCardContent
                               side="top"
@@ -1118,44 +1289,52 @@ const HomePage: React.FC = () => {
                         </div>
                       </div>
                       <h2 className="text-lg font-semibold text-start w-full my-2 lg:h-[55px] hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
-                        {product.title}
+                        {product.material.name}
                       </h2>
                       <div className="flex w-full justify-start items-center gap-4">
                         <Rating
                           name="product-rating"
-                          value={product.rating}
-                          className="text-xl 2xl:text-2xl"
+                          value={4} //{product.rating}
                           precision={0.5}
+                          className="text-xl 2xl:text-2xl"
                           readOnly
                         />
                         <span className="text-black text-sm font-semibold">
-                          {product.rating}
+                          {/* {product.rating} */} 4
                         </span>
                         <span className="text-gray-600 text-sm">
-                          ({product.reviews} reviews)
+                          {/* ({product.reviews} reviews) */}
+                          (10 reviews)
                         </span>
                       </div>
                       <div className="flex w-full justify-between items-center mt-3">
                         <div className="flex gap-2">
                           <div className="text-xl sm:text-[16px] 2xl:text-xl font-normal text-stone-400 line-through">
-                            {product.price}đ
+                            {product.material.salePrice}đ
                           </div>
                           <div className="text-xl sm:text-[16px] 2xl:text-xl font-semibold">
-                            {product.price}đ
+                            {product.material.salePrice}đ
                           </div>
                         </div>
                         <div>
-                          <button className="px-3 py-2 font-semibold text-sm bg-red-300 hover:bg-red-400 text-white rounded-md shadow-sm group-hover:scale-125 ease-in-out duration-300 ">
+                          <button
+                            // onClick={() => handleAddToCart(product)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAddToCart();
+                            }}
+                            className="px-3 py-2 font-semibold text-sm bg-red-300 hover:bg-red-400 text-white rounded-md shadow-sm group-hover:scale-125 ease-in-out duration-300 "
+                          >
                             <RiShoppingCart2Line size={25} />
                           </button>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          )}
           <CarouselPrevious />
           <CarouselNext />
         </Carousel>
@@ -1169,45 +1348,57 @@ const HomePage: React.FC = () => {
                 <h2 className="text-2xl font-bold mb-4">Top Selling</h2>
                 <div className="border-b-2 border-stone-300 mb-4"></div>
                 <div className="space-y-10">
-                  {topSelling.map((product, index) => (
-                    <div
-                      key={index}
-                      className="group flex items-center p-2 rounded-sm transition ease-in-out hover:-translate-y-1 duration-300"
-                    >
-                      <img
-                        alt={`Image of ${product.title}`}
-                        className="w-32 h-32 rounded"
-                        src={product.imgSrc}
-                      />
-                      <div className="ml-8">
-                        <h3 className="text-lg font-semibold group-hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
-                          {product.title}
-                        </h3>
-                        <div className="flex w-full justify-start items-center gap-4">
-                          <Rating
-                            name="product-rating"
-                            value={product.rating}
-                            precision={0.5}
-                            className="text-xl 2xl:text-2xl"
-                            readOnly
+                  {isLoadingPaginatedMaterials ? (
+                    <div className="flex items-center space-x-4">
+                      <Skeleton className="h-42 w-42 rounded-full" />
+                      <div className="space-y-2">
+                        <Skeleton className="h-7 w-[250px]" />
+                        <Skeleton className="h-7 w-[200px]" />
+                      </div>
+                    </div>
+                  ) : (
+                    dataPaginatedMaterials?.data.map((product, index) => (
+                      <Link href={`/product/${product.material.id}`}>
+                        <div
+                          key={index}
+                          className="group flex items-center p-2 rounded-sm transition ease-in-out hover:-translate-y-1 duration-300"
+                        >
+                          <img
+                            alt={`Image of ${product.material.name}`}
+                            className="w-32 h-32 rounded object-cover"
+                            src={product.material.imageUrl}
                           />
-                          <span className="text-black text-sm font-semibold">
-                            ({product.rating})
-                          </span>
-                        </div>
-                        <div className="flex w-full justify-between items-center mt-3">
-                          <div className="flex flex-col gap-0 sm:gap-0">
-                            <div className="text-xl sm:text-[18px] font-semibold">
-                              {product.price}đ
+                          <div className="ml-8">
+                            <h3 className="text-lg font-semibold group-hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
+                              {product.material.name}
+                            </h3>
+                            <div className="flex w-full justify-start items-center gap-4">
+                              <Rating
+                                name="product-rating"
+                                value={4}
+                                precision={0.5}
+                                className="text-xl 2xl:text-2xl"
+                                readOnly
+                              />
+                              <span className="text-black text-sm font-semibold">
+                                (4)
+                              </span>
                             </div>
-                            <div className="ml-1 text-lg sm:text-[14px] font-normal text-stone-400 line-through">
-                              {product.price}đ
+                            <div className="flex w-full justify-between items-center mt-3">
+                              <div className="flex flex-col gap-0 sm:gap-0">
+                                <div className="text-xl sm:text-[18px] font-semibold">
+                                  {product.material.salePrice}đ
+                                </div>
+                                <div className="ml-1 text-lg sm:text-[14px] font-normal text-stone-400 line-through">
+                                  {product.material.salePrice}đ
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  ))}
+                      </Link>
+                    ))
+                  )}
                 </div>
               </div>
 
@@ -1216,44 +1407,57 @@ const HomePage: React.FC = () => {
                 <h2 className="text-2xl font-bold mb-4">Trending Products</h2>
                 <div className="border-b-2 border-stone-300 mb-4"></div>
                 <div className="space-y-10">
-                  {trendingProducts.map((product, index) => (
-                    <div
-                      key={index}
-                      className="group flex items-center p-2 rounded-sm transition ease-in-out hover:-translate-y-1 duration-300"
-                    >
-                      <img
-                        alt={`Image of ${product.title}`}
-                        className="w-32 h-32 rounded"
-                        src={product.imgSrc}
-                      />
-                      <div className="ml-8">
-                        <h3 className="text-lg font-semibold group-hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
-                          {product.title}
-                        </h3>
-                        <div className="flex w-full justify-start items-center gap-4">
-                          <Rating
-                            name="product-rating"
-                            value={product.rating}
-                            precision={0.5}
-                            readOnly
+                  {isLoadingPaginatedMaterials ? (
+                    <div className="flex items-center space-x-4">
+                      <Skeleton className="h-42 w-42 rounded-full" />
+                      <div className="space-y-2">
+                        <Skeleton className="h-7 w-[250px]" />
+                        <Skeleton className="h-7 w-[200px]" />
+                      </div>
+                    </div>
+                  ) : (
+                    dataPaginatedMaterials?.data.map((product, index) => (
+                      <Link href={`/product/${product.material.id}`}>
+                        <div
+                          key={index}
+                          className="group flex items-center p-2 rounded-sm transition ease-in-out hover:-translate-y-1 duration-300"
+                        >
+                          <img
+                            alt={`Image of ${product.material.name}`}
+                            className="w-32 h-32 rounded object-cover"
+                            src={product.material.imageUrl}
                           />
-                          <span className="text-black text-sm font-semibold">
-                            ({product.rating})
-                          </span>
-                        </div>
-                        <div className="flex w-full justify-between items-center mt-3">
-                          <div className="flex flex-col gap-0 sm:gap-0">
-                            <div className="text-xl sm:text-[18px] font-semibold">
-                              {product.price}đ
+                          <div className="ml-8">
+                            <h3 className="text-lg font-semibold group-hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
+                              {product.material.name}
+                            </h3>
+                            <div className="flex w-full justify-start items-center gap-4">
+                              <Rating
+                                name="product-rating"
+                                value={4}
+                                precision={0.5}
+                                className="text-xl 2xl:text-2xl"
+                                readOnly
+                              />
+                              <span className="text-black text-sm font-semibold">
+                                (4)
+                              </span>
                             </div>
-                            <div className="ml-1 text-lg sm:text-[14px] font-normal text-stone-400 line-through">
-                              {product.price}đ
+                            <div className="flex w-full justify-between items-center mt-3">
+                              <div className="flex flex-col gap-0 sm:gap-0">
+                                <div className="text-xl sm:text-[18px] font-semibold">
+                                  {product.material.salePrice}đ
+                                </div>
+                                <div className="ml-1 text-lg sm:text-[14px] font-normal text-stone-400 line-through">
+                                  {product.material.salePrice}đ
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  ))}
+                      </Link>
+                    ))
+                  )}
                 </div>
               </div>
 
@@ -1262,44 +1466,57 @@ const HomePage: React.FC = () => {
                 <h2 className="text-2xl font-bold mb-4">Recently Added</h2>
                 <div className="border-b-2 border-stone-300 mb-4"></div>
                 <div className="space-y-10">
-                  {recentlyAdded.map((product, index) => (
-                    <div
-                      key={index}
-                      className="group flex items-center p-2 rounded-sm transition ease-in-out hover:-translate-y-1 duration-300"
-                    >
-                      <img
-                        alt={`Image of ${product.title}`}
-                        className="w-32 h-32 rounded"
-                        src={product.imgSrc}
-                      />
-                      <div className="ml-8">
-                        <h3 className="text-lg font-semibold group-hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
-                          {product.title}
-                        </h3>
-                        <div className="flex w-full justify-start items-center gap-4">
-                          <Rating
-                            name="product-rating"
-                            value={product.rating}
-                            precision={0.5}
-                            readOnly
+                  {isLoadingPaginatedMaterials ? (
+                    <div className="flex items-center space-x-4">
+                      <Skeleton className="h-42 w-42 rounded-full" />
+                      <div className="space-y-2">
+                        <Skeleton className="h-7 w-[250px]" />
+                        <Skeleton className="h-7 w-[200px]" />
+                      </div>
+                    </div>
+                  ) : (
+                    dataPaginatedMaterials?.data.map((product, index) => (
+                      <Link href={`/product/${product.material.id}`}>
+                        <div
+                          key={index}
+                          className="group flex items-center p-2 rounded-sm transition ease-in-out hover:-translate-y-1 duration-300"
+                        >
+                          <img
+                            alt={`Image of ${product.material.name}`}
+                            className="w-32 h-32 rounded object-cover"
+                            src={product.material.imageUrl}
                           />
-                          <span className="text-black text-sm font-semibold">
-                            ({product.rating})
-                          </span>
-                        </div>
-                        <div className="flex w-full justify-between items-center mt-3">
-                          <div className="flex flex-col gap-0 sm:gap-0">
-                            <div className="text-xl sm:text-[18px] font-semibold">
-                              {product.price}đ
+                          <div className="ml-8">
+                            <h3 className="text-lg font-semibold group-hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
+                              {product.material.name}
+                            </h3>
+                            <div className="flex w-full justify-start items-center gap-4">
+                              <Rating
+                                name="product-rating"
+                                value={4}
+                                precision={0.5}
+                                className="text-xl 2xl:text-2xl"
+                                readOnly
+                              />
+                              <span className="text-black text-sm font-semibold">
+                                (4)
+                              </span>
                             </div>
-                            <div className="ml-1 text-lg sm:text-[14px] font-normal text-stone-400 line-through">
-                              {product.price}đ
+                            <div className="flex w-full justify-between items-center mt-3">
+                              <div className="flex flex-col gap-0 sm:gap-0">
+                                <div className="text-xl sm:text-[18px] font-semibold">
+                                  {product.material.salePrice}đ
+                                </div>
+                                <div className="ml-1 text-lg sm:text-[14px] font-normal text-stone-400 line-through">
+                                  {product.material.salePrice}đ
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  ))}
+                      </Link>
+                    ))
+                  )}
                 </div>
               </div>
             </div>

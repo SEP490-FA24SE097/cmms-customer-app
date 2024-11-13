@@ -80,7 +80,7 @@ export default function Header() {
   const { data: brandData, isLoading: isLoadingBrand } = useGetBrand();
 
   const { data: session } = useSession();
-  console.log(session?.user.user.fullName);
+  // console.log(session?.user.user.fullName);
 
   const isLogin = session?.user;
 
