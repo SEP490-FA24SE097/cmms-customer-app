@@ -45,7 +45,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useRouter } from "next/navigation";
+
 import { signOut, useSession } from "next-auth/react";
 import { useShoppingContext } from "@/context/shopping-cart-context";
 import { createAndGetCart } from "@/lib/actions/cart/action/cart";
@@ -80,7 +80,7 @@ export default function Header() {
   const { data: brandData, isLoading: isLoadingBrand } = useGetBrand();
 
   const { data: session } = useSession();
-  // console.log(session?.user.user.fullName);
+  // console.log(session?.user.accessToken);
 
   const isLogin = session?.user;
 
