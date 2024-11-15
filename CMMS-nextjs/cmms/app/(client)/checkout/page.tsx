@@ -10,7 +10,7 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import { useSession } from "next-auth/react";
-import { any, z } from "zod";
+import { useRouter } from "next/navigation";
 import {
   Command,
   CommandEmpty,
@@ -39,6 +39,7 @@ type Location = {
 };
 
 export default function CheckoutPage() {
+  const router = useRouter();
   const { data: session } = useSession();
   const { toast } = useToast();
   const [name, setName] = useState<string | null>(
@@ -154,23 +155,82 @@ export default function CheckoutPage() {
   }, [selectedDistrict]);
 
   const handlePaymentClick = async () => {
+    const phoneRegex = /^[0-9]{8,15}$/;
+    if (!phone || !phoneRegex.test(phone)) {
+      toast({
+        title: "Lỗi",
+        description: "Vui lòng nhập số điện thoại hợp lệ (8-15 chữ số).",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate address
+    if (!address) {
+      toast({
+        title: "Lỗi",
+        description: "Vui lòng nhập địa chỉ.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate province
+    if (!selectedProvince) {
+      toast({
+        title: "Lỗi",
+        description: "Vui lòng chọn tỉnh/thành phố.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate district
+    if (!selectedDistrict) {
+      toast({
+        title: "Lỗi",
+        description: "Vui lòng chọn quận/huyện.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate ward
+    if (!selectedWard) {
+      toast({
+        title: "Lỗi",
+        description: "Vui lòng chọn phường/xã.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Prepare payment data
     const paymentData = {
       note: note,
       address: fullAddress,
       paymentType: paymentType,
       cartItems: cartItem,
     };
-    console.log(paymentData);
 
     // If validation passes, proceed with the API call
     try {
       const response = await createPayment(paymentData);
       toast({
-        title: "Thành công",
-        description: "Thanh toán đã được thực hiện thành công.",
-        variant: "default",
+        title: "Thanh toán đã được thực hiện thành công.",
+        description: "Cảm ơn bạn vì đã chọn mua hàng ở chúng tôi!",
+        style: {
+          backgroundColor: "green",
+          color: "white",
+        },
       });
       console.log("Payment Response:", response);
+      localStorage.removeItem("cartItem");
+      // Điều hướng về trang chủ
+
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
     } catch (error) {
       toast({
         title: "Lỗi",
@@ -180,6 +240,7 @@ export default function CheckoutPage() {
       console.error("Payment failed:", error);
     }
   };
+
   const handleOpenCartModal = () => {
     const dataToSend = { cartItems: cartItem };
 
