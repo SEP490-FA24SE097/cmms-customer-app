@@ -68,17 +68,17 @@ export function DataTable<TData, TValue>({
     <div>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          placeholder="Tìm kiếm theo mã đơn hàng..."
+          value={(table.getColumn("id")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("id")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
-              Columns
+              Hiển thị
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -86,6 +86,16 @@ export function DataTable<TData, TValue>({
               .getAllColumns()
               .filter((column) => column.getCanHide())
               .map((column) => {
+                // Xử lý header để hiển thị
+                let header;
+                if (typeof column.columnDef.header === "function") {
+                  // Nếu header là hàm, hiển thị fallback (tên cột hoặc id)
+                  header = column.id;
+                } else {
+                  // Nếu header là chuỗi/JSX, hiển thị trực tiếp
+                  header = column.columnDef.header || column.id;
+                }
+
                 return (
                   <DropdownMenuCheckboxItem
                     key={column.id}
@@ -95,7 +105,7 @@ export function DataTable<TData, TValue>({
                       column.toggleVisibility(!!value)
                     }
                   >
-                    {column.id}
+                    {header}
                   </DropdownMenuCheckboxItem>
                 );
               })}

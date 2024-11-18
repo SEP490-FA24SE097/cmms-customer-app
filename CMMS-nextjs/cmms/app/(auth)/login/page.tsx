@@ -21,12 +21,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
-
+  const [loading, setLoading] = useState(false);
   const LoginSchema = z.object({
     userName: z
       .string()
@@ -44,6 +45,7 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
+    setLoading(true); // Set loading to true when the submission starts
     try {
       const res = await signIn("credentials", {
         redirect: false,
@@ -53,7 +55,7 @@ export default function LoginPage() {
       });
 
       if (!res?.error) {
-        router.push("/"); // Redirect to homepage
+        router.push("/"); 
         toast({
           title: "Đăng nhập thành công",
           description: "Bạn đã đăng nhập thành công!",
@@ -71,6 +73,8 @@ export default function LoginPage() {
         description: "Có lỗi xảy ra rồi",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false); // Set loading to false when the submission completes
     }
   };
   const { toast } = useToast();
@@ -143,12 +147,21 @@ export default function LoginPage() {
                 Quên mật khẩu?
               </a>
 
-              <Button
-                type="submit"
-                className="w-full mt-5 rounded-full font-bold bg-indigo-600 hover:bg-indigo-700 "
-              >
-                Đăng nhập
-              </Button>
+              {loading && loading ? (
+                <Button
+                  type="submit"
+                  className="w-full mt-5 rounded-full font-bold bg-gray-600  "
+                >
+                  Loading...
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  className="w-full mt-5 rounded-full font-bold bg-indigo-600 hover:bg-indigo-700 "
+                >
+                  Đăng nhập
+                </Button>
+              )}
               <p className="mt-3 flex justify-center text-sm font-light text-gray-500 dark:text-gray-400">
                 Tôi chưa có tài khoản?{" "}
                 <Link

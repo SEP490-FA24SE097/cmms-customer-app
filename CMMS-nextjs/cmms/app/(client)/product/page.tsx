@@ -114,7 +114,7 @@ export default function Listing() {
     Record<string, string | number | boolean>
   >({
     page: currentPage,
-    itemPerPage: 2,
+    itemPerPage: 4,
     brandId: "",
     categoryId: "",
     lowerPrice: "",
@@ -200,7 +200,7 @@ export default function Listing() {
   const clearFilters = () => {
     setSearchParams({
       page: 1,
-      itemPerPage: 2,
+      itemPerPage: 4,
       brandId: "",
       categoryId: "",
       lowerPrice: "",

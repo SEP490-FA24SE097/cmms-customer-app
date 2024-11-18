@@ -16,7 +16,6 @@ export async function createAndGetCart(
   data: any
 ): Promise<ApiListResponse<ICart>> {
   noStore();
-  // console.log(data);
 
   // const fakeData = {
   //   cartItems: [
@@ -38,8 +37,7 @@ export async function createAndGetCart(
   //     },
   //   ],
   // };
-  const result = await apiRequest(() => axiosAuth.post("/cart/getCart", data));
-
+  const result = await apiRequest(() => axiosAuth.post("/", data));
   if (!result.success) {
     return { data: [], error: result.error };
   }

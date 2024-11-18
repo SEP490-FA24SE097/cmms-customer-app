@@ -4,6 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ArrowUpDown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,36 +55,37 @@ export const columns = (
     },
   },
   {
+    
     accessorKey: "invoice.userVM.fullName",
     header: "Họ và tên",
   },
   {
-    accessorKey: "invoice.totalAmount",
-    header: "Tổng tiền",
+    accessorKey: "transactionPayment",
+    header: "Trạng thái đơn hàng",
     cell: ({ row }) => {
-      // Use type assertion to specify that the value is a string or number
-      const estimatedArrivalValue = row.getValue("invoice.totalAmount") as
-        | string
-        | number;
+      const transactionPayment = row.original.transactionPayment;
+      return transactionPayment ? transactionPayment : "Chưa giao hàng";
+    },
+  },
+  {
+    id: "needToPay",
+    header: "Tổng tiền",
+    accessorFn: (row) => row.invoice?.needToPay, // Safely access nested field
+    cell: ({ getValue }) => {
+      const money = getValue();
 
-      // Convert to a number and handle potential NaN
-      const money =
-        typeof estimatedArrivalValue === "number"
-          ? estimatedArrivalValue
-          : parseFloat(estimatedArrivalValue as string);
-
-      // Check if money is a valid number
-      if (isNaN(money)) {
-        return <div className="text-right font-medium">Invalid amount</div>; // or return an empty div
+      // Handle invalid values
+      if (typeof money !== "number" || isNaN(money)) {
+        return <div>Không xác định</div>;
       }
 
-      // Format the number as currency
-      const formatted = money.toLocaleString("vi-VN", {
+      // Format as Vietnamese currency
+      const formattedMoney = new Intl.NumberFormat("vi-VN", {
         style: "currency",
-        currency: "VND", // Currency code should be in uppercase
-      });
+        currency: "VND",
+      }).format(money);
 
-      return <div className="text-right font-medium">{formatted}</div>;
+      return <div>{formattedMoney}</div>;
     },
   },
 

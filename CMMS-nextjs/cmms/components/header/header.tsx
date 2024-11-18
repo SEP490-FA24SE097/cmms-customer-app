@@ -89,6 +89,7 @@ export default function Header() {
   const [cartData, setCartData] = useState<ICart[]>([]);
   const [cartQty1, setCartQty] = useState<number>();
   const [isPending, startTransition] = useTransition();
+
   const {
     cartQty,
     cartItem,
@@ -109,6 +110,7 @@ export default function Header() {
 
     startTransition(async () => {
       const result = await createAndGetCart(dataToSend);
+      // console.log(result.data);
 
       if (result && result.data) {
         // Update cartData and reset total price based on response
@@ -216,14 +218,14 @@ export default function Header() {
                         </span>
                       )}
                     </div>
-                    <h3 className="hidden md:block">Vỏ hàng</h3>
+                    <h3 className="hidden md:block">Giỏ hàng</h3>
                     <IoIosArrowDown className="hidden md:block" />
                   </Button>
                 </SheetTrigger>
                 <SheetContent className="w-[400px] sm:w-[600px]">
                   <SheetHeader>
                     <SheetTitle className="text-2xl pb-5">
-                      Vỏ hàng của bạn
+                      Giỏ hàng của bạn
                     </SheetTitle>
                     <SheetDescription>
                       <div className="border-t">
@@ -393,20 +395,26 @@ export default function Header() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56">
-                    <DropdownMenuLabel>Xin chào, Cường</DropdownMenuLabel>
+                    <DropdownMenuLabel>
+                      Xin chào, {session.user.user.fullName}
+                    </DropdownMenuLabel>
                     <DropdownMenuLabel className="text-[12px] mt-0 pt-0 font-normal text-slate-500">
-                      cuong@gmail.com
+                      {session.user.user.email}
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
-                      <DropdownMenuItem className="font-semibold">
-                        <FaRegUser />
-                        <span>Thông tin</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="font-semibold">
-                        <FaHistory />
-                        <span>Lịch sử đơn hàng</span>
-                      </DropdownMenuItem>
+                      <Link href="/profile/editprofile">
+                        <DropdownMenuItem className="font-semibold">
+                          <FaRegUser />
+                          <span>Thông tin</span>
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link href="/profile/order">
+                        <DropdownMenuItem className="font-semibold">
+                          <FaHistory />
+                          <span>Lịch sử đơn hàng</span>
+                        </DropdownMenuItem>
+                      </Link>
                       <DropdownMenuItem className="font-semibold">
                         <FaHistory />
                         <span>chưa bt</span>

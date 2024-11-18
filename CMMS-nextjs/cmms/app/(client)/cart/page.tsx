@@ -94,7 +94,7 @@ export default function CartPage() {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage className="text-xl">Vỏ hàng</BreadcrumbPage>
+                <BreadcrumbPage className="text-xl">Giỏ hàng</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -102,7 +102,7 @@ export default function CartPage() {
         <div className="bg-white-100 p-4 pb-10">
           <div className="container mx-auto">
             <h1 className="text-3xl font-bold mb-6 text-center">
-              Vỏ hàng của bạn
+              Giỏ hàng của bạn
             </h1>
 
             <div className="flex flex-col lg:flex-row gap-4">
