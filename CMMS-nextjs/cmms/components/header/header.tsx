@@ -85,8 +85,7 @@ export default function Header() {
   const isLogin = session?.user;
 
   // const [isOpenCart, setIsOpenCart] = useState(false);
-  const [totalItemPrice, setTotalItemPrice] = useState(0);
-  const [cartData, setCartData] = useState<ICart[]>([]);
+  const [cartData, setCartData] = useState<ICart>();
   const [cartQty1, setCartQty] = useState<number>();
   const [isPending, startTransition] = useTransition();
 
@@ -99,11 +98,11 @@ export default function Header() {
     updateQuantity,
   } = useShoppingContext();
 
-  useEffect(() => {
-    // Calculate total itemTotalPrice whenever cartData changes
-    const total = cartData.reduce((sum, item) => sum + item.itemTotalPrice, 0);
-    setTotalItemPrice(total);
-  }, [cartData]);
+  // useEffect(() => {
+  //   // Calculate total itemTotalPrice whenever cartData changes
+  //   const total = cartData.reduce((sum, item) => sum + item.itemTotalPrice, 0);
+  //   setTotalItemPrice(total);
+  // }, [cartData]);
 
   const handleOpenCartModal = () => {
     const dataToSend = { cartItems: cartItem };
@@ -120,6 +119,8 @@ export default function Header() {
       }
     });
   };
+
+  // console.log(cartData);
 
   useEffect(() => {
     localStorage.setItem("cartItem", JSON.stringify(cartItem));
@@ -242,13 +243,24 @@ export default function Header() {
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {cartData.length === 0 ? (
-                                    <div>
-                                      Bạn không có sản phẩm nào trong vỏ hàng
-                                    </div>
+                                  {cartData?.storeItems.length === 0 ? (
+                                    <tr>
+                                      <td
+                                        colSpan={4}
+                                        className="text-center py-4"
+                                      >
+                                        <img
+                                          src="/empty_cart.png"
+                                          alt="Empty cart"
+                                        />
+                                        <h2 className="text-[25px] mt-10">
+                                          Bạn chưa có sản phẩm nào trong vỏ hàng
+                                        </h2>
+                                      </td>
+                                    </tr>
                                   ) : (
                                     <>
-                                      {cartData.map((product) => (
+                                      {cartData?.storeItems.map((product) => (
                                         <tr
                                           key={product.materialId}
                                           className="border-b"
@@ -343,18 +355,10 @@ export default function Header() {
                             </div>
                             <div>
                               <div className="mt-6">
-                                <div className="flex justify-between py-1">
-                                  <span>Tổng tiền:</span>
-                                  <span>{totalItemPrice}</span>
-                                </div>
-                                <div className="flex justify-between py-1">
-                                  <span>Giảm giá:</span>
-                                  <span>0%</span>
-                                </div>
                                 <hr className="my-2" />
                                 <div className="flex justify-between py-1 font-bold">
                                   <span>Thành tiền:</span>
-                                  <span>{totalItemPrice}</span>
+                                  <span>{cartData?.total}</span>
                                 </div>
                               </div>
                               <div className="mt-6 flex justify-end space-x-4">

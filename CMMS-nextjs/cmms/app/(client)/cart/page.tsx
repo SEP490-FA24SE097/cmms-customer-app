@@ -9,22 +9,30 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { FaStore } from "react-icons/fa";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import Link from "next/link";
 import { ICart } from "@/lib/actions/cart/type/cart-type";
 import { useShoppingContext } from "@/context/shopping-cart-context";
-import { createAndGetCart } from "@/lib/actions/cart/action/cart";
+import {
+  createAndGetCart,
+  GetCartCheckout,
+} from "@/lib/actions/cart/action/cart";
 import { useToast } from "@/hooks/use-toast";
+import { ICheckout } from "@/lib/actions/cart/type/cart-checkout-type";
+
 
 export default function CartPage() {
   const [totalItemPrice, setTotalItemPrice] = useState(0);
-  const [cartData, setCartData] = useState<ICart[]>([]);
+  const [cartData, setCartData] = useState<ICheckout>();
   const [cartQty1, setCartQty] = useState<number>();
   const [isPending, startTransition] = useTransition();
-  const subtotal = cartData.reduce((acc, item) => acc + item.itemTotalPrice, 0);
-  const shipping = 0;
-  const tax = 0.0;
-  const total = subtotal + shipping + tax;
+
   const { toast } = useToast();
   const {
     cartQty,
@@ -45,8 +53,8 @@ export default function CartPage() {
   };
 
   // Check if there is any item with insufficient quantity
-  const hasInsufficientQuantity = cartData.some(
-    (item) => item.isChangeQuantity
+  const hasInsufficientQuantity = cartData?.items.some((item) =>
+    item.storeItems.some((storeItem) => storeItem.isChangeQuantity)
   );
 
   // Prevent checkout if any item has insufficient quantity
@@ -56,16 +64,12 @@ export default function CartPage() {
       showWarningToast();
     }
   };
-  useEffect(() => {
-    // Calculate total itemTotalPrice whenever cartData changes
-    const total = cartData.reduce((sum, item) => sum + item.itemTotalPrice, 0);
-    setTotalItemPrice(total);
-  }, [cartData]);
+
   const handleOpenCartModal = () => {
     const dataToSend = { cartItems: cartItem };
 
     startTransition(async () => {
-      const result = await createAndGetCart(dataToSend);
+      const result = await GetCartCheckout(dataToSend);
 
       if (result && result.data) {
         // Update cartData and reset total price based on response
@@ -75,6 +79,7 @@ export default function CartPage() {
       }
     });
   };
+  console.log(cartData);
   useEffect(() => {
     localStorage.setItem("cartItem", JSON.stringify(cartItem));
     setCartQty(cartQty);
@@ -107,7 +112,7 @@ export default function CartPage() {
 
             <div className="flex flex-col lg:flex-row gap-4">
               {/* Cart Items */}
-              {cartData.length === 0 ? (
+              {cartData?.items.length === 0 ? (
                 <div className="mx-auto">
                   <img src="/empty_cart.png" alt="Empty cart" />
                   <h2 className="text-[25px] mt-10">
@@ -124,45 +129,55 @@ export default function CartPage() {
               ) : (
                 <>
                   <div className="w-full lg:w-3/4 bg-white p-4 rounded shadow">
-                    <table className="w-full text-left">
-                      <thead>
-                        <tr>
-                          <th className="py-2">Ảnh</th>
-                          <th className="py-2">Sản phẩm</th>
-                          <th className="py-2">Giá</th>
-                          <th className="py-2">Số lượng</th>
-                          <th className="py-2">Tổng tiền</th>
-                          <th className="py-2"></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {cartData.map((item) => (
-                          <tr key={item.materialId} className="border-t">
-                            <td className="py-4">
+                    {cartData?.items.map((item) => (
+                      <div
+                        key={item.storeId}
+                        className="border mb-10 rounded-sm shadow-md py-2"
+                      >
+                        <div className="flex gap-7 items-center p-2 px-10 border-b">
+                          <FaStore size={30} />
+                          <h1 className="text-2xl capitalize font-bold">
+                            {item.storeName}
+                          </h1>
+                        </div>
+                        <div
+                          className={`m-5 ${
+                            item.storeItems.length === 1 ? "" : "border"
+                          }`}
+                        >
+                          {item.storeItems.map((product, index) => (
+                            <div
+                              key={product.materialId} // Add a key for each product
+                              className={`flex justify-between gap-5 items-center p-5 ${
+                                index < item.storeItems.length - 1
+                                  ? "border-b"
+                                  : ""
+                              }`}
+                            >
                               <img
-                                src={item.imageUrl}
-                                alt={item.itemName}
-                                width={100}
-                                height={100}
+                                className="w-20 h-20 object-cover"
+                                src={product.imageUrl}
+                                alt=""
                               />
-                            </td>
-                            <td className="py-4">
-                              <div className="capitalize">{item.itemName}</div>
-                              {item.isChangeQuantity && (
-                                <span className="text-sm text-red-500">
-                                  Không đủ sản phẩm
-                                </span>
-                              )}
-                            </td>
-                            <td className="py-4">{item.basePrice}đ</td>
-                            <td className="py-4">
+                              <h1 className="text-xl w-40 capitalize font-medium overflow-hidden line-clamp-2 text-ellipsis">
+                                {product.itemName}
+                              </h1>
+                              {product.isChangeQuantity === true ? <h1 className="capitalize text-sm w-20 text-red-500 font-medium">
+                                Sản phẩm không đủ số lượng
+                              </h1>: ""}
+                              <h1 className="">
+                                {product.salePrice.toLocaleString("vi-VN", {
+                                  style: "currency",
+                                  currency: "vnd",
+                                })}
+                              </h1>
                               <div className="flex items-center">
-                                <div className=" border rounded-sm w-12 lg:w-auto bg-gray-100 hover:bg-white group">
+                                <div className="border rounded-sm w-12 lg:w-auto bg-gray-100 hover:bg-white group">
                                   <button
                                     onClick={() =>
                                       decreateQty(
-                                        item.materialId,
-                                        item.variantId ?? null
+                                        product.materialId,
+                                        product.variantId ?? null
                                       )
                                     }
                                     className="px-3 py-2 w-full lg:w-auto text-gray-400 hover:text-black font-bold"
@@ -171,11 +186,11 @@ export default function CartPage() {
                                   </button>
                                   <input
                                     type="text"
-                                    value={item.quantity}
+                                    value={product.quantity}
                                     onChange={(e) =>
                                       updateQuantity(
-                                        item.materialId,
-                                        item.variantId ?? null,
+                                        product.materialId,
+                                        product.variantId ?? null,
                                         Number(e.target.value)
                                       )
                                     }
@@ -184,8 +199,8 @@ export default function CartPage() {
                                   <button
                                     onClick={() =>
                                       inscreateQty(
-                                        item.materialId,
-                                        item.variantId ?? null
+                                        product.materialId,
+                                        product.variantId ?? null
                                       )
                                     }
                                     className="px-3 py-2 w-full lg:w-auto text-gray-400 hover:text-black font-bold"
@@ -194,25 +209,42 @@ export default function CartPage() {
                                   </button>
                                 </div>
                               </div>
-                            </td>
-                            <td className="py-4">{item.itemTotalPrice}đ</td>
-                            <td className="py-4 text-right">
-                              <button
-                                onClick={() =>
-                                  removeCartItem(
-                                    item.materialId,
-                                    item.variantId ?? null
-                                  )
-                                }
-                                className="text-gray-500 hover:text-black mr-5"
-                              >
-                                <RiDeleteBin6Line />
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                              <h1 className="w-[100px] flex justify-end">
+                                {product.itemTotalPrice.toLocaleString(
+                                  "vi-VN",
+                                  {
+                                    style: "currency",
+                                    currency: "vnd",
+                                  }
+                                )}
+                              </h1>
+                              <div>
+                                <HoverCard openDelay={50} closeDelay={100}>
+                                  <HoverCardTrigger>
+                                    <RiDeleteBin6Line
+                                      onClick={() =>
+                                        removeCartItem(
+                                          product.materialId,
+                                          product.variantId ?? null
+                                        )
+                                      }
+                                      className="text-red-400 hover:text-red-500 cursor-pointer"
+                                      size={25}
+                                    />
+                                  </HoverCardTrigger>
+                                  <HoverCardContent
+                                    side="top"
+                                    className="w-fit p-2 bg-slate-950 text-white border-none"
+                                  >
+                                    Xóa
+                                  </HoverCardContent>
+                                </HoverCard>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
                     <div className="flex justify-between items-center mt-4">
                       <div className="flex items-center">
                         <input
@@ -234,19 +266,34 @@ export default function CartPage() {
                       <h2 className="text-xl font-bold mb-4">Cart Totals</h2>
                       <div className="flex justify-between py-2 border-t">
                         <span>Tổng tiền</span>
-                        <span>{subtotal}đ</span>
+                        <span>
+                          {cartData?.totalAmount.toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "vnd",
+                          })}
+                        </span>
                       </div>
                       <div className="flex justify-between py-2 border-t">
                         <span>Shipping</span>
-                        <span>{shipping}đ</span>
+                        <span>0d</span>
                       </div>
                       <div className="flex justify-between py-2 border-t">
                         <span>Giảm giá</span>
-                        <span>{tax}đ</span>
+                        <span>
+                          {cartData?.discount.toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "vnd",
+                          })}
+                        </span>
                       </div>
                       <div className="flex justify-between py-2 border-t font-bold">
                         <span>Total</span>
-                        <span>{total}đ</span>
+                        <span>
+                          {cartData?.salePrice.toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "vnd",
+                          })}
+                        </span>
                       </div>
                       <Button
                         disabled={hasInsufficientQuantity}

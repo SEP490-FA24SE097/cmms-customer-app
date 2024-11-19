@@ -25,13 +25,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
-import { createAndGetCart } from "@/lib/actions/cart/action/cart";
+import { createAndGetCart, GetCartCheckout } from "@/lib/actions/cart/action/cart";
 import { ICart } from "@/lib/actions/cart/type/cart-type";
 import { useShoppingContext } from "@/context/shopping-cart-context";
 import Link from "next/link";
 import axios from "axios";
 import { createPayment } from "@/lib/actions/payment/payment";
 import { useToast } from "@/hooks/use-toast";
+import { ICheckout } from "@/lib/actions/cart/type/cart-checkout-type";
 
 type Location = {
   value: string;
@@ -58,7 +59,7 @@ export default function CheckoutPage() {
     session?.user.user.note || null
   );
   const [paymentType, setPaymentType] = useState<number>(3);
-  const [cartData, setCartData] = useState<ICart[]>([]);
+  const [cartData, setCartData] = useState<ICheckout>();
   const [cartQty1, setCartQty] = useState<number>();
   const { cartQty, cartItem } = useShoppingContext();
 
@@ -245,7 +246,7 @@ export default function CheckoutPage() {
     const dataToSend = { cartItems: cartItem };
 
     startTransition(async () => {
-      const result = await createAndGetCart(dataToSend);
+      const result = await GetCartCheckout(dataToSend);
 
       if (result && result.data) {
         // Update cartData and reset total price based on response
@@ -586,30 +587,7 @@ export default function CheckoutPage() {
                   Đơn hàng ({cartQty1} sản phẩm)
                 </h2>
                 <div className="grid gap-4 overflow-y-auto max-h-96">
-                  {cartData.map((product) => (
-                    <div
-                      key={product.materialId}
-                      className="flex items-center p-2"
-                    >
-                      <div className="relative">
-                        <img
-                          src={product.imageUrl}
-                          alt={`Image of ${product.itemName}`}
-                          className="w-20 h-20 object-cover mr-2"
-                        />
-                        <span className="absolute -top-2 -right-2 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-sm mr-2">
-                          {product.quantity}
-                        </span>
-                      </div>
-                      <div className="flex-1">
-                        <div className="text-sm">{product.itemName}</div>
-                        {/* <div className="text-xs text-gray-500">
-                          Size: {product.size}
-                        </div> */}
-                      </div>
-                      <div className="text-sm">{product.itemTotalPrice}</div>
-                    </div>
-                  ))}
+             
                 </div>
 
                 <div className="mt-4 border-t">
