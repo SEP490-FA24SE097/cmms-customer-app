@@ -24,8 +24,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { FaStore } from "react-icons/fa";
 import { Textarea } from "@/components/ui/textarea";
-import { createAndGetCart, GetCartCheckout } from "@/lib/actions/cart/action/cart";
+import {
+  createAndGetCart,
+  GetCartCheckout,
+} from "@/lib/actions/cart/action/cart";
 import { ICart } from "@/lib/actions/cart/type/cart-type";
 import { useShoppingContext } from "@/context/shopping-cart-context";
 import Link from "next/link";
@@ -212,19 +216,23 @@ export default function CheckoutPage() {
       address: fullAddress,
       paymentType: paymentType,
       cartItems: cartItem,
+      amount: cartData?.totalAmount,
+      discount: cartData?.discount,
+      salePrice: cartData?.salePrice,
     };
 
     // If validation passes, proceed with the API call
     try {
       const response = await createPayment(paymentData);
-      toast({
-        title: "Thanh toán đã được thực hiện thành công.",
-        description: "Cảm ơn bạn vì đã chọn mua hàng ở chúng tôi!",
-        style: {
-          backgroundColor: "green",
-          color: "white",
-        },
-      });
+      if (response.data)
+        toast({
+          title: "Thanh toán đã được thực hiện thành công.",
+          description: "Cảm ơn bạn vì đã chọn mua hàng ở chúng tôi!",
+          style: {
+            backgroundColor: "green",
+            color: "white",
+          },
+        });
       console.log("Payment Response:", response);
       localStorage.removeItem("cartItem");
       // Điều hướng về trang chủ
@@ -256,6 +264,7 @@ export default function CheckoutPage() {
       }
     });
   };
+  // console.log(cartData);
   useEffect(() => {
     localStorage.setItem("cartItem", JSON.stringify(cartItem));
     setCartQty(cartQty);
@@ -586,8 +595,70 @@ export default function CheckoutPage() {
                 <h2 className="text-lg font-semibold my-4">
                   Đơn hàng ({cartQty1} sản phẩm)
                 </h2>
-                <div className="grid gap-4 overflow-y-auto max-h-96">
-             
+                <div
+                  className="grid gap-4 overflow-y-auto max-h-96 [&::-webkit-scrollbar]:w-1
+                  [&::-webkit-scrollbar-track]:rounded-full
+                  [&::-webkit-scrollbar-track]:bg-gray-100
+                  [&::-webkit-scrollbar-thumb]:rounded-full
+                  [&::-webkit-scrollbar-thumb]:bg-gray-300
+                  dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+                  dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
+                >
+                  {cartData?.items.map((item) => (
+                    <div key={item.storeId} className="py-2 border-b">
+                      <div className="flex gap-7 items-center p-2 border-b">
+                        <FaStore size={20} />
+                        <h1 className="text-lg capitalize font-bold">
+                          {item.storeName}
+                        </h1>
+                      </div>
+                      <div
+                        className={`${
+                          item.storeItems.length === 1 ? "" : "border mt-2"
+                        }`}
+                      >
+                        {item.storeItems.map((product, index) => (
+                          <div
+                            key={product.materialId} // Add a key for each product
+                            className={`flex gap-5 items-center p-5 ${
+                              index < item.storeItems.length - 1
+                                ? "border-b"
+                                : ""
+                            }`}
+                          >
+                            <img
+                              className="w-12 h-12 object-cover"
+                              src={product.imageUrl}
+                              alt=""
+                            />
+                            <div>
+                              <h1 className="text-[15px] capitalize font-medium overflow-hidden line-clamp-2 text-ellipsis">
+                                {product.itemName} dsf sdf asdf asdf asdf asdf
+                              </h1>
+                              {product.isChangeQuantity === true ? (
+                                <h1 className="capitalize text-sm w-20 text-red-500 font-medium">
+                                  Sản phẩm không đủ số lượng
+                                </h1>
+                              ) : (
+                                ""
+                              )}
+                              <div className="flex justify-between items-center">
+                                <h1 className="text-[14px] text-slate-400">
+                                  {product.salePrice.toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "vnd",
+                                  })}
+                                </h1>
+                                <h1 className="w-[100px] flex justify-end">
+                                  x{product.quantity}
+                                </h1>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
 
                 <div className="mt-4 border-t">
