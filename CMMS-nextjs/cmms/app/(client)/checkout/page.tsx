@@ -224,30 +224,45 @@ export default function CheckoutPage() {
     // If validation passes, proceed with the API call
     try {
       const response = await createPayment(paymentData);
-      if (response.data)
+    
+      // Check if the response indicates success
+      if (response.data?.success) {
         toast({
           title: "Thanh toán đã được thực hiện thành công.",
-          description: "Cảm ơn bạn vì đã chọn mua hàng ở chúng tôi!",
+          description:"Cảm ơn bạn vì đã chọn mua hàng ở chúng tôi!",
           style: {
             backgroundColor: "green",
             color: "white",
           },
         });
-      console.log("Payment Response:", response);
-      localStorage.removeItem("cartItem");
-      // Điều hướng về trang chủ
-
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 2000);
+    
+        localStorage.removeItem("cartItem");
+    
+        // Redirect to the home page after a short delay
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 2000);
+      } else {
+        // Handle cases where the response indicates failure
+        toast({
+          title: "Lỗi",
+          description:"Đã xảy ra lỗi không xác định. Vui lòng thử lại.",
+          variant: "destructive",
+        });
+    
+        console.error("Unexpected Payment Response:", response);
+      }
     } catch (error) {
+      // Handle network or unexpected errors
       toast({
         title: "Lỗi",
         description: "Thanh toán thất bại. Vui lòng thử lại.",
         variant: "destructive",
       });
-      console.error("Payment failed:", error);
+    
+      console.error("Payment failed with exception:", error);
     }
+    
   };
 
   const handleOpenCartModal = () => {

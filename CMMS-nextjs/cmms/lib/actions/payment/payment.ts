@@ -9,19 +9,24 @@ import {
   fetchSingleData,
 } from "@/lib/api/api-handler/generic";
 import { axiosAuth } from "@/lib/api/api-interceptor/api";
-
-export async function createPayment<T>(data: any): Promise<ApiListResponse<T>> {
+export interface PaymentResponse {
+  success: boolean;
+  message: string;
+}
+export async function createPayment(data: any): Promise<ApiSingleResponse<PaymentResponse>> {
   noStore();
   const result = await apiRequest(() => axiosAuth.post("/payment", data));
   console.log(result);
+
   if (!result.success) {
-    return { data: [], error: result.error };
+    return { data: null, error: result.error || undefined };
   }
 
-  // Assuming the result.data contains the expected fields from the API response
+  // Ensure the response data conforms to the expected structure
   return {
-    data: result.data.data ? [result.data.data] : [],
-    pageCount: result.data.pagination?.perPage ?? 0,
-    totalPages: result.data.pagination?.total ?? 0,
+    data: result.data as PaymentResponse, // Type assertion if you are sure about the structure
+    error: undefined,
   };
 }
+
+

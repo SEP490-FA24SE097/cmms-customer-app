@@ -79,7 +79,7 @@ export default function CartPage() {
       }
     });
   };
-  console.log(cartData);
+  // console.log(cartData);
   useEffect(() => {
     localStorage.setItem("cartItem", JSON.stringify(cartItem));
     setCartQty(cartQty);
