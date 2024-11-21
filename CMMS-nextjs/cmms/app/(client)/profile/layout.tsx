@@ -14,7 +14,7 @@ export default function ProfileLayout({
 
   return (
     <div className="bg-gray-100 py-10">
-      <div className="max-w-[85%] xl:max-w-[70%] mx-auto">
+      <div className="max-w-[85%] xl:max-w-[80%] mx-auto">
         <div className="grid sm:grid-cols-4 gap-10">
           {/* Sidebar Menu */}
           <div className="col-span-1 bg-white w-full h-[40vh] rounded-sm shadow-lg">
