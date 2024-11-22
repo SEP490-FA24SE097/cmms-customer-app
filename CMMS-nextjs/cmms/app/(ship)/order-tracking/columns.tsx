@@ -55,16 +55,53 @@ export const columns = (
     },
   },
   {
-    
     accessorKey: "invoice.userVM.fullName",
     header: "Họ và tên",
   },
   {
-    accessorKey: "transactionPayment",
+    accessorKey: "invoice.invoiceStatus",
     header: "Trạng thái đơn hàng",
     cell: ({ row }) => {
-      const transactionPayment = row.original.transactionPayment;
-      return transactionPayment ? transactionPayment : "Chưa giao hàng";
+      const status = row.original.invoice.invoiceStatus;
+
+      // Define a mapping for the status codes to user-friendly labels
+      const statusLabels: Record<number, string> = {
+        0: "Đang chờ duyệt",
+        1: "Đã duyệt",
+        2: "Đang giao hàng",
+        3: "Hoàn thành",
+        4: "Đã hủy",
+        5: "Hoàn tiền",
+        6: "Không nhận hàng",
+      };
+
+      // Validation logic for special cases
+      if (status === 0) {
+        return (
+          <span className="text-yellow-500 font-medium">
+            {statusLabels[status]} (Vui lòng chờ!)
+          </span>
+        );
+      } else if (status === 4 || status === 6) {
+        return (
+          <span className="text-red-500 font-medium">
+            {statusLabels[status]}
+          </span>
+        );
+      } else if (status === 3) {
+        return (
+          <span className="text-green-500 font-medium">
+            {statusLabels[status]}
+          </span>
+        );
+      }
+
+      // Fallback to the mapped label or default message
+      return (
+        <span className="text-gray-700 font-medium">
+          {statusLabels[status] || "Trạng thái không xác định"}
+        </span>
+      );
     },
   },
   {
@@ -105,11 +142,11 @@ export const columns = (
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(order.id)}
             >
-              Copy Order ID
+              Sao chép mã đơn
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => handleViewCustomer(order)}>
-              View Customer
+              Cập nhật đơn hàng
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

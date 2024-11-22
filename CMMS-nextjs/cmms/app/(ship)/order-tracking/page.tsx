@@ -36,7 +36,11 @@ import { IShippingDetails } from "@/lib/actions/delivery/type/delivery-type";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { updateShipping } from "@/lib/actions/delivery/action/delivery";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  updateShipping,
+  updateShippingFail,
+} from "@/lib/actions/delivery/action/delivery";
 const formatDate = (
   isoDateString: string,
   format: "dd-MM-yyyy" | "dd/MM/yyyy HH:mm" = "dd-MM-yyyy"
@@ -71,6 +75,8 @@ const getInvoiceStatus = (
       return { text: "Hủy", className: "text-red-600" }; // Màu đỏ
     case 5:
       return { text: "Hoàn tiền", className: "text-purple-600" }; // Màu tím
+    case 6:
+      return { text: "Không nhận hàng", className: "text-red-600" }; // Màu đỏ
     default:
       return { text: "Không xác định", className: "text-gray-600" }; // Màu xám
   }
@@ -80,6 +86,7 @@ export default function OrderPage() {
   const { toast } = useToast();
   const { data: session, status } = useSession();
   const [deliveryDate, setDeliveryDate] = useState<string | null>(null);
+  const [deliveryNote, setDeliveryNote] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<number | null>(null);
   const ShipperId = session?.user?.user.id
     ? { ShipperId: session.user.user.id }
@@ -121,6 +128,60 @@ export default function OrderPage() {
         toast({
           title: "Thành công",
           description: "Đơn hàng đã được cập nhật thành công.",
+          style: {
+            backgroundColor: "green",
+            color: "white",
+          },
+        });
+        closeDialog(); // Đóng dialog sau khi cập nhật thành công
+      } else {
+        toast({
+          title: "Lỗi",
+          description: "Cập nhật thất bại.",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Lỗi hệ thống",
+        description: error?.message || "Đã xảy ra lỗi không xác định.",
+        variant: "destructive",
+      });
+    }
+  };
+  const handleSubmitFail = async () => {
+    if (!selectedCustomer) {
+      toast({
+        title: "Không có đơn hàng được chọn",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!deliveryNote) {
+      toast({
+        title: "Vui lòng điền đầy đủ lý do thông tin",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const requestData = {
+      reason: deliveryNote,
+      shippingDetailId: selectedCustomer.id,
+      shippingDate: deliveryDate,
+      updateType: 0,
+    };
+
+    try {
+      const result = await updateShippingFail(requestData);
+      if (result) {
+        toast({
+          title: "Thành công",
+          description: "Đơn hàng đã được cập nhật thành công.",
+          style: {
+            backgroundColor: "green",
+            color: "white",
+          },
         });
         closeDialog(); // Đóng dialog sau khi cập nhật thành công
       } else {
@@ -331,93 +392,106 @@ export default function OrderPage() {
                     : "0"}
                 </p>
               </div>
-              <div className="mt-4 space-x-10">
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="bg-red-500 text-white hover:bg-red-400 hover:text-white"
-                    >
-                      Hủy đơn
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        Are you absolutely sure?
-                      </AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone. This will permanently
-                        delete your account and remove your data from our
-                        servers.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction>Continue</AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="bg-blue-500 text-white hover:bg-blue-400 hover:text-white"
-                    >
-                      Cập nhật
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent className="max-w-[50vh]">
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Cập nhật đơn hàng</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        <div className="space-y-2 text-black">
-                          <Label htmlFor="date">Ngày giao hàng</Label>
-                          <Input
-                            type="date"
-                            id="date"
-                            placeholder="Ngày giao hàng"
-                            value={deliveryDate || ""}
-                            onChange={(e) => setDeliveryDate(e.target.value)}
-                          />
-                        </div>
-                        <div className="space-y-2 mt-5 text-black">
-                          <Label htmlFor="payment-method">
-                            Hình thức giao hàng
-                          </Label>
-                          <Select
-                            value={paymentMethod?.toString() || ""}
-                            onValueChange={(value) =>
-                              setPaymentMethod(Number(value))
-                            }
-                          >
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Chọn hình thức giao hàng" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="0">Tiền mặt</SelectItem>
-                              <SelectItem value="1">Chuyển khoản</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Hủy</AlertDialogCancel>
-                      <Button onClick={handleSubmit}>
+              {selectedCustomer.invoice.invoiceStatus === 2 && (
+                <div className="mt-4 space-x-10">
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="bg-red-500 text-white hover:bg-red-400 hover:text-white"
+                      >
+                        Hủy đơn
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="max-w-[50vh]">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Cập nhật đơn hàng</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          <div className="space-y-2 text-black">
+                            <Label htmlFor="date">Ngày giao hàng</Label>
+                            <Input
+                              type="date"
+                              id="date"
+                              placeholder="Ngày giao hàng"
+                              value={deliveryDate || ""}
+                              onChange={(e) => setDeliveryDate(e.target.value)}
+                            />
+                          </div>
+                          <div className="space-y-2 mt-5 text-black">
+                            <Label htmlFor="payment-method">Lý do</Label>
+                            <Textarea
+                              placeholder="Nhập lý do giao hàng thất bại!"
+                              value={deliveryNote || ""}
+                              onChange={(e) => setDeliveryNote(e.target.value)}
+                            />
+                          </div>
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
+                        <Button onClick={handleSubmitFail}>Cập nhật</Button>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="bg-blue-500 text-white hover:bg-blue-400 hover:text-white"
+                      >
                         Cập nhật
                       </Button>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="max-w-[50vh]">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Cập nhật đơn hàng</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          <div className="space-y-2 text-black">
+                            <Label htmlFor="date">Ngày giao hàng</Label>
+                            <Input
+                              type="date"
+                              id="date"
+                              placeholder="Ngày giao hàng"
+                              value={deliveryDate || ""}
+                              onChange={(e) => setDeliveryDate(e.target.value)}
+                            />
+                          </div>
+                          <div className="space-y-2 mt-5 text-black">
+                            <Label htmlFor="payment-method">
+                              Hình thức giao hàng
+                            </Label>
+                            <Select
+                              value={paymentMethod?.toString() || ""}
+                              onValueChange={(value) =>
+                                setPaymentMethod(Number(value))
+                              }
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Chọn hình thức giao hàng" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="0">Tiền mặt</SelectItem>
+                                <SelectItem value="1">Chuyển khoản</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
+                        <Button onClick={handleSubmit}>Cập nhật</Button>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              )}
             </div>
 
             <button
               className="mt-4 btn bg-blue-500 text-white px-4 py-2 rounded"
               onClick={closeDialog}
             >
-              Close
+              Đóng
             </button>
           </DialogContent>
         </Dialog>
