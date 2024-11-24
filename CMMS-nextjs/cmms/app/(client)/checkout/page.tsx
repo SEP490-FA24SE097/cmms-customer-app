@@ -216,11 +216,11 @@ export default function CheckoutPage() {
       address: fullAddress,
       paymentType: paymentType,
       cartItems: cartItem,
+      phoneReceive: phone,
       amount: cartData?.totalAmount,
       discount: cartData?.discount,
       salePrice: cartData?.salePrice,
     };
-
     // If validation passes, proceed with the API call
     try {
       const response = await createPayment(paymentData);

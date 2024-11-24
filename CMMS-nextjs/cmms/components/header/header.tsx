@@ -51,33 +51,65 @@ import { useShoppingContext } from "@/context/shopping-cart-context";
 import { createAndGetCart } from "@/lib/actions/cart/action/cart";
 import { ICart } from "@/lib/actions/cart/type/cart-type";
 import { useGetBrand } from "@/lib/actions/brand/react-query/brand-query";
+import { useGetCategory } from "@/lib/actions/categories/react-query/category-query";
 interface Category {
   title: string;
   icon: React.ReactNode;
-  items: string[];
+  items: { name: string; id: string }[]; // Mỗi phần tử của `items` là một đối tượng
 }
-
-const categories: Category[] = [
-  {
-    title: "Vật liệu cơ bản",
-    icon: <GiStoneTablet />,
-    items: ["Xi măng", "sắt", "thép", "cát", "đá", "gạch"],
-  },
-  {
-    title: "Vật liệu kêt cấu",
-    icon: <GiConcreteBag />,
-    items: ["bê tông", "phụ gia xây dựng"],
-  },
-  {
-    title: "Vật liệu hoàn thiện",
-    icon: <LuLampFloor />,
-    items: ["Tường", "trần", "sàn", "vật tư nội thất", "vật tư ngoại thất"],
-  },
-];
+// const categories: Category[] = [
+//   {
+//     title: "Vật liệu cơ bản",
+//     icon: <GiStoneTablet />,
+//     items: ["Xi măng", "sắt", "thép", "cát", "đá", "gạch"],
+//   },
+//   {
+//     title: "Vật liệu kêt cấu",
+//     icon: <GiConcreteBag />,
+//     items: ["bê tông", "phụ gia xây dựng"],
+//   },
+//   {
+//     title: "Vật liệu hoàn thiện",
+//     icon: <LuLampFloor />,
+//     items: ["Tường", "trần", "sàn", "vật tư nội thất", "vật tư ngoại thất"],
+//   },
+// ];
 
 export default function Header() {
   // const [isLogin, setIsLogin] = useState(false);
   const { data: brandData, isLoading: isLoadingBrand } = useGetBrand();
+  const { data: categoryData, isLoading: isLoadingCategory } = useGetCategory();
+  const [searchKeyword, setSearchKeyword] = useState("");
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchKeyword(e.target.value); // Cập nhật giá trị input
+  };
+
+  const mapCategoryData = (data: { data: any[] } | undefined): Category[] => {
+    if (!data || !data.data) return []; // Kiểm tra dữ liệu tồn tại và hợp lệ
+
+    return data.data
+      .slice(0, 3) // Chỉ lấy 3 phần tử đầu tiên
+      .map((category, index) => ({
+        title: category.name,
+        icon:
+          index === 0 ? (
+            <GiStoneTablet />
+          ) : index === 1 ? (
+            <GiConcreteBag />
+          ) : (
+            <LuLampFloor />
+          ),
+        items: category.subCategories.slice(0, 3).map((sub: any) => ({
+          name: sub.name,
+          id: sub.id,
+        })), // Đưa cả `name` và `id` vào `items`
+      }));
+  };
+
+  // Chuyển đổi dữ liệu
+  const categories: Category[] = mapCategoryData(categoryData);
+
 
   const { data: session } = useSession();
   // console.log(session?.user.accessToken);
@@ -97,12 +129,6 @@ export default function Header() {
     removeCartItem,
     updateQuantity,
   } = useShoppingContext();
-
-  // useEffect(() => {
-  //   // Calculate total itemTotalPrice whenever cartData changes
-  //   const total = cartData.reduce((sum, item) => sum + item.itemTotalPrice, 0);
-  //   setTotalItemPrice(total);
-  // }, [cartData]);
 
   const handleOpenCartModal = () => {
     const dataToSend = { cartItems: cartItem };
@@ -149,45 +175,31 @@ export default function Header() {
               </Link>
             </div>
             <div className="max-w-lg mr-auto ml-8">
-              <form className="flex gap-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      className="hidden lg:flex bg-slate-100 lg:h-10 hover:bg-slate-200 text-[18px] rounded-s font-bold border-blue-300"
-                      variant="outline"
-                    >
-                      Vật liệu xây dựng <IoIosArrowDown />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56">
-                    <DropdownMenuLabel>Các loại vật liệu</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuGroup>
-                      <DropdownMenuItem>
-                        <span>Vật liệu xây dựng cơ bản</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <span>Vật liệu xây dựng kết cấu</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <span>Vật liệu xây dựng hoàn thiện</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+              <form
+                className="flex mx-5 gap-2"
+                onSubmit={(e) => e.preventDefault()} // Ngăn chặn form gửi yêu cầu HTTP
+              >
                 <div className="flex w-full max-w-sm items-center">
                   <Input
                     type="search"
+                    value={searchKeyword} // Liên kết trạng thái với input
+                    onChange={handleInputChange}
                     placeholder="Tìm kiếm"
-                    className="w-full lg:h-10 lg:text-2xl lg:w-[200px] xl:w-[250px] 2xl:w-[500px]"
+                    className="w-full lg:h-10 lg:text-2xl lg:w-[300px] xl:w-[500px] 2xl:w-[700px]"
                   />
-                  <Button
-                    variant="outline"
-                    type="submit"
-                    className="bg-blue-300 lg:h-10"
+                  <Link
+                    href={`/product?keyword=${encodeURIComponent(
+                      searchKeyword
+                    )}`}
                   >
-                    <FaSearch className="h-5 w-5" />
-                  </Button>
+                    <Button
+                      variant="outline"
+                      type="button" // Đổi type thành "button" vì không cần submit
+                      className="bg-blue-300 ml-2 lg:h-10"
+                    >
+                      <FaSearch className="h-5 w-5" />
+                    </Button>
+                  </Link>
                 </div>
               </form>
             </div>
@@ -476,7 +488,7 @@ export default function Header() {
                             <div key={index}>
                               <Button
                                 variant="ghost"
-                                className="font-bold text-2xl hover:bg-white hover:text-red-300 mb-4 flex items-center"
+                                className="font-bold text-2xl hover:bg-white mb-4 flex items-center"
                               >
                                 <span className="mr-2">{category.icon}</span>
                                 {category.title}
@@ -484,9 +496,13 @@ export default function Header() {
                               <ul className="space-y-2">
                                 {category.items.map((item, itemIndex) => (
                                   <li key={itemIndex}>
-                                    <Label className="ml-8 text-[18px] hover:text-red-200 capitalize    ">
-                                      {item}
-                                    </Label>
+                                    <Link
+                                      href={`/product?categoryId=${item.id}`}
+                                    >
+                                      <Label className="ml-8 text-[18px] hover:text-red-200 capitalize    ">
+                                        {item.name}
+                                      </Label>
+                                    </Link>
                                   </li>
                                 ))}
                               </ul>
@@ -497,7 +513,7 @@ export default function Header() {
                           <img
                             alt="Construction worker on a wooden frame structure under a blue sky"
                             src="https://storage.googleapis.com/a1aa/image/FyvX4XAnwBrUIR3M8yUkJ1s9jBof1uQAITjOU39QarvIoj1JA.jpg"
-                            className="object-cover w-[500px] h-[300px] rounded-md mr-10"
+                            className="object-cover w-[500px] h-[200px] rounded-md mr-10"
                           />
                         </div>
                       </div>

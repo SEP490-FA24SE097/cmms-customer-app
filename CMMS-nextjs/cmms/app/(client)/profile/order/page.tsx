@@ -80,7 +80,7 @@ export default function Order() {
     CustomerId: session?.user?.user.id ?? "",
     "defaultSearch.perPage": perPage,
     "defaultSearch.currentPage": currentPage,
-    "defaultSearch.sortBy": "InvoiceDate",
+    "defaultSearch.sortBy": "invoiceDate",
     "defaultSearch.isAscending": false,
   });
 
@@ -167,131 +167,149 @@ export default function Order() {
                               </SheetTitle>
                               <SheetDescription>
                                 <div className="flex mb-5 text-black justify-between">
-                                  <div className="text-md">
+                                  <div className="text-md flex-1">
                                     <h1>
                                       <strong>Mã đơn hàng</strong>: {invoice.id}
                                     </h1>
                                   </div>
-                                  <div className="text-md">
+                                  <div className="text-md flex-1">
                                     <h1>
                                       <strong>Thời gian giao dự kiến</strong>:{" "}
                                       {new Date(
-                                        invoice.invoiceDate
+                                        invoice.shippingDetailVM.estimatedArrival
                                       ).toLocaleDateString()}
                                     </h1>
                                   </div>
                                 </div>
                                 <div className="flex mb-5 text-black justify-between">
-                                  <div className="text-md">
+                                  <div className="text-md flex-1">
                                     <h1>
-                                      <strong>Địa chỉ</strong>: {invoice.id}
+                                      <strong>Cửa hàng</strong>:{" "}
+                                      {invoice.storeName}
                                     </h1>
                                   </div>
-                                  <div className="text-md">
+                                  <div className="text-md flex 1">
                                     <h1>
-                                      <strong>Số điện thoại</strong>: 01235566
+                                      <strong>Người bán</strong>:{" "}
+                                      {invoice.staffName}
+                                    </h1>
+                                  </div>
+                                </div>
+                                <div className="flex mb-5 text-black justify-between">
+                                  <div className="text-md flex-1">
+                                    <h1>
+                                      <strong>Địa chỉ</strong>:{" "}
+                                      {invoice.shippingDetailVM?.address || ""}
+                                    </h1>
+                                  </div>
+                                  <div className="text-md flex-1">
+                                    <h1>
+                                      <strong>Địa chỉ</strong>:{" "}
+                                      {invoice.shippingDetailVM?.phoneReceive ||
+                                        ""}
                                     </h1>
                                   </div>
                                 </div>
                                 <div className="text-black">
-                                  <Table>
-                                    <TableHeader>
-                                      <TableRow>
-                                        <TableHead className="w-[100px] font-bold">
-                                          Ảnh
-                                        </TableHead>
-                                        <TableHead className="font-bold">
-                                          Tên sản phẩm
-                                        </TableHead>
-                                        <TableHead className="font-bold">
-                                          Số lượng
-                                        </TableHead>
-                                        <TableHead className="font-bold">
-                                          Giá tiền
-                                        </TableHead>
-                                      </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                      {invoice.invoiceDetails.map((product) => (
-                                        <TableRow key={product.storeId}>
-                                          <TableCell>
-                                            {product.imageUrl && (
-                                              <img
-                                                src={product.imageUrl}
-                                                alt=""
-                                                className="w-20 h-20 object-cover"
-                                              />
-                                            )}
-                                          </TableCell>
-                                          <TableCell>
-                                            {product.itemName}
-                                          </TableCell>
-                                          <TableCell>
-                                            {product.quantity}
-                                          </TableCell>
-                                          <TableCell>
-                                            {product.itemTotalPrice.toLocaleString(
+                                  <div className="max-h-60 overflow-y-auto">
+                                    <Table>
+                                      <TableHeader>
+                                        <TableRow>
+                                          <TableHead className="w-[100px] font-bold">
+                                            Ảnh
+                                          </TableHead>
+                                          <TableHead className="font-bold">
+                                            Tên sản phẩm
+                                          </TableHead>
+                                          <TableHead className="font-bold">
+                                            Số lượng
+                                          </TableHead>
+                                          <TableHead className="font-bold">
+                                            Giá tiền
+                                          </TableHead>
+                                        </TableRow>
+                                      </TableHeader>
+                                      <TableBody>
+                                        {invoice.invoiceDetails.map(
+                                          (product) => (
+                                            <TableRow key={product.storeId}>
+                                              <TableCell>
+                                                {product.imageUrl && (
+                                                  <img
+                                                    src={product.imageUrl}
+                                                    alt=""
+                                                    className="w-20 h-20 object-cover"
+                                                  />
+                                                )}
+                                              </TableCell>
+                                              <TableCell>
+                                                {product.itemName}
+                                              </TableCell>
+                                              <TableCell>
+                                                {product.quantity}
+                                              </TableCell>
+                                              <TableCell>
+                                                {product.itemTotalPrice.toLocaleString(
+                                                  "vi-VN",
+                                                  {
+                                                    style: "currency",
+                                                    currency: "vnd",
+                                                  }
+                                                )}
+                                              </TableCell>
+                                            </TableRow>
+                                          )
+                                        )}
+                                      </TableBody>
+                                    </Table>
+                                  </div>
+                                  <div className="w-full bg-gray-100">
+                                    <div className="flex justify-between p-2">
+                                      <h1>Tổng tiền</h1>
+                                      <h1>
+                                        {invoice.totalAmount.toLocaleString(
+                                          "vi-VN",
+                                          {
+                                            style: "currency",
+                                            currency: "vnd",
+                                          }
+                                        )}
+                                      </h1>
+                                    </div>
+                                    <div className="flex justify-between p-2">
+                                      <h1>Giảm giá</h1>
+                                      <h1>
+                                        {invoice?.discount !== null
+                                          ? invoice.discount.toLocaleString(
                                               "vi-VN",
                                               {
                                                 style: "currency",
                                                 currency: "vnd",
                                               }
-                                            )}
-                                          </TableCell>
-                                        </TableRow>
-                                      ))}
-                                    </TableBody>
-                                    <TableFooter>
-                                      <TableRow>
-                                        <TableCell colSpan={3}>
-                                          Tổng tiền
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                          {invoice.totalAmount.toLocaleString(
-                                            "vi-VN",
-                                            {
-                                              style: "currency",
-                                              currency: "vnd",
-                                            }
-                                          )}
-                                        </TableCell>
-                                      </TableRow>
-                                      <TableRow>
-                                        <TableCell colSpan={3}>
-                                          Giảm giá
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                          {invoice?.discount !== null
-                                            ? invoice.discount.toLocaleString(
-                                                "vi-VN",
-                                                {
-                                                  style: "currency",
-                                                  currency: "vnd",
-                                                }
-                                              )
-                                            : "0 ₫"}
-                                        </TableCell>
-                                      </TableRow>
-                                      <TableRow>
-                                        <TableCell
-                                          className="font-bold text-xl"
-                                          colSpan={3}
-                                        >
-                                          Thành tiền
-                                        </TableCell>
-                                        <TableCell className="text-right font-bold text-xl">
-                                          {invoice.salePrice.toLocaleString(
-                                            "vi-VN",
-                                            {
-                                              style: "currency",
-                                              currency: "vnd",
-                                            }
-                                          )}
-                                        </TableCell>
-                                      </TableRow>
-                                    </TableFooter>
-                                  </Table>
-                                  <Stack className="mt-5" sx={{ width: "100%" }} spacing={4}>
+                                            )
+                                          : "0 ₫"}
+                                      </h1>
+                                    </div>
+                                    <div className="flex justify-between p-2">
+                                      <h1 className="font-bold text-xl">
+                                        Thành tiền
+                                      </h1>
+                                      <h1 className="font-bold text-xl">
+                                        {invoice.salePrice.toLocaleString(
+                                          "vi-VN",
+                                          {
+                                            style: "currency",
+                                            currency: "vnd",
+                                          }
+                                        )}
+                                      </h1>
+                                    </div>
+                                  </div>
+                                  <Stack
+                                    className="mt-5"
+                                    sx={{ width: "100%" }}
+                                    spacing={4}
+                                  >
                                     <Stepper
                                       alternativeLabel
                                       activeStep={activeStep}
@@ -323,7 +341,7 @@ export default function Order() {
             </TableBody>
           </Table>
         </div>
-        <Pagination>
+        <Pagination className="mt-5">
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious

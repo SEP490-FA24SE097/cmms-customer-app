@@ -9,6 +9,8 @@ export type IInvoices = {
     customerPaid: number;
     staffId: string;
     storeId: string;
+    staffName: string;
+    storeName:string;
     userVM: IUserVM;
     sellPlace: number;
     buyIn: string;

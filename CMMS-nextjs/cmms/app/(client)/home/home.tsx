@@ -59,38 +59,26 @@ const fakeData = [
     title: "Cơ bản",
     imgSrc:
       "https://gachtrangtridep.net/wp-content/uploads/2021/05/1-bao-xi-mang-nang-bao-nhieu-kg.jpg",
-    items: [
-      "Headlights",
-      "Tail Lights",
-      "Fog Lights",
-      "Turn Signals",
-      "Switches & Relays",
-    ],
+    items: ["Gạch", "Xi măng", "Cát"],
   },
   {
     title: "Kết cấu",
     imgSrc:
       "https://phugiachongtham.net/kcfinder/upload/images/phu-gia-be-tong-phun-PCON-1kg.jpg",
-    items: [
-      "Fuel Pumps",
-      "Motor Oil",
-      "Spark Plugs",
-      "Fuel Injector",
-      "Control Motor",
-    ],
+    items: ["Phụ gia xây dựng", "Vữa xây dựng", "Bê tông"],
   },
   {
     title: "Hoàn thiện",
     imgSrc:
       "https://product.hstatic.net/1000288788/product/z2232844194712_ca52107a4642158d6aa441f76762b512_34e0d44951264bc0b24038e47761bfda_master.jpg",
-    items: ["Bumpers", "Hoods", "Grilles", "Fog Lights", "Door Handles"],
+    items: ["Vật tư nội thất", "Tường", "Sàn"],
   },
 ];
 const fakeCategories = [
   { name: "Tất cả", key: "all" },
-  { name: "Vật tư nội thất", key: "danh mục 1" },
-  { name: "Sàn", key: "danh mục 2" },
-  { name: "Gạch", key: "gach" },
+  { name: "Xi măng", key: "Xi măng" },
+  { name: "Cát", key: "cát" },
+  { name: "Đá", key: "đá" },
 ];
 const materialsDataParams = {
   isCreatedDateDescending: true,
@@ -104,10 +92,12 @@ const materialsDataWithPriceParams = {
 const paginatedMaterialsParams = {
   page: 1,
   itemPerPage: 3,
-  categoryId: "85a4f0e6-3f44-42ba-b2fe-3cff6fdc99be",
+  // categoryId: "85a4f0e6-3f44-42ba-b2fe-3cff6fdc99be",
 };
 const HomePage: React.FC = () => {
   const router = useRouter();
+  const [isLoadingPage, setIsLoadingPage] = useState(false);
+
   const { toast } = useToast();
   const { addCartItem } = useShoppingContext();
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -144,6 +134,11 @@ const HomePage: React.FC = () => {
   } = useGetMaterial(paginatedMaterialsParams);
   const { data: storeQuantityData, isLoading: isLoadingStoreQuantity } =
     useGetQuantityStore(searchParamsquantity);
+
+  const handleNavigation = (path: string) => {
+    setIsLoadingPage(true);
+    router.push(path);
+  };
   const handleVariantNameClick = (variantName: string) => {
     setSelectedVariantName(variantName);
   };
@@ -319,6 +314,14 @@ const HomePage: React.FC = () => {
         );
   return (
     <section className="bg-gray-100 pb-10">
+      {isLoadingPage && (
+        <div className="fixed top-0 left-0 w-full h-1 bg-blue-500">
+          <div
+            className="h-full bg-blue-700 transition-all duration-300"
+            style={{ width: "100%" }}
+          ></div>
+        </div>
+      )}
       <div className="w-full sm:h-[700px] h-[40vh] m-auto py-5 relative group">
         <div
           style={{ backgroundImage: `url(${sliders[currentIndex].url})` }}
@@ -374,7 +377,7 @@ const HomePage: React.FC = () => {
                     ))}
                   </ul>
                   <Link className="text-blue-600" href="/product">
-                    Shop All
+                    Xem
                   </Link>
                 </div>
               </div>
@@ -414,7 +417,7 @@ const HomePage: React.FC = () => {
                   <CarouselItem
                     key={product.material.id}
                     onClick={() =>
-                      router.push(`/product/${product.material.id}`)
+                      handleNavigation(`/product/${product.material.id}`)
                     }
                     className="pl-1 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 cursor-pointer"
                   >
@@ -830,18 +833,6 @@ const HomePage: React.FC = () => {
                               {product.material.salePrice}đ
                             </div>
                           </div>
-                          <div>
-                            <button
-                              // onClick={() => handleAddToCart(product)}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleAddToCart();
-                              }}
-                              className="px-3 py-2 font-semibold text-sm bg-red-300 hover:bg-red-400 text-white rounded-md shadow-sm group-hover:scale-125 ease-in-out duration-300 "
-                            >
-                              <RiShoppingCart2Line size={25} />
-                            </button>
-                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -902,7 +893,9 @@ const HomePage: React.FC = () => {
               {filteredProducts?.map((product, index) => (
                 <CarouselItem
                   key={product.material.id}
-                  onClick={() => router.push(`/product/${product.material.id}`)}
+                  onClick={() =>
+                    handleNavigation(`/product/${product.material.id}`)
+                  }
                   className="pl-1 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 cursor-pointer"
                 >
                   <Card
@@ -1316,18 +1309,6 @@ const HomePage: React.FC = () => {
                             {product.material.salePrice}đ
                           </div>
                         </div>
-                        <div>
-                          <button
-                            // onClick={() => handleAddToCart(product)}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleAddToCart();
-                            }}
-                            className="px-3 py-2 font-semibold text-sm bg-red-300 hover:bg-red-400 text-white rounded-md shadow-sm group-hover:scale-125 ease-in-out duration-300 "
-                          >
-                            <RiShoppingCart2Line size={25} />
-                          </button>
-                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -1345,7 +1326,7 @@ const HomePage: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
               {/* Top Selling */}
               <div>
-                <h2 className="text-2xl font-bold mb-4">Top Selling</h2>
+                <h2 className="text-2xl font-bold mb-4">Lựa chọn nhiều nhất</h2>
                 <div className="border-b-2 border-stone-300 mb-4"></div>
                 <div className="space-y-10">
                   {isLoadingPaginatedMaterials ? (
