@@ -23,6 +23,7 @@ export async function getShipping(
     "/shippingDetails/getShippingDetails",
     searchParams
   );
+  console.log(result);
   if (!result.success) {
     return { data: [], pageCount: 0, error: result.error };
   }
@@ -37,7 +38,7 @@ export async function updateShipping<T>(
   const result = await apiRequest(() =>
     api.post("/shippingDetails/update-shippingDetail-status", data)
   );
-  console.log(result);
+
   if (!result.success) {
     return { data: [], error: result.error };
   }
@@ -55,7 +56,6 @@ export async function updateShippingFail<T>(
   const result = await apiRequest(() =>
     api.post("/invoices/update-invoice", data)
   );
-  console.log(result);
   if (!result.success) {
     return { data: [], error: result.error };
   }

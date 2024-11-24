@@ -94,6 +94,12 @@ export const columns = (
             {statusLabels[status]}
           </span>
         );
+      } else if (status === 2) {
+        return (
+          <span className="text-orange-500 font-medium">
+            {statusLabels[status]}
+          </span>
+        );
       }
 
       // Fallback to the mapped label or default message

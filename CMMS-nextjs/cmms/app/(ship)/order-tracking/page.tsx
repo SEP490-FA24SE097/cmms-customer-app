@@ -20,6 +20,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -88,13 +97,34 @@ export default function OrderPage() {
   const [deliveryDate, setDeliveryDate] = useState<string | null>(null);
   const [deliveryNote, setDeliveryNote] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<number | null>(null);
-  const ShipperId = session?.user?.user.id
-    ? { ShipperId: session.user.user.id }
-    : null;
-  const { data: dataShipper, isLoading: isDataShipper } = useShippoing(
-    ShipperId || {}
-  );
+  const [currentPage, setCurrentPage] = useState(0);
+  const [perPage, setPerPage] = useState(10); // Default items per page
+  // const ShipperId = session?.user?.user.id
+  //   ? { ShipperId: session.user.user.id }
+  //   : null;
+  const [searchParams, setSearchParams] = useState<
+    Record<string, string | number | boolean>
+  >({
+    ShipperId: session?.user?.user.id ?? "",
+    "defaultSearch.perPage": perPage,
+    "defaultSearch.currentPage": currentPage,
+  });
+  const { data: dataShipper, isLoading: isDataShipper } =
+    useShippoing(searchParams);
+  const totalPages = dataShipper?.totalPages || 1;
+  useEffect(() => {
+    setSearchParams((prev) => ({
+      ...prev,
+      "defaultSearch.currentPage": currentPage,
+    }));
+  }, [currentPage]);
 
+  const handlePageChange = (page: number) => {
+    if (page >= 0 && page < totalPages) {
+      // Adjusted for zero-based index
+      setCurrentPage(page);
+    }
+  };
   const handleSubmit = async () => {
     if (!selectedCustomer) {
       toast({
@@ -219,6 +249,54 @@ export default function OrderPage() {
     <section className="py-24">
       <div className="container mx-auto">
         <DataTable columns={columns(handleViewCustomer)} data={shippingData} />
+        <div className="mt-5">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={
+                    () => currentPage > 0 && handlePageChange(currentPage - 1) // Adjust for zero-based index
+                  }
+                  aria-disabled={currentPage === 0}
+                  className={
+                    currentPage === 0
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                >
+                  Trở lại
+                </PaginationPrevious>
+              </PaginationItem>
+              {[...Array(totalPages)].map((_, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink
+                    isActive={currentPage === index} // Adjusted for zero-based index
+                    onClick={() => handlePageChange(index)}
+                    className="cursor-pointer"
+                  >
+                    {index + 1} {/* Display the page number starting from 1 */}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() =>
+                    currentPage < totalPages - 1 && // Adjust for zero-based index
+                    handlePageChange(currentPage + 1)
+                  }
+                  aria-disabled={currentPage === totalPages - 1} // Adjust for zero-based index
+                  className={
+                    currentPage === totalPages - 1
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                >
+                  Tiếp
+                </PaginationNext>
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
       </div>
 
       {/* Dialog */}
