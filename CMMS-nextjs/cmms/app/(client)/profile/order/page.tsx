@@ -34,12 +34,32 @@ import Stack from "@mui/material/Stack";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { addDays,sub , format } from "date-fns";
+import { vi } from "date-fns/locale"; // Import locale tiếng Việt
+import { Calendar as CalendarIcon } from "lucide-react";
+import { DateRange } from "react-day-picker";
 
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import StepConnector, {
   stepConnectorClasses,
 } from "@mui/material/StepConnector";
 import { StepIconProps } from "@mui/material/StepIcon";
-
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { IInvoices } from "@/lib/actions/invoices/type/invoice-type";
 const getInvoiceStatus = (
   status: number
@@ -69,11 +89,17 @@ const statusSteps = [
   "Hủy",
   "Hoàn tiền",
 ];
-export default function Order() {
+export default function Order({
+  className,
+}: React.HTMLAttributes<HTMLDivElement>) {
   const { data: session } = useSession();
   const [currentPage, setCurrentPage] = useState(0);
   const [perPage, setPerPage] = useState(5); // Default items per page
-
+  const [selectedSort, setSelectedSort] = useState<string>("");
+  const [date, setDate] = React.useState<DateRange | undefined>({
+    from: sub(new Date(), { days: 7 }), 
+    to: addDays(new Date(), 7), // +7 ngày từ ngày hiện tại
+  });
   const [searchParams, setSearchParams] = useState<
     Record<string, string | number | boolean>
   >({
@@ -82,20 +108,40 @@ export default function Order() {
     "defaultSearch.currentPage": currentPage,
     "defaultSearch.sortBy": "invoiceDate",
     "defaultSearch.isAscending": false,
+    FromDate: date?.from ? format(date.from, "yyyy-MM-dd") : "",
+    ToDate: date?.to ? format(date.to, "yyyy-MM-dd") : "",
   });
-
+  const handleSelectChange = (value: string) => {
+    setSelectedSort(value); // Update the selected sort option
+    setSearchParams((prevParams) => {
+      switch (value) {
+        case "1":
+          return {
+            ...prevParams,
+            "defaultSearch.isAscending": false,
+          };
+        case "2":
+          return {
+            ...prevParams,
+            "defaultSearch.isAscending": true,
+          };
+        default:
+          return prevParams;
+      }
+    });
+  };
   const { data: invoices, isLoading } = useGetInvoice(searchParams);
-  console.log(invoices);
   const totalPages = invoices?.totalPages || 1;
 
   // Update searchParams whenever currentPage changes
   useEffect(() => {
     setSearchParams((prev) => ({
       ...prev,
-      "defaultSearch.currentPage": currentPage,
+      "defaultSearch.currentPage": currentPage, // Cập nhật trang hiện tại
+      FromDate: date?.from ? format(date.from, "yyyy-MM-dd") : "", // Định dạng ngày bắt đầu
+      ToDate: date?.to ? format(date.to, "yyyy-MM-dd") : "", // Định dạng ngày kết thúc
     }));
-    console.log(searchParams);
-  }, [currentPage]);
+  }, [currentPage, date]); // Thêm `date` vào danh sách phụ thuộc nếu cần
 
   const handlePageChange = (page: number) => {
     if (page >= 0 && page < totalPages) {
@@ -109,6 +155,56 @@ export default function Order() {
       <h2 className="text-xl sm:col-span-2 px-4 font-bold pb-5">
         Lịch sử đơn hàng
       </h2>
+      <div className="flex justify-end mb-5">
+        <div className={cn("grid gap-2", className)}>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                id="date"
+                variant={"outline"}
+                className={cn(
+                  "w-[250px] justify-start text-left font-normal mr-5",
+                  !date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon />
+                {date?.from ? (
+                  date.to ? (
+                    <>
+                      {/* Định dạng ngày tháng theo kiểu Việt Nam */}
+                      {format(date.from, "dd/MM/yyyy", { locale: vi })} -{" "}
+                      {format(date.to, "dd/MM/yyyy", { locale: vi })}
+                    </>
+                  ) : (
+                    format(date.from, "dd/MM/yyyy", { locale: vi })
+                  )
+                ) : (
+                  <span>Chọn ngày</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                initialFocus
+                mode="range"
+                defaultMonth={date?.from}
+                selected={date}
+                onSelect={setDate}
+                numberOfMonths={2}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+        <Select value={selectedSort} onValueChange={handleSelectChange}>
+          <SelectTrigger className="w-[120px]">
+            <SelectValue placeholder="Mặc định" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1">Mới nhất</SelectItem>
+            <SelectItem value="2">Cũ nhất</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
       <div>
         <div className="rounded-md border">
           <Table className="text-[18px] ">
@@ -166,13 +262,13 @@ export default function Order() {
                                 Thông tin đơn hàng
                               </SheetTitle>
                               <SheetDescription>
-                                <div className="flex mb-5 text-black justify-between">
-                                  <div className="text-md flex-1">
+                                <div className="flex mb-2 text-black justify-between">
+                                  <div className="text-md flex-[3]">
                                     <h1>
                                       <strong>Mã đơn hàng</strong>: {invoice.id}
                                     </h1>
                                   </div>
-                                  <div className="text-md flex-1">
+                                  <div className="text-md flex-[2]">
                                     <h1>
                                       <strong>Thời gian giao dự kiến</strong>:{" "}
                                       {new Date(
@@ -181,32 +277,40 @@ export default function Order() {
                                     </h1>
                                   </div>
                                 </div>
-                                <div className="flex mb-5 text-black justify-between">
-                                  <div className="text-md flex-1">
+                                <div className="flex mb-2 text-black justify-between">
+                                  <div className="text-md flex-[3]">
                                     <h1>
-                                      <strong>Cửa hàng</strong>:{" "}
+                                      <strong>Tên cửa hàng</strong>:{" "}
                                       {invoice.storeName}
                                     </h1>
                                   </div>
-                                  <div className="text-md flex 1">
+                                  <div className="text-md flex-[2]">
                                     <h1>
-                                      <strong>Người bán</strong>:{" "}
+                                      <strong>Tên nhân viên</strong>:{" "}
                                       {invoice.staffName}
                                     </h1>
                                   </div>
                                 </div>
-                                <div className="flex mb-5 text-black justify-between">
-                                  <div className="text-md flex-1">
-                                    <h1>
+                                <div className="flex mb-2 text-black justify-between">
+                                  <div className="text-md flex-[3]">
+                                    <h1 className="mr-5">
                                       <strong>Địa chỉ</strong>:{" "}
                                       {invoice.shippingDetailVM?.address || ""}
                                     </h1>
                                   </div>
-                                  <div className="text-md flex-1">
+                                  <div className="text-md flex-[2]">
                                     <h1>
                                       <strong>Địa chỉ</strong>:{" "}
                                       {invoice.shippingDetailVM?.phoneReceive ||
                                         ""}
+                                    </h1>
+                                  </div>
+                                </div>
+                                <div className="flex mb-2 text-black justify-between">
+                                  <div className="text-md flex-[3]">
+                                    <h1 className="mr-5">
+                                      <strong>Ngày nhận hàng</strong>:{" "}
+                                      {invoice.shippingDetailVM.shippingDate}
                                     </h1>
                                   </div>
                                 </div>

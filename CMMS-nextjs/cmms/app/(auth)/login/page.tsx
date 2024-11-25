@@ -11,7 +11,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { useToast } from "@/hooks/use-toast";
-
+import { getSession } from "next-auth/react";
 import {
   Form,
   FormControl,
@@ -22,9 +22,12 @@ import {
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+import { jwtDecode } from "jwt-decode";
+
 
 export default function LoginPage() {
   const router = useRouter();
+
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
   const [isLoadingPage, setIsLoadingPage] = useState(false);
@@ -56,7 +59,25 @@ export default function LoginPage() {
       });
 
       if (!res?.error) {
-        handleNavigation("/");
+        const session = await getSession(); // Lấy session hiện tại
+        const token = session?.user?.accessToken;
+        let userRole = "";
+        if (token) {
+          try {
+            const decodedToken = jwtDecode<any>(token);
+            userRole =
+              decodedToken[
+                "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+              ] || "No role found";
+          } catch (error) {
+            console.error("Error decoding token:", error);
+          }
+        }
+        if (userRole === "Shipper_Store") {
+          handleNavigation("/order-tracking");
+        } else {
+          handleNavigation("/");
+        }
         toast({
           title: "Đăng nhập thành công",
           description: "Bạn đã đăng nhập thành công!",
@@ -79,6 +100,7 @@ export default function LoginPage() {
       setLoading(false); // Set loading to false when the submission completes
     }
   };
+
   const { toast } = useToast();
   const handleNavigation = (path: string) => {
     setIsLoadingPage(true);

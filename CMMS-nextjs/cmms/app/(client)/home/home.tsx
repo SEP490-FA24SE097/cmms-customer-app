@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Rating from "@mui/material/Rating";
 import Stack from "@mui/material/Stack";
@@ -53,6 +53,7 @@ import {
   useShoppingContext,
 } from "@/context/shopping-cart-context";
 import Link from "next/link";
+import { useRole } from "@/providers/role-context";
 
 const fakeData = [
   {
@@ -97,7 +98,7 @@ const paginatedMaterialsParams = {
 const HomePage: React.FC = () => {
   const router = useRouter();
   const [isLoadingPage, setIsLoadingPage] = useState(false);
-
+  const { role } = useRole();
   const { toast } = useToast();
   const { addCartItem } = useShoppingContext();
   const [currentIndex, setCurrentIndex] = useState(0);

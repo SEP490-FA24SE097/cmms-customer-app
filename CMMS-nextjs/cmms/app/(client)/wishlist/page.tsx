@@ -1,20 +1,25 @@
-"use client"
-import React from 'react';
+"use client";
+import React from "react";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { Button } from "@/components/ui/button";
 import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-  } from "@/components/ui/breadcrumb";
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+
+import { jwtDecode } from "jwt-decode";
+import { useSession } from "next-auth/react";
+
 const products = [
   {
     id: 1,
     name: "Brandix Spark Plug Kit ASR-400",
-    imageUrl: "https://storage.googleapis.com/a1aa/image/kJTZYAAVMeUcPS6KMspHNElXRfKICwj92sxRyMqVX0rTKYsTA.jpg",
+    imageUrl:
+      "https://storage.googleapis.com/a1aa/image/kJTZYAAVMeUcPS6KMspHNElXRfKICwj92sxRyMqVX0rTKYsTA.jpg",
     stockStatus: "In Stock",
     price: "$19.00",
     reviews: 3,
@@ -22,7 +27,8 @@ const products = [
   {
     id: 2,
     name: "Brandix Brake Kit BDX-750Z370-S",
-    imageUrl: "https://storage.googleapis.com/a1aa/image/CSLnubsT6n7eGqMF2WujhvGhBZ3lCJ03YJIsJY2HJbbJFM2JA.jpg",
+    imageUrl:
+      "https://storage.googleapis.com/a1aa/image/CSLnubsT6n7eGqMF2WujhvGhBZ3lCJ03YJIsJY2HJbbJFM2JA.jpg",
     stockStatus: "In Stock",
     price: "$224.00",
     reviews: 22,
@@ -30,7 +36,8 @@ const products = [
   {
     id: 3,
     name: "Left Headlight Of Brandix Z54",
-    imageUrl: "https://storage.googleapis.com/a1aa/image/bD2GHLhYkhqrIxu9x1IIaq0IkIYbfiVPVilhU5ZPIgPKFM2JA.jpg",
+    imageUrl:
+      "https://storage.googleapis.com/a1aa/image/bD2GHLhYkhqrIxu9x1IIaq0IkIYbfiVPVilhU5ZPIgPKFM2JA.jpg",
     stockStatus: "In Stock",
     price: "$349.00",
     reviews: 14,
@@ -39,10 +46,30 @@ const products = [
 ];
 
 const WishlistPage: React.FC = () => {
+  const { data: session } = useSession();
+  // console.log(session?.user.accessToken);
+  const token = session?.user.accessToken; // Thay bằng token thực tế
+  let role = "";
+  try {
+    if (token) { // Kiểm tra token không phải undefined
+      // Decode token
+      const decodedToken = jwtDecode<any>(token);
+  
+      // Lấy giá trị của trường role
+      role =
+        decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ||
+        "No role found";
+    } else {
+      console.error("Token is undefined");
+    }
+  } catch (error) {
+    console.error("Error decoding token:", error);
+  }
+
   return (
     <div className="bg-gray-100 p-6">
       <div className="max-w-[85%] mx-auto">
-      <div className="p-5">
+        <div className="p-5">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
@@ -80,42 +107,64 @@ const WishlistPage: React.FC = () => {
                 <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Price
                 </th>
-                <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100">
-                </th>
+                <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100"></th>
               </tr>
             </thead>
             <tbody>
-              {products.map(product => (
+              {products.map((product) => (
                 <tr key={product.id}>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                    <img alt={product.name} className="w-20 h-20 object-cover" src={product.imageUrl} />
+                    <img
+                      alt={product.name}
+                      className="w-20 h-20 object-cover"
+                      src={product.imageUrl}
+                    />
                   </td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                    <p className="text-gray-900 whitespace-no-wrap">{product.name}</p>
+                    <p className="text-gray-900 whitespace-no-wrap">
+                      {product.name}
+                    </p>
                     <div className="flex items-center mt-2">
                       {[...Array(5)].map((_, index) => (
-                        <span key={index} className={index < Math.round(product.reviews / 5) ? "text-yellow-500" : "text-gray-400"}>
+                        <span
+                          key={index}
+                          className={
+                            index < Math.round(product.reviews / 5)
+                              ? "text-yellow-500"
+                              : "text-gray-400"
+                          }
+                        >
                           <i className="fas fa-star"></i>
                         </span>
                       ))}
-                      <span className="text-gray-600 ml-2">{product.reviews} reviews</span>
+                      <span className="text-gray-600 ml-2">
+                        {product.reviews} reviews
+                      </span>
                     </div>
                   </td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                     <span className="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
-                      <span aria-hidden className="absolute inset-0 bg-green-200 opacity-50 rounded-full"></span>
+                      <span
+                        aria-hidden
+                        className="absolute inset-0 bg-green-200 opacity-50 rounded-full"
+                      ></span>
                       <span className="relative">{product.stockStatus}</span>
                     </span>
                   </td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                    <p className="text-gray-900 whitespace-no-wrap">{product.price}</p>
+                    <p className="text-gray-900 whitespace-no-wrap">
+                      {product.price}
+                    </p>
                   </td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right">
                     <Button className="bg-blue-500 text-white px-4 py-2 rounded">
                       Add to cart
                     </Button>
-                    <Button variant="ghost" className="text-gray-400 hover:text-gray-600 ml-4">
-                      <RiDeleteBin6Line/>
+                    <Button
+                      variant="ghost"
+                      className="text-gray-400 hover:text-gray-600 ml-4"
+                    >
+                      <RiDeleteBin6Line />
                     </Button>
                   </td>
                 </tr>

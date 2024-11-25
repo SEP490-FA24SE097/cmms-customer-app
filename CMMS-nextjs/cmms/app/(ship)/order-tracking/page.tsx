@@ -50,6 +50,8 @@ import {
   updateShipping,
   updateShippingFail,
 } from "@/lib/actions/delivery/action/delivery";
+import { useRole } from "@/providers/role-context";
+import { useRouter } from "next/navigation";
 const formatDate = (
   isoDateString: string,
   format: "dd-MM-yyyy" | "dd/MM/yyyy HH:mm" = "dd-MM-yyyy"
@@ -94,14 +96,21 @@ const getInvoiceStatus = (
 export default function OrderPage() {
   const { toast } = useToast();
   const { data: session, status } = useSession();
+  const router = useRouter();
+  const { role } = useRole(); // Get the role from the RoleContext
   const [deliveryDate, setDeliveryDate] = useState<string | null>(null);
   const [deliveryNote, setDeliveryNote] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [perPage, setPerPage] = useState(10); // Default items per page
-  // const ShipperId = session?.user?.user.id
-  //   ? { ShipperId: session.user.user.id }
-  //   : null;
+  useEffect(() => {
+    if (!role) return; // Chờ cho đến khi role được xác định
+    if (role !== 'Shipper_Store') {
+      router.push('/unauthorized');
+    }
+  }, [role, router]);
+  
+  
   const [searchParams, setSearchParams] = useState<
     Record<string, string | number | boolean>
   >({
@@ -154,7 +163,9 @@ export default function OrderPage() {
 
     try {
       const result = await updateShipping(requestData);
+      
       if (result) {
+        
         toast({
           title: "Thành công",
           description: "Đơn hàng đã được cập nhật thành công.",
@@ -232,7 +243,12 @@ export default function OrderPage() {
   const [selectedCustomer, setSelectedCustomer] =
     useState<IShippingDetails | null>(null);
 
-  const shippingData: IShippingDetails[] = dataShipper?.data || [];
+    const [shippingData, setShippingData] = useState<IShippingDetails[]>([]); 
+    useEffect(() => {
+      if (dataShipper?.data) {
+        setShippingData(dataShipper.data);
+      }
+    }, [dataShipper]);
   const handleViewCustomer = (customer: IShippingDetails) => {
     setSelectedCustomer(customer);
   };
