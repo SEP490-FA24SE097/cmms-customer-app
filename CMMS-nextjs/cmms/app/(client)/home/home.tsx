@@ -154,6 +154,7 @@ const HomePage: React.FC = () => {
   };
   const handleVariantClick = (variantId: string) => {
     setSelectedVariant(variantId);
+    setSelectedStoreId("");
   };
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
@@ -601,24 +602,30 @@ const HomePage: React.FC = () => {
 
                                     <div className="flex items-center space-x-2">
                                       <span className="text-3xl font-bold text-red-500">
-                                        {selectedVariantValue
+                                        {(selectedVariantValue
                                           ? selectedVariantValue
                                           : materialData?.data?.material
                                               ?.salePrice ||
-                                            "Product Price Not Available"}
-                                        đ
+                                            "Product Price Not Available"
+                                        ).toLocaleString("vi-VN", {
+                                          style: "currency",
+                                          currency: "VND",
+                                        })}
                                       </span>
 
                                       <span className="text-gray-500 line-through">
-                                        {selectedVariantValue
+                                        {(selectedVariantValue
                                           ? selectedVariantValue
                                           : materialData?.data?.material
                                               ?.salePrice ||
-                                            "Product Price Not Available"}
-                                        đ
+                                            "Product Price Not Available"
+                                        ).toLocaleString("vi-VN", {
+                                          style: "currency",
+                                          currency: "VND",
+                                        })}
                                       </span>
                                       <span className="text-red-500 text-sm">
-                                        20%
+                                        00%
                                       </span>
                                     </div>
 
@@ -827,10 +834,22 @@ const HomePage: React.FC = () => {
                         <div className="flex w-full justify-between items-center mt-3">
                           <div className="flex gap-2">
                             <div className="text-xl sm:text-[16px] 2xl:text-xl font-normal text-stone-400 line-through">
-                              {product.material.salePrice}đ
+                              {product.material.salePrice.toLocaleString(
+                                "vi-VN",
+                                {
+                                  style: "currency",
+                                  currency: "vnd",
+                                }
+                              )}
                             </div>
                             <div className="text-xl sm:text-[16px] 2xl:text-xl font-semibold">
-                              {product.material.salePrice}đ
+                              {product.material.salePrice.toLocaleString(
+                                "vi-VN",
+                                {
+                                  style: "currency",
+                                  currency: "vnd",
+                                }
+                              )}
                             </div>
                           </div>
                         </div>
@@ -911,7 +930,7 @@ const HomePage: React.FC = () => {
                       />
                       <div className="flex w-full justify-between">
                         <div className="bg-blue-400 px-2 py-1 rounded-sm my-1">
-                          {/* {product.discount} */} 20%
+                          {/* {product.discount} */} 00%
                         </div>
                         <div
                           onClick={(e) => e.stopPropagation()}
@@ -1078,21 +1097,27 @@ const HomePage: React.FC = () => {
 
                                   <div className="flex items-center space-x-2">
                                     <span className="text-3xl font-bold text-red-500">
-                                      {selectedVariantValue
+                                      {(selectedVariantValue
                                         ? selectedVariantValue
                                         : materialData?.data?.material
                                             ?.salePrice ||
-                                          "Product Price Not Available"}
-                                      đ
+                                          "Product Price Not Available"
+                                      ).toLocaleString("vi-VN", {
+                                        style: "currency",
+                                        currency: "VND",
+                                      })}
                                     </span>
 
                                     <span className="text-gray-500 line-through">
-                                      {selectedVariantValue
+                                      {(selectedVariantValue
                                         ? selectedVariantValue
                                         : materialData?.data?.material
                                             ?.salePrice ||
-                                          "Product Price Not Available"}
-                                      đ
+                                          "Product Price Not Available"
+                                      ).toLocaleString("vi-VN", {
+                                        style: "currency",
+                                        currency: "VND",
+                                      })}
                                     </span>
                                     <span className="text-red-500 text-sm">
                                       20%
@@ -1303,10 +1328,22 @@ const HomePage: React.FC = () => {
                       <div className="flex w-full justify-between items-center mt-3">
                         <div className="flex gap-2">
                           <div className="text-xl sm:text-[16px] 2xl:text-xl font-normal text-stone-400 line-through">
-                            {product.material.salePrice}đ
+                            {product.material.salePrice.toLocaleString(
+                              "vi-VN",
+                              {
+                                style: "currency",
+                                currency: "vnd",
+                              }
+                            )}
                           </div>
                           <div className="text-xl sm:text-[16px] 2xl:text-xl font-semibold">
-                            {product.material.salePrice}đ
+                            {product.material.salePrice.toLocaleString(
+                              "vi-VN",
+                              {
+                                style: "currency",
+                                currency: "vnd",
+                              }
+                            )}
                           </div>
                         </div>
                       </div>
@@ -1368,10 +1405,22 @@ const HomePage: React.FC = () => {
                             <div className="flex w-full justify-between items-center mt-3">
                               <div className="flex flex-col gap-0 sm:gap-0">
                                 <div className="text-xl sm:text-[18px] font-semibold">
-                                  {product.material.salePrice}đ
+                                  {product.material.salePrice.toLocaleString(
+                                    "vi-VN",
+                                    {
+                                      style: "currency",
+                                      currency: "vnd",
+                                    }
+                                  )}
                                 </div>
                                 <div className="ml-1 text-lg sm:text-[14px] font-normal text-stone-400 line-through">
-                                  {product.material.salePrice}đ
+                                  {product.material.salePrice.toLocaleString(
+                                    "vi-VN",
+                                    {
+                                      style: "currency",
+                                      currency: "vnd",
+                                    }
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -1427,10 +1476,22 @@ const HomePage: React.FC = () => {
                             <div className="flex w-full justify-between items-center mt-3">
                               <div className="flex flex-col gap-0 sm:gap-0">
                                 <div className="text-xl sm:text-[18px] font-semibold">
-                                  {product.material.salePrice}đ
+                                  {product.material.salePrice.toLocaleString(
+                                    "vi-VN",
+                                    {
+                                      style: "currency",
+                                      currency: "vnd",
+                                    }
+                                  )}
                                 </div>
                                 <div className="ml-1 text-lg sm:text-[14px] font-normal text-stone-400 line-through">
-                                  {product.material.salePrice}đ
+                                  {product.material.salePrice.toLocaleString(
+                                    "vi-VN",
+                                    {
+                                      style: "currency",
+                                      currency: "vnd",
+                                    }
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -1486,10 +1547,22 @@ const HomePage: React.FC = () => {
                             <div className="flex w-full justify-between items-center mt-3">
                               <div className="flex flex-col gap-0 sm:gap-0">
                                 <div className="text-xl sm:text-[18px] font-semibold">
-                                  {product.material.salePrice}đ
+                                  {product.material.salePrice.toLocaleString(
+                                    "vi-VN",
+                                    {
+                                      style: "currency",
+                                      currency: "vnd",
+                                    }
+                                  )}
                                 </div>
                                 <div className="ml-1 text-lg sm:text-[14px] font-normal text-stone-400 line-through">
-                                  {product.material.salePrice}đ
+                                  {product.material.salePrice.toLocaleString(
+                                    "vi-VN",
+                                    {
+                                      style: "currency",
+                                      currency: "vnd",
+                                    }
+                                  )}
                                 </div>
                               </div>
                             </div>

@@ -291,6 +291,7 @@ export default function Listing() {
   const { addCartItem } = useShoppingContext();
   const handleVariantClick = (variantId: string) => {
     setSelectedVariant(variantId);
+    setSelectedStoreId("");
   };
 
   const handleAddToCart = () => {
@@ -406,14 +407,14 @@ export default function Listing() {
   const increment = () => setCount(count + 1);
   const decrement = () => setCount(count - 1);
 
-  console.log(selectedName);
+
   return (
     <div className="bg-gray-100">
       {isLoadingPage && (
         <div className="fixed top-0 left-0 w-full h-1 bg-blue-500">
           <div
             className="h-full bg-blue-700 transition-all duration-300"
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
           ></div>
         </div>
       )}
@@ -586,383 +587,389 @@ export default function Listing() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pt-8">
             {data && data.data && data.data.length > 0 ? (
               data?.data.map((product, index) => (
-
-                  <div
-                    key={product.material.id}
-                    onClick={() => handleNavigation(`/product/${product.material.id}`)}
-                    className="cursor-pointer"
-                  >
-                    <Card
-                      className="pt-6 max-h-[550px] overflow-hidden hover:overflow-y-auto [&::-webkit-scrollbar]:w-2 rounded-sm
+                <div
+                  key={product.material.id}
+                  onClick={() =>
+                    handleNavigation(`/product/${product.material.id}`)
+                  }
+                  className="cursor-pointer"
+                >
+                  <Card
+                    className="pt-6 max-h-[550px] overflow-hidden hover:overflow-y-auto [&::-webkit-scrollbar]:w-2 rounded-sm
                 [&::-webkit-scrollbar-track]:bg-gray-100
                 [&::-webkit-scrollbar-thumb]:bg-gray-300 cursor-pointer group"
-                    >
-                      <CardContent className="flex flex-col items-center">
-                        <img
-                          src={product.material.imageUrl}
-                          alt={product.material.name}
-                          className="w-full h-64 lg:h-60 2xl:h-72 object-cover mb-4 group-hover:scale-110 ease-in-out duration-300"
-                        />
-                        <div className="flex w-full justify-between">
-                          <div className="bg-blue-400 px-2 py-1 rounded-sm my-1">
-                            {/* {product.discount} */} 20%
-                          </div>
-                          <div
-                            onClick={(e) => e.stopPropagation()}
-                            className="flex items-center gap-2 mr-2"
-                          >
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleMateridIdClick(product.material.id);
-                                    handleVariantClick(
-                                      product.variants[0]?.variantId
-                                    );
-                                    handleVariantNameClick(
-                                      product.variants[0]?.sku
-                                    );
-                                    handleVariantValueClick(
-                                      product.variants[0]?.price
-                                    );
-                                  }}
-                                  className="text-stone-500 hover:text-black hover:bg-white"
-                                >
-                                  <HoverCard>
-                                    <HoverCardTrigger>
-                                      <FaRegEye size={25} />
-                                    </HoverCardTrigger>
-                                    <HoverCardContent
-                                      side="top"
-                                      className="w-fit p-2 bg-slate-950 text-white border-none"
-                                    >
-                                      Xem nhanh
-                                    </HoverCardContent>
-                                  </HoverCard>
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="sm:max-w-[1000px] sm:h-auto h-full overflow-y-auto">
-                                <div className="container mx-auto grid gap-8 md:grid-cols-2 ">
-                                  <div>
-                                    <div className="w-full sm:h-[55vh] h-[40vh] m-auto py-5 relative group">
-                                      {isLoadingMaterialData ? (
-                                        <Skeleton className="h-[350px] w-[450px] rounded-xl" />
-                                      ) : images.length > 0 &&
-                                        images[currentIndex] ? (
-                                        <div
-                                          style={{
-                                            backgroundImage: `url(${images[currentIndex].src})`,
-                                          }}
-                                          onClick={handleClick}
-                                          className="w-full h-full rounded-xl bg-center bg-cover duration-500 cursor-pointer"
-                                        >
-                                          {/* Left Arrow */}
-                                          <div
-                                            className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] left-10 text-xl rounded-full p-2 bg-black/20 text-white cursor-pointer"
-                                            onClick={prevSlide}
-                                          >
-                                            <FaChevronLeft size={30} />
-                                          </div>
-                                          {/* Right Arrow */}
-                                          <div
-                                            className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] right-10 text-xl rounded-full p-2 bg-black/20 text-white cursor-pointer"
-                                            onClick={nextSlide}
-                                          >
-                                            <FaChevronRight size={30} />
-                                          </div>
-                                        </div>
-                                      ) : (
-                                        <p>No image available</p>
-                                      )}
-                                    </div>
-
-                                    {/* Full-size Image Modal */}
-                                    {isModalOpen && (
+                  >
+                    <CardContent className="flex flex-col items-center">
+                      <img
+                        src={product.material.imageUrl}
+                        alt={product.material.name}
+                        className="w-full h-64 lg:h-60 2xl:h-72 object-cover mb-4 group-hover:scale-110 ease-in-out duration-300"
+                      />
+                      <div className="flex w-full justify-between">
+                        <div className="bg-blue-400 px-2 py-1 rounded-sm my-1">
+                          {/* {product.discount} */} 20%
+                        </div>
+                        <div
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center gap-2 mr-2"
+                        >
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleMateridIdClick(product.material.id);
+                                  handleVariantClick(
+                                    product.variants[0]?.variantId
+                                  );
+                                  handleVariantNameClick(
+                                    product.variants[0]?.sku
+                                  );
+                                  handleVariantValueClick(
+                                    product.variants[0]?.price
+                                  );
+                                }}
+                                className="text-stone-500 hover:text-black hover:bg-white"
+                              >
+                                <HoverCard>
+                                  <HoverCardTrigger>
+                                    <FaRegEye size={25} />
+                                  </HoverCardTrigger>
+                                  <HoverCardContent
+                                    side="top"
+                                    className="w-fit p-2 bg-slate-950 text-white border-none"
+                                  >
+                                    Xem nhanh
+                                  </HoverCardContent>
+                                </HoverCard>
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[1000px] sm:h-auto h-full overflow-y-auto">
+                              <div className="container mx-auto grid gap-8 md:grid-cols-2 ">
+                                <div>
+                                  <div className="w-full sm:h-[55vh] h-[40vh] m-auto py-5 relative group">
+                                    {isLoadingMaterialData ? (
+                                      <Skeleton className="h-[350px] w-[450px] rounded-xl" />
+                                    ) : images.length > 0 &&
+                                      images[currentIndex] ? (
                                       <div
-                                        className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
-                                        onClick={handleOutsideClick}
+                                        style={{
+                                          backgroundImage: `url(${images[currentIndex].src})`,
+                                        }}
+                                        onClick={handleClick}
+                                        className="w-full h-full rounded-xl bg-center bg-cover duration-500 cursor-pointer"
                                       >
-                                        <div className="relative w-full max-w-4xl">
-                                          {/* Full-size Image */}
-                                          <img
-                                            src={images[currentIndex].src}
-                                            alt=""
-                                            className="w-full h-auto rounded-lg"
-                                          />
-
-                                          {/* Prev and Next Buttons */}
-                                          <button
-                                            className="absolute top-1/2 left-4 text-white text-3xl transform -translate-y-1/2 p-2 bg-black/40 rounded-full"
-                                            onClick={prevSlide}
-                                          >
-                                            <FaChevronLeft />
-                                          </button>
-                                          <button
-                                            className="absolute top-1/2 right-4 text-white text-3xl transform -translate-y-1/2 p-2 bg-black/40 rounded-full"
-                                            onClick={nextSlide}
-                                          >
-                                            <FaChevronRight />
-                                          </button>
+                                        {/* Left Arrow */}
+                                        <div
+                                          className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] left-10 text-xl rounded-full p-2 bg-black/20 text-white cursor-pointer"
+                                          onClick={prevSlide}
+                                        >
+                                          <FaChevronLeft size={30} />
+                                        </div>
+                                        {/* Right Arrow */}
+                                        <div
+                                          className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] right-10 text-xl rounded-full p-2 bg-black/20 text-white cursor-pointer"
+                                          onClick={nextSlide}
+                                        >
+                                          <FaChevronRight size={30} />
                                         </div>
                                       </div>
+                                    ) : (
+                                      <p>No image available</p>
                                     )}
-                                    <div>
-                                      <div className="flex justify-center w-full py-2 gap-5">
-                                        <Carousel
-                                          opts={{
-                                            align: "start",
-                                          }}
-                                          className="w-full max-w-sm"
-                                        >
-                                          <CarouselContent className="-ml-1">
-                                            {images.map((slide, slideIndex) => (
-                                              <CarouselItem
-                                                key={slideIndex}
-                                                className="pl-1 basis-1/4"
-                                              >
-                                                <img
-                                                  src={slide.src}
-                                                  key={slideIndex}
-                                                  onClick={() =>
-                                                    goToSlide(slideIndex)
-                                                  }
-                                                  className={`border-2 h-20 w-20 rounded-sm cursor-pointer ${
-                                                    currentIndex === slideIndex
-                                                      ? " border-red-300"
-                                                      : ""
-                                                  }`}
-                                                />
-                                              </CarouselItem>
-                                            ))}
-                                          </CarouselContent>
-                                          <CarouselPrevious />
-                                          <CarouselNext />
-                                        </Carousel>
-                                      </div>
-                                    </div>
                                   </div>
 
-                                  {/* Right Column */}
-                                  <div className="space-y-4">
-                                    <div className="flex items-center space-x-2">
-                                      <span className="bg-pink-200 text-pink-600 text-xs font-semibold px-2 py-1 rounded">
-                                        Sale Off
-                                      </span>
-                                    </div>
-                                    <h1 className="text-3xl font-bold">
-                                      {selectedVariantName
-                                        ? selectedVariantName
-                                        : materialData?.data?.material?.name ||
-                                          "Product Name Not Available"}
-                                    </h1>
+                                  {/* Full-size Image Modal */}
+                                  {isModalOpen && (
+                                    <div
+                                      className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+                                      onClick={handleOutsideClick}
+                                    >
+                                      <div className="relative w-full max-w-4xl">
+                                        {/* Full-size Image */}
+                                        <img
+                                          src={images[currentIndex].src}
+                                          alt=""
+                                          className="w-full h-auto rounded-lg"
+                                        />
 
-                                    <div className="flex items-center">
-                                      <Rating
-                                        name="half-rating-read"
-                                        defaultValue={4}
-                                        precision={0.5}
-                                        readOnly
-                                      />
-                                      <span className="text-gray-600 ml-2">
-                                        (32 reviews)
-                                      </span>
-                                    </div>
-
-                                    <div className="flex items-center space-x-2">
-                                      <span className="text-3xl font-bold text-red-500">
-                                        {selectedVariantValue
-                                          ? selectedVariantValue
-                                          : materialData?.data?.material
-                                              ?.salePrice ||
-                                            "Product Price Not Available"}
-                                        đ
-                                      </span>
-
-                                      <span className="text-gray-500 line-through">
-                                        {selectedVariantValue
-                                          ? selectedVariantValue
-                                          : materialData?.data?.material
-                                              ?.salePrice ||
-                                            "Product Price Not Available"}
-                                        đ
-                                      </span>
-                                      <span className="text-red-500 text-sm">
-                                        20%
-                                      </span>
-                                    </div>
-
-                                    <p className="text-gray-600">
-                                      {materialData?.data?.material
-                                        ?.description ||
-                                        "Product Description Not Available"}
-                                    </p>
-
-                                    <div>
-                                      <span className="text-gray-600">
-                                        Các loại
-                                      </span>
-                                      <div className="flex items-center space-x-2">
-                                        {materialData?.data?.variants &&
-                                        materialData.data.variants.length >
-                                          0 ? (
-                                          materialData.data.variants.map(
-                                            (variant, index) => (
-                                              <div
-                                                key={index}
-                                                onClick={() => {
-                                                  handleVariantClick(
-                                                    variant.variantId
-                                                  );
-                                                  handleVariantNameClick(
-                                                    variant.sku
-                                                  );
-                                                  handleVariantValueClick(
-                                                    variant.price
-                                                  );
-                                                }}
-                                                className={`flex items-center border p-1 ${
-                                                  selectedVariant ===
-                                                  variant.variantId
-                                                    ? "bg-red-100 text-red-600"
-                                                    : "hover:bg-red-100 hover:text-red-600"
-                                                } `}
-                                              >
-                                                <img
-                                                  src={variant.image}
-                                                  alt={`Variant ${index + 1}`}
-                                                  className="w-12 h-12 object-cover"
-                                                />
-                                                <div className="flex-col mt-2">
-                                                  {variant.attributes.map(
-                                                    (attribute, idx) => (
-                                                      <button
-                                                        key={idx}
-                                                        className="flex text-[14px] items-center"
-                                                      >
-                                                        <div className="capitalize font-bold">
-                                                          {attribute.name}
-                                                          :&nbsp;
-                                                        </div>
-                                                        <div className="capitalize">
-                                                          {attribute.value}
-                                                        </div>
-                                                      </button>
-                                                    )
-                                                  )}
-                                                </div>
-                                              </div>
-                                            )
-                                          )
-                                        ) : (
-                                          <p>Không có biến thể</p>
-                                        )}
+                                        {/* Prev and Next Buttons */}
+                                        <button
+                                          className="absolute top-1/2 left-4 text-white text-3xl transform -translate-y-1/2 p-2 bg-black/40 rounded-full"
+                                          onClick={prevSlide}
+                                        >
+                                          <FaChevronLeft />
+                                        </button>
+                                        <button
+                                          className="absolute top-1/2 right-4 text-white text-3xl transform -translate-y-1/2 p-2 bg-black/40 rounded-full"
+                                          onClick={nextSlide}
+                                        >
+                                          <FaChevronRight />
+                                        </button>
                                       </div>
                                     </div>
-                                    <div>
-                                      {storeQuantityData?.data &&
-                                      storeQuantityData.data.length > 0 ? (
-                                        <div>
-                                          <h2>
-                                            Hiện tại có{" "}
-                                            <span className="font-bold">
-                                              {storeQuantityData.data.length}
-                                            </span>{" "}
-                                            chi nhánh còn sản phẩm
-                                          </h2>
-                                          <ul className="w-[300px] max-h-[100px] overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
-                                            {storeQuantityData.data.map(
-                                              (item, index) => (
-                                                <li key={index}>
-                                                  <Button
-                                                    onClick={() =>
-                                                      handleStoreClick(
-                                                        item.storeId,
-                                                        item.quantity
-                                                      )
-                                                    }
-                                                    variant="ghost"
-                                                    className={`flex justify-start ${
-                                                      selectedStoreId ===
-                                                      item.storeId
-                                                        ? "bg-red-100 text-red-600"
-                                                        : "hover:bg-red-100 hover:text-red-600"
-                                                    } w-full text-blue-500`}
-                                                  >
-                                                    <p className="flex pl-2 items-center gap-3">
-                                                      <FaStore />
-                                                      {item.storeName}
-                                                      &nbsp;có:
-                                                      <span className="font-bold">
-                                                        {item.quantity}&nbsp;sản
-                                                        phẩm
-                                                      </span>
-                                                    </p>
-                                                  </Button>
-                                                </li>
-                                              )
-                                            )}
-                                          </ul>
-                                        </div>
-                                      ) : (
-                                        <p>Sản phẩm này hiện không còn hàng</p>
-                                      )}
-                                    </div>
-
-                                    <div className="flex items-center space-x-4">
-                                      <div className="flex items-center border rounded">
-                                        <button
-                                          className="px-3 py-2"
-                                          onClick={decrement}
-                                        >
-                                          -
-                                        </button>
-                                        <input
-                                          type="text"
-                                          value={count}
-                                          onChange={handleInputChange}
-                                          className="w-12 text-center border-l border-r"
-                                        />
-                                        <button
-                                          className="px-3 py-2"
-                                          onClick={increment}
-                                        >
-                                          +
-                                        </button>
-                                      </div>
-                                      {storeQuantityData?.data &&
-                                      storeQuantityData.data.length > 0 ? (
-                                        <button
-                                          onClick={handleAddToCart}
-                                          className="flex items-center px-6 py-2 bg-red-500 text-white rounded"
-                                        >
-                                          <i className="fas fa-shopping-cart mr-2"></i>{" "}
-                                          Thêm vào vỏ hàng
-                                        </button>
-                                      ) : (
-                                        <button className="flex items-center px-6 py-2 bg-gray-600 text-white rounded">
-                                          <i className="fas fa-shopping-cart mr-2"></i>{" "}
-                                          Thêm vào vỏ hàng
-                                        </button>
-                                      )}
-                                      <button className="px-2 py-2 border rounded hover:bg-red-500 hover:text-white transition ease-in-out duration-500 hover:-translate-y-2">
-                                        <CiHeart
-                                          size={25}
-                                          className="font-bold"
-                                        />
-                                      </button>
+                                  )}
+                                  <div>
+                                    <div className="flex justify-center w-full py-2 gap-5">
+                                      <Carousel
+                                        opts={{
+                                          align: "start",
+                                        }}
+                                        className="w-full max-w-sm"
+                                      >
+                                        <CarouselContent className="-ml-1">
+                                          {images.map((slide, slideIndex) => (
+                                            <CarouselItem
+                                              key={slideIndex}
+                                              className="pl-1 basis-1/4"
+                                            >
+                                              <img
+                                                src={slide.src}
+                                                key={slideIndex}
+                                                onClick={() =>
+                                                  goToSlide(slideIndex)
+                                                }
+                                                className={`border-2 h-20 w-20 rounded-sm cursor-pointer ${
+                                                  currentIndex === slideIndex
+                                                    ? " border-red-300"
+                                                    : ""
+                                                }`}
+                                              />
+                                            </CarouselItem>
+                                          ))}
+                                        </CarouselContent>
+                                        <CarouselPrevious />
+                                        <CarouselNext />
+                                      </Carousel>
                                     </div>
                                   </div>
                                 </div>
-                                <hr className="mt-5" />
-                                <div className="mx-auto">Xem chi tiet</div>
-                              </DialogContent>
-                            </Dialog>
 
-                            <HoverCard>
-                              <HoverCardTrigger>
-                                {/* {product.isFavorite ? (
+                                {/* Right Column */}
+                                <div className="space-y-4">
+                                  <div className="flex items-center space-x-2">
+                                    <span className="bg-pink-200 text-pink-600 text-xs font-semibold px-2 py-1 rounded">
+                                      Sale Off
+                                    </span>
+                                  </div>
+                                  <h1 className="text-3xl font-bold">
+                                    {selectedVariantName
+                                      ? selectedVariantName
+                                      : materialData?.data?.material?.name ||
+                                        "Product Name Not Available"}
+                                  </h1>
+
+                                  <div className="flex items-center">
+                                    <Rating
+                                      name="half-rating-read"
+                                      defaultValue={4}
+                                      precision={0.5}
+                                      readOnly
+                                    />
+                                    <span className="text-gray-600 ml-2">
+                                      (32 reviews)
+                                    </span>
+                                  </div>
+
+                                  <div className="flex items-center space-x-2">
+                                    <span className="text-3xl font-bold text-red-500">
+                                      {(selectedVariantValue
+                                        ? selectedVariantValue
+                                        : materialData?.data?.material
+                                            ?.salePrice ||
+                                          "Product Price Not Available"
+                                      ).toLocaleString("vi-VN", {
+                                        style: "currency",
+                                        currency: "VND",
+                                      })}
+                                    </span>
+
+                                    <span className="text-gray-500 line-through">
+                                    {(selectedVariantValue
+                                        ? selectedVariantValue
+                                        : materialData?.data?.material
+                                            ?.salePrice ||
+                                          "Product Price Not Available"
+                                      ).toLocaleString("vi-VN", {
+                                        style: "currency",
+                                        currency: "VND",
+                                      })}
+                                    </span>
+                                    <span className="text-red-500 text-sm">
+                                      00%
+                                    </span>
+                                  </div>
+
+                                  <p className="text-gray-600">
+                                    {materialData?.data?.material
+                                      ?.description ||
+                                      "Product Description Not Available"}
+                                  </p>
+
+                                  <div>
+                                    <span className="text-gray-600">
+                                      Các loại
+                                    </span>
+                                    <div className="flex items-center space-x-2">
+                                      {materialData?.data?.variants &&
+                                      materialData.data.variants.length > 0 ? (
+                                        materialData.data.variants.map(
+                                          (variant, index) => (
+                                            <div
+                                              key={index}
+                                              onClick={() => {
+                                                handleVariantClick(
+                                                  variant.variantId
+                                                );
+                                                handleVariantNameClick(
+                                                  variant.sku
+                                                );
+                                                handleVariantValueClick(
+                                                  variant.price
+                                                );
+                                              }}
+                                              className={`flex items-center border p-1 ${
+                                                selectedVariant ===
+                                                variant.variantId
+                                                  ? "bg-red-100 text-red-600"
+                                                  : "hover:bg-red-100 hover:text-red-600"
+                                              } `}
+                                            >
+                                              <img
+                                                src={variant.image}
+                                                alt={`Variant ${index + 1}`}
+                                                className="w-12 h-12 object-cover"
+                                              />
+                                              <div className="flex-col mt-2">
+                                                {variant.attributes.map(
+                                                  (attribute, idx) => (
+                                                    <button
+                                                      key={idx}
+                                                      className="flex text-[14px] items-center"
+                                                    >
+                                                      <div className="capitalize font-bold">
+                                                        {attribute.name}
+                                                        :&nbsp;
+                                                      </div>
+                                                      <div className="capitalize">
+                                                        {attribute.value}
+                                                      </div>
+                                                    </button>
+                                                  )
+                                                )}
+                                              </div>
+                                            </div>
+                                          )
+                                        )
+                                      ) : (
+                                        <p>Không có biến thể</p>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    {storeQuantityData?.data &&
+                                    storeQuantityData.data.length > 0 ? (
+                                      <div>
+                                        <h2>
+                                          Hiện tại có{" "}
+                                          <span className="font-bold">
+                                            {storeQuantityData.data.length}
+                                          </span>{" "}
+                                          chi nhánh còn sản phẩm
+                                        </h2>
+                                        <ul className="w-[300px] max-h-[100px] overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
+                                          {storeQuantityData.data.map(
+                                            (item, index) => (
+                                              <li key={index}>
+                                                <Button
+                                                  onClick={() =>
+                                                    handleStoreClick(
+                                                      item.storeId,
+                                                      item.quantity
+                                                    )
+                                                  }
+                                                  variant="ghost"
+                                                  className={`flex justify-start ${
+                                                    selectedStoreId ===
+                                                    item.storeId
+                                                      ? "bg-red-100 text-red-600"
+                                                      : "hover:bg-red-100 hover:text-red-600"
+                                                  } w-full text-blue-500`}
+                                                >
+                                                  <p className="flex pl-2 items-center gap-3">
+                                                    <FaStore />
+                                                    {item.storeName}
+                                                    &nbsp;có:
+                                                    <span className="font-bold">
+                                                      {item.quantity}&nbsp;sản
+                                                      phẩm
+                                                    </span>
+                                                  </p>
+                                                </Button>
+                                              </li>
+                                            )
+                                          )}
+                                        </ul>
+                                      </div>
+                                    ) : (
+                                      <p>Sản phẩm này hiện không còn hàng</p>
+                                    )}
+                                  </div>
+
+                                  <div className="flex items-center space-x-4">
+                                    <div className="flex items-center border rounded">
+                                      <button
+                                        className="px-3 py-2"
+                                        onClick={decrement}
+                                      >
+                                        -
+                                      </button>
+                                      <input
+                                        type="text"
+                                        value={count}
+                                        onChange={handleInputChange}
+                                        className="w-12 text-center border-l border-r"
+                                      />
+                                      <button
+                                        className="px-3 py-2"
+                                        onClick={increment}
+                                      >
+                                        +
+                                      </button>
+                                    </div>
+                                    {storeQuantityData?.data &&
+                                    storeQuantityData.data.length > 0 ? (
+                                      <button
+                                        onClick={handleAddToCart}
+                                        className="flex items-center px-6 py-2 bg-red-500 text-white rounded"
+                                      >
+                                        <i className="fas fa-shopping-cart mr-2"></i>{" "}
+                                        Thêm vào vỏ hàng
+                                      </button>
+                                    ) : (
+                                      <button className="flex items-center px-6 py-2 bg-gray-600 text-white rounded">
+                                        <i className="fas fa-shopping-cart mr-2"></i>{" "}
+                                        Thêm vào vỏ hàng
+                                      </button>
+                                    )}
+                                    <button className="px-2 py-2 border rounded hover:bg-red-500 hover:text-white transition ease-in-out duration-500 hover:-translate-y-2">
+                                      <CiHeart
+                                        size={25}
+                                        className="font-bold"
+                                      />
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                              <hr className="mt-5" />
+                              <div className="mx-auto">Xem chi tiet</div>
+                            </DialogContent>
+                          </Dialog>
+
+                          <HoverCard>
+                            <HoverCardTrigger>
+                              {/* {product.isFavorite ? (
                             <CiHeart
                               className="text-stone-500 hover:text-black"
                               size={25}
@@ -970,52 +977,64 @@ export default function Listing() {
                           ) : (
                             <FaHeart className="text-red-300" size={25} />
                           )} */}
-                                <CiHeart
-                                  className="text-stone-500 hover:text-black"
-                                  size={25}
-                                />
-                              </HoverCardTrigger>
-                              <HoverCardContent
-                                side="top"
-                                className="w-fit p-2 bg-slate-950 text-white border-none"
-                              >
-                                Yêu thích
-                              </HoverCardContent>
-                            </HoverCard>
+                              <CiHeart
+                                className="text-stone-500 hover:text-black"
+                                size={25}
+                              />
+                            </HoverCardTrigger>
+                            <HoverCardContent
+                              side="top"
+                              className="w-fit p-2 bg-slate-950 text-white border-none"
+                            >
+                              Yêu thích
+                            </HoverCardContent>
+                          </HoverCard>
+                        </div>
+                      </div>
+                      <h2 className="text-lg font-semibold text-start w-full my-2 lg:h-[55px] hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
+                        {product.material.name}
+                      </h2>
+                      <div className="flex w-full justify-start items-center gap-4">
+                        <Rating
+                          name="product-rating"
+                          value={4} //{product.rating}
+                          precision={0.5}
+                          className="text-xl 2xl:text-2xl"
+                          readOnly
+                        />
+                        <span className="text-black text-sm font-semibold">
+                          {/* {product.rating} */} 4
+                        </span>
+                        <span className="text-gray-600 text-sm">
+                          {/* ({product.reviews} reviews) */}
+                          (10 reviews)
+                        </span>
+                      </div>
+                      <div className="flex w-full justify-between items-center mt-3">
+                        <div className="flex gap-2">
+                          <div className="text-xl sm:text-[16px] 2xl:text-xl font-normal text-stone-400 line-through">
+                            {product.material.salePrice.toLocaleString(
+                              "vi-VN",
+                              {
+                                style: "currency",
+                                currency: "vnd",
+                              }
+                            )}
+                          </div>
+                          <div className="text-xl sm:text-[16px] 2xl:text-xl font-semibold">
+                            {product.material.salePrice.toLocaleString(
+                              "vi-VN",
+                              {
+                                style: "currency",
+                                currency: "vnd",
+                              }
+                            )}
                           </div>
                         </div>
-                        <h2 className="text-lg font-semibold text-start w-full my-2 lg:h-[55px] hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
-                          {product.material.name}
-                        </h2>
-                        <div className="flex w-full justify-start items-center gap-4">
-                          <Rating
-                            name="product-rating"
-                            value={4} //{product.rating}
-                            precision={0.5}
-                            className="text-xl 2xl:text-2xl"
-                            readOnly
-                          />
-                          <span className="text-black text-sm font-semibold">
-                            {/* {product.rating} */} 4
-                          </span>
-                          <span className="text-gray-600 text-sm">
-                            {/* ({product.reviews} reviews) */}
-                            (10 reviews)
-                          </span>
-                        </div>
-                        <div className="flex w-full justify-between items-center mt-3">
-                          <div className="flex gap-2">
-                            <div className="text-xl sm:text-[16px] 2xl:text-xl font-normal text-stone-400 line-through">
-                              {product.material.salePrice}đ
-                            </div>
-                            <div className="text-xl sm:text-[16px] 2xl:text-xl font-semibold">
-                              {product.material.salePrice}đ
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               ))
             ) : (
               <div className="col-span-full text-center mx-auto">

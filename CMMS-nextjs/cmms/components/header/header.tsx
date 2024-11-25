@@ -110,7 +110,6 @@ export default function Header() {
   // Chuyển đổi dữ liệu
   const categories: Category[] = mapCategoryData(categoryData);
 
-
   const { data: session } = useSession();
   // console.log(session?.user.accessToken);
 
@@ -194,7 +193,7 @@ export default function Header() {
                   >
                     <Button
                       variant="outline"
-                      type="button" // Đổi type thành "button" vì không cần submit
+                      type="button" 
                       className="bg-blue-300 ml-2 lg:h-10"
                     >
                       <FaSearch className="h-5 w-5" />
@@ -331,7 +330,13 @@ export default function Header() {
                                             </div>
                                           </td>
                                           <td className="py-2 px-4">
-                                            {product.itemTotalPrice}
+                                            {product.itemTotalPrice.toLocaleString(
+                                              "vi-VN",
+                                              {
+                                                style: "currency",
+                                                currency: "vnd",
+                                              }
+                                            )}
                                           </td>
                                           <td className="px-4">
                                             <HoverCard
@@ -370,13 +375,15 @@ export default function Header() {
                                 <hr className="my-2" />
                                 <div className="flex justify-between py-1 font-bold">
                                   <span>Thành tiền:</span>
-                                  <span>{cartData?.total}</span>
+                                  <span>
+                                    {cartData?.total.toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "vnd",
+                                    })}
+                                  </span>
                                 </div>
                               </div>
                               <div className="mt-6 flex justify-end space-x-4">
-                                <button className="bg-gray-200 text-gray-700 py-2 px-4 rounded">
-                                  Trở về
-                                </button>
                                 <Link href="/cart">
                                   <button className="bg-red-500 text-white py-2 px-4 rounded">
                                     Tiền tới thanh toán
