@@ -25,10 +25,13 @@ import {
 } from "@/lib/actions/cart/action/cart";
 import { useToast } from "@/hooks/use-toast";
 import { ICheckout } from "@/lib/actions/cart/type/cart-checkout-type";
-
+import { useSession } from "next-auth/react";
 
 export default function CartPage() {
-  const [totalItemPrice, setTotalItemPrice] = useState(0);
+  const { data: session } = useSession();
+  // console.log(session?.user.accessToken);
+
+  const isLogin = session?.user;
   const [cartData, setCartData] = useState<ICheckout>();
   const [cartQty1, setCartQty] = useState<number>();
   const [isPending, startTransition] = useTransition();
@@ -59,6 +62,15 @@ export default function CartPage() {
 
   // Prevent checkout if any item has insufficient quantity
   const handleCheckoutClick = (e: React.MouseEvent) => {
+    if (!isLogin) {
+      toast({
+        title: "Bạn không có tài khoản vui lòng đăng nhập!!!",
+        variant: "destructive", // This sets the toast style to destructive (error style)
+        duration: 3000, // 3 seconds duration
+      });
+      e.preventDefault();
+      return;
+    }
     if (hasInsufficientQuantity) {
       e.preventDefault();
       showWarningToast();
@@ -162,9 +174,13 @@ export default function CartPage() {
                               <h1 className="text-xl w-40 capitalize font-medium overflow-hidden line-clamp-2 text-ellipsis">
                                 {product.itemName}
                               </h1>
-                              {product.isChangeQuantity === true ? <h1 className="capitalize text-sm w-20 text-red-500 font-medium">
-                                Sản phẩm không đủ số lượng
-                              </h1>: ""}
+                              {product.isChangeQuantity === true ? (
+                                <h1 className="capitalize text-sm w-20 text-red-500 font-medium">
+                                  Sản phẩm không đủ số lượng
+                                </h1>
+                              ) : (
+                                ""
+                              )}
                               <h1 className="">
                                 {product.salePrice.toLocaleString("vi-VN", {
                                   style: "currency",
@@ -300,7 +316,9 @@ export default function CartPage() {
                         onClick={handleCheckoutClick}
                         className="bg-red-300 text-2xl text-white w-full py-7 mt-4"
                       >
-                        <Link href="/checkout">Tiến hành thanh toán</Link>
+                        <Link href={isLogin ? "/checkout" : "/login"}>
+                          Tiến hành thanh toán
+                        </Link>
                       </Button>
                     </div>
                   </div>
