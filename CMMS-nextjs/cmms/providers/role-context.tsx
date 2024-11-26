@@ -1,7 +1,7 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 // Define the context type
 interface RoleContextType {
@@ -11,19 +11,22 @@ interface RoleContextType {
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
 // Create the RoleProvider component
-export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { data: session } = useSession();
   const [role, setRole] = useState<string>("");
 
   useEffect(() => {
-    const token = session?.user.accessToken;
+    const token = session?.user?.accessToken;
 
     if (token) {
       try {
         const decodedToken = jwtDecode<any>(token);
         const userRole =
-          decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ||
-          "No role found";
+          decodedToken[
+            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+          ] || "No role found";
         setRole(userRole);
       } catch (error) {
         console.error("Error decoding token:", error);
@@ -35,7 +38,9 @@ export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [session]);
 
-  return <RoleContext.Provider value={{ role }}>{children}</RoleContext.Provider>;
+  return (
+    <RoleContext.Provider value={{ role }}>{children}</RoleContext.Provider>
+  );
 };
 
 // Hook to use the role in components
