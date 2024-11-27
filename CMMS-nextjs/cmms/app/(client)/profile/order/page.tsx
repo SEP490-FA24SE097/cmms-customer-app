@@ -43,7 +43,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { addDays,sub , format } from "date-fns";
+import { addDays, sub, format } from "date-fns";
 import { vi } from "date-fns/locale"; // Import locale tiếng Việt
 import { Calendar as CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
@@ -89,15 +89,17 @@ const statusSteps = [
   "Hủy",
   "Hoàn tiền",
 ];
-export default function Order({
-  className,
-}: React.HTMLAttributes<HTMLDivElement>) {
+export default function Order(
+  {
+    // className,
+  }
+) {
   const { data: session } = useSession();
   const [currentPage, setCurrentPage] = useState(0);
   const [perPage, setPerPage] = useState(5); // Default items per page
   const [selectedSort, setSelectedSort] = useState<string>("");
   const [date, setDate] = React.useState<DateRange | undefined>({
-    from: sub(new Date(), { days: 7 }), 
+    from: sub(new Date(), { days: 7 }),
     to: addDays(new Date(), 7), // +7 ngày từ ngày hiện tại
   });
   const [searchParams, setSearchParams] = useState<
@@ -156,7 +158,8 @@ export default function Order({
         Lịch sử đơn hàng
       </h2>
       <div className="flex justify-end mb-5">
-        <div className={cn("grid gap-2", className)}>
+        {/* // hot fix     <div className={cn("grid gap-2", className)}> */}
+        <div className={cn("grid gap-2")}>
           <Popover>
             <PopoverTrigger asChild>
               <Button

@@ -1377,7 +1377,7 @@ const HomePage: React.FC = () => {
                     </div>
                   ) : (
                     dataPaginatedMaterials?.data.map((product, index) => (
-                      <Link href={`/product/${product.material.id}`}>
+                      <Link key={index}  href={`/product/${product.material.id}`}>
                         <div
                           key={index}
                           className="group flex items-center p-2 rounded-sm transition ease-in-out hover:-translate-y-1 duration-300"
@@ -1448,7 +1448,7 @@ const HomePage: React.FC = () => {
                     </div>
                   ) : (
                     dataPaginatedMaterials?.data.map((product, index) => (
-                      <Link href={`/product/${product.material.id}`}>
+                      <Link key={index} href={`/product/${product.material.id}`}>
                         <div
                           key={index}
                           className="group flex items-center p-2 rounded-sm transition ease-in-out hover:-translate-y-1 duration-300"
@@ -1519,7 +1519,7 @@ const HomePage: React.FC = () => {
                     </div>
                   ) : (
                     dataPaginatedMaterials?.data.map((product, index) => (
-                      <Link href={`/product/${product.material.id}`}>
+                      <Link key={index} href={`/product/${product.material.id}`}>
                         <div
                           key={index}
                           className="group flex items-center p-2 rounded-sm transition ease-in-out hover:-translate-y-1 duration-300"
