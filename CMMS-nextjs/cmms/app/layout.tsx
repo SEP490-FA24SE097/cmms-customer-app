@@ -33,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${roboto.className} antialiased`}>
-        <NextTopLoader height={5} />
+        <NextTopLoader height={5}  />
         <SessionProviders>
           <RoleProvider>
             <QueryProvider>

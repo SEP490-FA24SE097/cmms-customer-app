@@ -224,20 +224,20 @@ export default function CheckoutPage() {
     // If validation passes, proceed with the API call
     try {
       const response = await createPayment(paymentData);
-    
+
       // Check if the response indicates success
       if (response.data?.success) {
         toast({
           title: "Thanh toán đã được thực hiện thành công.",
-          description:"Cảm ơn bạn vì đã chọn mua hàng ở chúng tôi!",
+          description: "Cảm ơn bạn vì đã chọn mua hàng ở chúng tôi!",
           style: {
             backgroundColor: "green",
             color: "white",
           },
         });
-    
+
         localStorage.removeItem("cartItem");
-    
+
         // Redirect to the home page after a short delay
         setTimeout(() => {
           window.location.href = "/";
@@ -246,10 +246,10 @@ export default function CheckoutPage() {
         // Handle cases where the response indicates failure
         toast({
           title: "Lỗi",
-          description:"Đã xảy ra lỗi không xác định. Vui lòng thử lại.",
+          description: "Đã xảy ra lỗi không xác định. Vui lòng thử lại.",
           variant: "destructive",
         });
-    
+
         console.error("Unexpected Payment Response:", response);
       }
     } catch (error) {
@@ -259,10 +259,9 @@ export default function CheckoutPage() {
         description: "Thanh toán thất bại. Vui lòng thử lại.",
         variant: "destructive",
       });
-    
+
       console.error("Payment failed with exception:", error);
     }
-    
   };
 
   const handleOpenCartModal = () => {
@@ -691,18 +690,33 @@ export default function CheckoutPage() {
                   <div className="text-sm mb-2">
                     <div className="flex justify-between">
                       <span>Tạm tính</span>
-                      <span>4.925.000đ</span>
+                      <span>
+                        {cartData?.totalAmount.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "vnd",
+                        })}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Phí vận chuyển</span>
-                      <span>18.000đ</span>
+                      <span>
+                        {cartData?.discount.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "vnd",
+                        })}
+                      </span>
                     </div>
                   </div>
 
                   <div className="text-lg font-semibold mb-4">
                     <div className="flex justify-between">
                       <span>Tổng cộng</span>
-                      <span className="text-blue-500">4.943.000đ</span>
+                      <span className="text-blue-500">
+                        {cartData?.salePrice.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "vnd",
+                        })}
+                      </span>
                     </div>
                   </div>
 

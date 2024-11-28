@@ -753,7 +753,7 @@ export default function Listing() {
                                       Sale Off
                                     </span>
                                   </div>
-                                  <h1 className="text-3xl font-bold">
+                                  <h1 className="text-3xl capitalize font-bold">
                                     {selectedVariantName
                                       ? selectedVariantName
                                       : materialData?.data?.material?.name ||
@@ -991,7 +991,7 @@ export default function Listing() {
                           </HoverCard>
                         </div>
                       </div>
-                      <h2 className="text-lg font-semibold text-start w-full my-2 lg:h-[55px] hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
+                      <h2 className="text-lg capitalize font-semibold text-start w-full my-2 lg:h-[55px] hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
                         {product.material.name}
                       </h2>
                       <div className="flex w-full justify-start items-center gap-4">
