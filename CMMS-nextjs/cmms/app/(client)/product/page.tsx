@@ -166,16 +166,12 @@ export default function Listing() {
   const handleVariantValueClick = (variantValue: number) => {
     setSelectedVariantValue(variantValue);
   };
-  const handleStoreClick = (storeId: string, quantity: number) => {
-    setSelectedStoreId(storeId);
-    setAvailableQuantity(quantity);
-  };
   const [selectedBrand, setSelectedBrand] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedName, setSelectedName] = useState<string>("");
   const [selectedSort, setSelectedSort] = useState<string>("");
   const [value, setValue] = useState<number[]>([0, 1000000]); // initial price range
-  const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
+
   const [availableQuantity, setAvailableQuantity] = useState<number | null>(
     null
   );
@@ -291,55 +287,30 @@ export default function Listing() {
   const { addCartItem } = useShoppingContext();
   const handleVariantClick = (variantId: string) => {
     setSelectedVariant(variantId);
-    setSelectedStoreId("");
   };
 
   const handleAddToCart = () => {
     if (!materialData) return;
 
-    if (!selectedStoreId) {
-      toast({
-        title: "Vui lòng chọn cửa hàng.",
-        style: { backgroundColor: "#3b82f6", color: "#ffffff" },
-      });
-      return;
-    }
 
     const materialId = materialData.data?.material.id;
 
     // Retrieve cart from localStorage and parse it
     const cart = JSON.parse(localStorage.getItem("cartItem") || "[]");
-    // Check if there is an item with the same materialId and variantId but a different storeId
-    const existingInOtherStore = cart.some(
-      (item: any) =>
-        item.materialId === materialId &&
-        item.variantId === selectedVariant &&
-        item.storeId !== selectedStoreId
-    );
 
-    if (existingInOtherStore) {
-      toast({
-        title: "Bạn đã có sản phẩm này ở cửa hàng khác.",
-        style: { backgroundColor: "#f87171", color: "#ffffff" }, // Red background for error
-      });
-      return;
-    }
-    // Find the existing quantity in the cart for the specific combination of materialId, storeId, and variantId
     const currentCartQuantity = cart.reduce((acc: any, item: any) => {
       const matchesMaterial = item.materialId === materialId;
-      const matchesStore = item.storeId === selectedStoreId;
       const matchesVariant =
         item.variantId === selectedVariant ||
         (!selectedVariant && !item.variantId);
 
-      return matchesMaterial && matchesStore && matchesVariant
-        ? acc + item.quantity
-        : acc;
+      return matchesMaterial && matchesVariant ? acc + item.quantity : acc;
     }, 0);
+    const totalQuantity = storeQuantityData?.data?.totalQuantityInAllStore;
     // Check if adding `count` would exceed store's available quantity
     if (
-      availableQuantity !== null &&
-      currentCartQuantity + count > availableQuantity
+      totalQuantity !== undefined &&
+      currentCartQuantity + count > totalQuantity
     ) {
       toast({
         title: "Vượt quá số lượng có sẵn.",
@@ -351,7 +322,7 @@ export default function Listing() {
     const data = {
       materialId,
       quantity: count,
-      storeId: selectedStoreId,
+      // storeId: selectedStoreId,
       variantId: selectedVariant,
     } as MaterialStore;
 
@@ -405,8 +376,11 @@ export default function Listing() {
   };
 
   const increment = () => setCount(count + 1);
-  const decrement = () => setCount(count - 1);
-
+  const decrement = () => {
+    if (count > 1) {
+      setCount(count - 1);
+    }
+  };
 
   return (
     <div className="bg-gray-100">
@@ -786,7 +760,7 @@ export default function Listing() {
                                     </span>
 
                                     <span className="text-gray-500 line-through">
-                                    {(selectedVariantValue
+                                      {(selectedVariantValue
                                         ? selectedVariantValue
                                         : materialData?.data?.material
                                             ?.salePrice ||
@@ -863,58 +837,47 @@ export default function Listing() {
                                           )
                                         )
                                       ) : (
-                                        <p>Không có biến thể</p>
+                                        <div></div>
                                       )}
                                     </div>
                                   </div>
                                   <div>
-                                    {storeQuantityData?.data &&
-                                    storeQuantityData.data.length > 0 ? (
-                                      <div>
-                                        <h2>
-                                          Hiện tại có{" "}
-                                          <span className="font-bold">
-                                            {storeQuantityData.data.length}
-                                          </span>{" "}
-                                          chi nhánh còn sản phẩm
-                                        </h2>
-                                        <ul className="w-[300px] max-h-[100px] overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
-                                          {storeQuantityData.data.map(
-                                            (item, index) => (
-                                              <li key={index}>
-                                                <Button
-                                                  onClick={() =>
-                                                    handleStoreClick(
-                                                      item.storeId,
-                                                      item.quantity
-                                                    )
-                                                  }
-                                                  variant="ghost"
-                                                  className={`flex justify-start ${
-                                                    selectedStoreId ===
-                                                    item.storeId
-                                                      ? "bg-red-100 text-red-600"
-                                                      : "hover:bg-red-100 hover:text-red-600"
-                                                  } w-full text-blue-500`}
+                                    <div>
+                                      <h2>
+                                        Hiện tại có{" "}
+                                        <span className="font-bold">
+                                          {
+                                            storeQuantityData?.data?.items
+                                              .length
+                                          }
+                                        </span>{" "}
+                                        chi nhánh còn sản phẩm
+                                      </h2>
+                                      <div className="h-32">
+                                        <ul className="max-h-32 text-[12px] text-blue-500 overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
+                                          {storeQuantityData?.data &&
+                                            storeQuantityData.data.items.map(
+                                              (item, index) => (
+                                                <li
+                                                  className="w-full"
+                                                  key={index}
                                                 >
                                                   <p className="flex pl-2 items-center gap-3">
-                                                    <FaStore />
-                                                    {item.storeName}
-                                                    &nbsp;có:
-                                                    <span className="font-bold">
-                                                      {item.quantity}&nbsp;sản
-                                                      phẩm
-                                                    </span>
+                                                    <FaStore size={30} />
+                                                    <div className="flex w-full justify-between">
+                                                      {item.storeName}
+                                                      &nbsp;
+                                                      <span className="text-end font-bold">
+                                                        {item.quantity}
+                                                      </span>
+                                                    </div>
                                                   </p>
-                                                </Button>
-                                              </li>
-                                            )
-                                          )}
+                                                </li>
+                                              )
+                                            )}
                                         </ul>
                                       </div>
-                                    ) : (
-                                      <p>Sản phẩm này hiện không còn hàng</p>
-                                    )}
+                                    </div>
                                   </div>
 
                                   <div className="flex items-center space-x-4">
@@ -939,7 +902,8 @@ export default function Listing() {
                                       </button>
                                     </div>
                                     {storeQuantityData?.data &&
-                                    storeQuantityData.data.length > 0 ? (
+                                    storeQuantityData.data
+                                      .totalQuantityInAllStore > 0 ? (
                                       <button
                                         onClick={handleAddToCart}
                                         className="flex items-center px-6 py-2 bg-red-500 text-white rounded"

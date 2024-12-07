@@ -11,14 +11,12 @@ import { createContext, useContext, useState, useEffect } from "react";
 export type CartItem = {
   quantity: number;
   materialId: string;
-  storeId: string;
   variantId: string;
 };
 
 // Material store type definition
 export type MaterialStore = {
   materialId: string;
-  storeId: string;
   variantId: string;
 };
 

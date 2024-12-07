@@ -276,7 +276,7 @@ export default function Header() {
                                           key={product.materialId}
                                           className="border-b"
                                         >
-                                          <td className="py-2 px-4 flex items-center">
+                                          <td className="py-2 px-4 capitalize flex items-center">
                                             <img
                                               src={product.imageUrl}
                                               alt={product.itemName}

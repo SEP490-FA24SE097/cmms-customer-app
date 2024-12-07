@@ -207,49 +207,25 @@ export default function DetailsPage() {
   const handleAddToCart = () => {
     if (!materialData) return;
 
-    if (!selectedStoreId) {
-      toast({
-        title: "Vui lòng chọn cửa hàng.",
-        style: { backgroundColor: "#3b82f6", color: "#ffffff" },
-      });
-      return;
-    }
 
     const materialId = materialData.data?.material.id;
 
     // Retrieve cart from localStorage and parse it
     const cart = JSON.parse(localStorage.getItem("cartItem") || "[]");
-    // Check if there is an item with the same materialId and variantId but a different storeId
-    const existingInOtherStore = cart.some(
-      (item: any) =>
-        item.materialId === materialId &&
-        item.variantId === selectedVariant &&
-        item.storeId !== selectedStoreId
-    );
 
-    if (existingInOtherStore) {
-      toast({
-        title: "Bạn đã có sản phẩm này ở cửa hàng khác.",
-        style: { backgroundColor: "#f87171", color: "#ffffff" }, // Red background for error
-      });
-      return;
-    }
-    // Find the existing quantity in the cart for the specific combination of materialId, storeId, and variantId
     const currentCartQuantity = cart.reduce((acc: any, item: any) => {
       const matchesMaterial = item.materialId === materialId;
-      const matchesStore = item.storeId === selectedStoreId;
       const matchesVariant =
         item.variantId === selectedVariant ||
         (!selectedVariant && !item.variantId);
 
-      return matchesMaterial && matchesStore && matchesVariant
-        ? acc + item.quantity
-        : acc;
+      return matchesMaterial && matchesVariant ? acc + item.quantity : acc;
     }, 0);
+    const totalQuantity = storeQuantityData?.data?.totalQuantityInAllStore;
     // Check if adding `count` would exceed store's available quantity
     if (
-      availableQuantity !== null &&
-      currentCartQuantity + count > availableQuantity
+      totalQuantity !== undefined &&
+      currentCartQuantity + count > totalQuantity
     ) {
       toast({
         title: "Vượt quá số lượng có sẵn.",
@@ -261,7 +237,7 @@ export default function DetailsPage() {
     const data = {
       materialId,
       quantity: count,
-      storeId: selectedStoreId,
+      // storeId: selectedStoreId,
       variantId: selectedVariant,
     } as MaterialStore;
 
@@ -285,13 +261,7 @@ export default function DetailsPage() {
       src: materialData?.data?.material.imageUrl,
       alt: "Main product image",
     },
-    // Spread the subImages array, if it exists
-    // ...(materialData?.data?.material.subImages || []).map(
-    //   (subImage, index) => ({
-    //     src: subImage,
-    //     alt: `Sub image ${index + 1}`,
-    //   })
-    // ),
+
     ...(materialData?.data?.variants || []).map((variant, index) => ({
       src: variant.image,
       alt: `Variant image ${index + 1}`,
@@ -315,15 +285,13 @@ export default function DetailsPage() {
   const [selectedVariantPrice, setSelectedVariantPrice] = useState<
     number | null
   >(materialData?.data?.variants[0]?.price ?? null);
-  const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
+  // const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
   const [count, setCount] = useState(1);
   const [comment, setComment] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [website, setWebsite] = useState("");
-  const [availableQuantity, setAvailableQuantity] = useState<number | null>(
-    null
-  );
+
   const prevSlide = () => {
     const isFirstSlide = currentIndex === 0;
     const newIndex = isFirstSlide ? images.length - 1 : currentIndex - 1;
@@ -374,10 +342,7 @@ export default function DetailsPage() {
   const handleVariantPriceClick = (variantPrice: number) => {
     setSelectedVariantPrice(variantPrice);
   };
-  const handleStoreClick = (storeId: string, quantity: number) => {
-    setSelectedStoreId(storeId);
-    setAvailableQuantity(quantity);
-  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
     if (value > 0) {
@@ -386,11 +351,11 @@ export default function DetailsPage() {
       setCount(1); // Reset to 1 if input is zero or negative
     }
   };
+  const materialId = materialData?.data?.material.id;
   const searchParamsquantity = {
-    materialId: materialData?.data?.material.id,
-    variantId: selectedVariant,
+    materialId: materialId,
+    variantId: selectedVariant || undefined,
   };
-
   const { data: storeQuantityData, isLoading: isLoadingStoreQuantity } =
     useGetQuantityStore(searchParamsquantity);
   return (
@@ -606,46 +571,34 @@ export default function DetailsPage() {
                 </div>
               </div>
               <div>
-                {storeQuantityData?.data &&
-                storeQuantityData.data.length > 0 ? (
-                  <div>
-                    <h2>
-                      Hiện tại có{" "}
-                      <span className="font-bold">
-                        {storeQuantityData.data.length}
-                      </span>{" "}
-                      chi nhánh còn sản phẩm
-                    </h2>
-                    <ul className="w-[300px] max-h-[100px] overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
-                      {storeQuantityData.data.map((item, index) => (
-                        <li key={index}>
-                          <Button
-                            onClick={() =>
-                              handleStoreClick(item.storeId, item.quantity)
-                            }
-                            variant="ghost"
-                            className={`flex justify-start ${
-                              selectedStoreId === item.storeId
-                                ? "bg-red-100 text-red-600"
-                                : "hover:bg-red-100 hover:text-red-600"
-                            } w-full text-blue-500`}
-                          >
+                <div>
+                  <h2>
+                    Hiện tại có{" "}
+                    <span className="font-bold">
+                      {storeQuantityData?.data?.items.length}
+                    </span>{" "}
+                    chi nhánh còn sản phẩm
+                  </h2>
+                  <div className="h-32">
+                    <ul className="max-h-32 text-[12px] text-blue-500 overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
+                      {storeQuantityData?.data &&
+                        storeQuantityData.data.items.map((item, index) => (
+                          <li className="w-full" key={index}>
                             <p className="flex pl-2 items-center gap-3">
-                              <FaStore />
-                              {item.storeName}
-                              &nbsp;có:
-                              <span className="font-bold">
-                                {item.quantity}&nbsp;sản phẩm
-                              </span>
+                              <FaStore size={30} />
+                              <div className="flex w-full justify-between">
+                                {item.storeName}
+                                &nbsp;
+                                <span className="text-end font-bold">
+                                  {item.quantity}
+                                </span>
+                              </div>
                             </p>
-                          </Button>
-                        </li>
-                      ))}
+                          </li>
+                        ))}
                     </ul>
                   </div>
-                ) : (
-                  <p>Sản phẩm này hiện không còn hàng</p>
-                )}
+                </div>
               </div>
 
               <div className="flex items-center space-x-4">
@@ -664,7 +617,7 @@ export default function DetailsPage() {
                   </button>
                 </div>
                 {storeQuantityData?.data &&
-                storeQuantityData.data.length > 0 ? (
+                storeQuantityData.data.totalQuantityInAllStore > 0 ? (
                   <button
                     onClick={handleAddToCart}
                     className="flex items-center px-6 py-2 bg-red-500 text-white rounded"
