@@ -148,7 +148,7 @@ export default function CartPage() {
                       >
                         <div className="flex gap-7 items-center p-2 px-10 border-b">
                           <FaStore size={30} />
-                          <h1 className="text-2xl capitalize font-bold">
+                          <h1 className="text-xl capitalize">
                             {item.storeName}
                           </h1>
                         </div>
@@ -171,7 +171,7 @@ export default function CartPage() {
                                 src={product.imageUrl}
                                 alt=""
                               />
-                              <h1 className="text-xl w-40 capitalize font-medium overflow-hidden line-clamp-2 text-ellipsis">
+                              <h1 className="text-md w-40 capitalize font-medium overflow-hidden line-clamp-2 text-ellipsis">
                                 {product.itemName}
                               </h1>
                               {product.isChangeQuantity === true ? (
@@ -259,27 +259,37 @@ export default function CartPage() {
                             </div>
                           ))}
                         </div>
+                        <div className="flex gap-7 justify-around items-center p-2 px-10 border-t">
+                          <div className="flex gap-2 mt-2">
+                            <h1>Tổng tiền: {" "}</h1>
+                            <h1>{item.totalStoreAmount.toLocaleString("vi-VN",{
+                              style: "currency",
+                              currency: "vnd",
+                            })}</h1>
+                          </div>
+                          <div className="flex gap-2 mt-2">
+                            <h1>Phí vận chuyển: {" "}</h1>
+                            <h1>{item.shippngFree.toLocaleString("vi-VN",{
+                              style: "currency",
+                              currency: "vnd",
+                            })}</h1>
+                          </div>
+                          <div className="flex font-bold gap-2 mt-2">
+                            <h1>Thành tiền: {" "}</h1>
+                            <h1>{item.finalPrice.toLocaleString("vi-VN",{
+                              style: "currency",
+                              currency: "vnd",
+                            })}</h1>
+                          </div>
+                        </div>
                       </div>
                     ))}
-                    <div className="flex justify-between items-center mt-4">
-                      <div className="flex items-center">
-                        <input
-                          className="border p-2 mr-2"
-                          type="text"
-                          placeholder="Code giảm giá"
-                        />
-
-                        <Button className="bg-red-300 font-bold text-white px-4 py-2">
-                          Áp dụng
-                        </Button>
-                      </div>
-                    </div>
                   </div>
 
                   {/* Cart Totals */}
                   <div className="w-full lg:w-1/4">
                     <div className="bg-white p-4 rounded shadow">
-                      <h2 className="text-xl font-bold mb-4">Cart Totals</h2>
+                      <h2 className="text-xl font-bold mb-4">Tổng đơn hàng</h2>
                       <div className="flex justify-between py-2 border-t">
                         <span>Tổng tiền</span>
                         <span>
@@ -290,20 +300,25 @@ export default function CartPage() {
                         </span>
                       </div>
                       <div className="flex justify-between py-2 border-t">
-                        <span>Shipping</span>
-                        <span>0d</span>
+                        <span>Phí vận chuyển</span>
+                        <span>
+                          {cartData?.shippingFee.toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "vnd",
+                          })}
+                        </span>
                       </div>
                       <div className="flex justify-between py-2 border-t">
                         <span>Giảm giá</span>
                         <span>
-                          {cartData?.discount.toLocaleString("vi-VN", {
+                          -{cartData?.discount.toLocaleString("vi-VN", {
                             style: "currency",
                             currency: "vnd",
                           })}
                         </span>
                       </div>
                       <div className="flex justify-between py-2 border-t font-bold">
-                        <span>Total</span>
+                        <span>Thành tiền</span>
                         <span>
                           {cartData?.salePrice.toLocaleString("vi-VN", {
                             style: "currency",

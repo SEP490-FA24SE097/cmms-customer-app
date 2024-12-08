@@ -9,16 +9,16 @@ import {
   fetchListDataWithPagi,
   fetchSingleData,
 } from "@/lib/api/api-handler/generic";
-import { IInvoices } from "../type/invoice-type";
+import { ICusInvoices, IInvoices } from "../type/invoice-type";
 
 // form mẫu fetch list
 export async function getInvoices(
   searchParams: Record<string, string | number | boolean>
-): Promise<ApiListResponse<IInvoices>> {
+): Promise<ApiListResponse<ICusInvoices>> {
   noStore();
 
-  const result = await fetchListDataWithPagi<IInvoices>(
-    "/invoices",
+  const result = await fetchListDataWithPagi<ICusInvoices>(
+    "/invoices/customer",
     searchParams
   );
   if (!result.success) {

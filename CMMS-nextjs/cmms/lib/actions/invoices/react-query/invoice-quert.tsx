@@ -5,7 +5,7 @@ import {
   ApiSingleResponse,
 } from "@/lib/api/api-handler/generic";
 import { useQuery } from "@tanstack/react-query";
-import { IInvoices } from "../type/invoice-type";
+import { ICusInvoices, IInvoices } from "../type/invoice-type";
 import { getInvoices } from "../action/invoice-action";
 
 
@@ -13,7 +13,7 @@ import { getInvoices } from "../action/invoice-action";
 export const useGetInvoice = (
   searchParams: Record<string, string | number | boolean>
 ) => {
-  return useQuery<ApiListResponse<IInvoices>>({
+  return useQuery<ApiListResponse<ICusInvoices>>({
     queryKey: ["INVOICE_LIST", searchParams],
     queryFn: () => getInvoices(searchParams),
   });

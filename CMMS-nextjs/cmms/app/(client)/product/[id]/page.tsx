@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { FaHeart } from "react-icons/fa";
 import { FaRegEye } from "react-icons/fa";
 import { FaStore } from "react-icons/fa";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Card,
   CardContent,
@@ -38,6 +39,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MdLocationOn } from "react-icons/md";
 import {
   Carousel,
   CarouselContent,
@@ -52,12 +54,21 @@ import { CiHeart } from "react-icons/ci";
 import { useParams } from "next/navigation";
 import { useGetMaterialById } from "@/lib/actions/materials/react-query/material-query";
 import { useGetQuantityStore } from "@/lib/actions/material_in_store/react-query/material-qty-store-query";
+
 import {
   CartItem,
   MaterialStore,
   useShoppingContext,
 } from "@/context/shopping-cart-context";
+import { useSession } from "next-auth/react";
+import SelectLocation from "@/components/select-location/page";
+
+
 export default function DetailsPage() {
+  const { data: session } = useSession();
+  const [isDialogOpen1, setIsDialogOpen1] = useState(false);
+  const [isDialogOpen2, setIsDialogOpen2] = useState(false);
+
   const reviews = [
     {
       name: "Sienna",
@@ -207,7 +218,6 @@ export default function DetailsPage() {
   const handleAddToCart = () => {
     if (!materialData) return;
 
-
     const materialId = materialData.data?.material.id;
 
     // Retrieve cart from localStorage and parse it
@@ -351,13 +361,18 @@ export default function DetailsPage() {
       setCount(1); // Reset to 1 if input is zero or negative
     }
   };
+
   const materialId = materialData?.data?.material.id;
   const searchParamsquantity = {
     materialId: materialId,
     variantId: selectedVariant || undefined,
   };
+
   const { data: storeQuantityData, isLoading: isLoadingStoreQuantity } =
     useGetQuantityStore(searchParamsquantity);
+
+  const [radioValue, setRadioValue] = useState("default");
+  const addressFull = session?.user.user.province + ", " +session?.user.user.district + ", " +session?.user.user.ward;
   return (
     <div className="bg-gray-100">
       <div className="max-w-[85%] mx-auto lg:w-[70%]">
@@ -515,18 +530,142 @@ export default function DetailsPage() {
                 <span className="text-3xl font-bold text-red-500">
                   {selectedVariantPrice
                     ? selectedVariantPrice
-                    : materialData?.data?.material.salePrice}
-                  đ
+                    : materialData?.data?.material.salePrice.toLocaleString(
+                        "vi-VN",
+                        {
+                          style: "currency",
+                          currency: "vnd",
+                        }
+                      )}
                 </span>
                 <span className="text-gray-500 line-through">
                   {selectedVariantPrice
                     ? selectedVariantPrice
-                    : materialData?.data?.material.salePrice}
-                  đ
+                    : materialData?.data?.material.salePrice.toLocaleString(
+                        "vi-VN",
+                        {
+                          style: "currency",
+                          currency: "vnd",
+                        }
+                      )}
                 </span>
                 <span className="text-red-500 text-sm">20%</span>
               </div>
+              <div className="flex justify-between items-center">
+                <div className="flex gap-2 items-center">
+                  <MdLocationOn size={20} />
+                  <h1>Giao đến:</h1>
+                  {!session?.user?.user?.ward ? (
+                    <Dialog
+                      open={isDialogOpen1}
+                      onOpenChange={setIsDialogOpen1}
+                    >
+                      <DialogTrigger asChild>
+                        <Button className="text-blue-500" variant="ghost">
+                          Bạn muốn giao tới đâu?
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Địa chỉ giao hàng</DialogTitle>
+                          <DialogDescription>
+                            <div>
+                              <p>
+                                Hãy chọn địa chỉ nhận hàng để được dự báo thời
+                                gian giao hàng cùng phí đóng gói, vận chuyển một
+                                cách chính xác nhất.
+                              </p>
+                              <hr className="my-5" />
+                              <RadioGroup
+                                className="text-black"
+                                value={radioValue}
+                                onValueChange={(value) => setRadioValue(value)} // Cập nhật state khi thay đổi
+                              >
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="default" id="r1" />
+                                  <Label htmlFor="r1">
+                                    {session?.user.user.ward
+                                      ? `${addressFull}`
+                                      : "Hãy chọn khu vực giao hàng"}
+                                  </Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="comfortable" id="r2" />
+                                  <Label htmlFor="r2">
+                                    Chọn khu vực giao hàng khác
+                                  </Label>
+                                </div>
+                              </RadioGroup>
+                              {radioValue === "comfortable" && (
+                                <div className="mt-5 mx-20">
+                                  <SelectLocation
+                                    setIsDialogOpen={setIsDialogOpen1}
 
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          </DialogDescription>
+                        </DialogHeader>
+                      </DialogContent>
+                    </Dialog>
+                  ) : (
+                    <p>{addressFull}</p>
+                  )}
+                </div>
+                <div>
+                  <Dialog open={isDialogOpen2} onOpenChange={setIsDialogOpen2}>
+                    <DialogTrigger asChild>
+                      <Button className="text-blue-500" variant="ghost">
+                        Đổi
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Địa chỉ giao hàng</DialogTitle>
+                        <DialogDescription>
+                          <div>
+                            <p>
+                              Hãy chọn địa chỉ nhận hàng để được dự báo thời
+                              gian giao hàng cùng phí đóng gói, vận chuyển một
+                              cách chính xác nhất.
+                            </p>
+                            <hr className="my-5" />
+                            <RadioGroup
+                              className="text-black"
+                              value={radioValue}
+                              onValueChange={(value) => setRadioValue(value)} // Cập nhật state khi thay đổi
+                            >
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="default" id="r1" />
+                                <Label htmlFor="r1">
+                                  {session?.user.user.ward
+                                    ? `${addressFull}`
+                                    : "Hãy chọn khu vực giao hàng"}
+                                </Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="comfortable" id="r2" />
+                                <Label htmlFor="r2">
+                                  Chọn khu vực giao hàng khác
+                                </Label>
+                              </div>
+                            </RadioGroup>
+                            {radioValue === "comfortable" && (
+                              <div className="mt-5 mx-20">
+                                <SelectLocation
+                                  setIsDialogOpen={setIsDialogOpen2}
+                                 
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </DialogDescription>
+                      </DialogHeader>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </div>
               <p className="text-gray-600">
                 {materialData?.data?.material.description}
               </p>

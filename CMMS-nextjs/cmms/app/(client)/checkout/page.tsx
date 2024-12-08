@@ -171,55 +171,51 @@ export default function CheckoutPage() {
     }
 
     // Validate address
-    if (!address) {
-      toast({
-        title: "Lỗi",
-        description: "Vui lòng nhập địa chỉ.",
-        variant: "destructive",
-      });
-      return;
-    }
+    // if (!address) {
+    //   toast({
+    //     title: "Lỗi",
+    //     description: "Vui lòng nhập địa chỉ.",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
 
-    // Validate province
-    if (!selectedProvince) {
-      toast({
-        title: "Lỗi",
-        description: "Vui lòng chọn tỉnh/thành phố.",
-        variant: "destructive",
-      });
-      return;
-    }
+    // // Validate province
+    // if (!selectedProvince) {
+    //   toast({
+    //     title: "Lỗi",
+    //     description: "Vui lòng chọn tỉnh/thành phố.",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
 
-    // Validate district
-    if (!selectedDistrict) {
-      toast({
-        title: "Lỗi",
-        description: "Vui lòng chọn quận/huyện.",
-        variant: "destructive",
-      });
-      return;
-    }
+    // // Validate district
+    // if (!selectedDistrict) {
+    //   toast({
+    //     title: "Lỗi",
+    //     description: "Vui lòng chọn quận/huyện.",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
 
-    // Validate ward
-    if (!selectedWard) {
-      toast({
-        title: "Lỗi",
-        description: "Vui lòng chọn phường/xã.",
-        variant: "destructive",
-      });
-      return;
-    }
+    // // Validate ward
+    // if (!selectedWard) {
+    //   toast({
+    //     title: "Lỗi",
+    //     description: "Vui lòng chọn phường/xã.",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
 
     // Prepare payment data
     const paymentData = {
       note: note,
-      address: fullAddress,
       paymentType: paymentType,
-      cartItems: cartItem,
+      preCheckOutItemCartModel: cartData?.items,
       phoneReceive: phone,
-      amount: cartData?.totalAmount,
-      discount: cartData?.discount,
-      salePrice: cartData?.salePrice,
     };
     // If validation passes, proceed with the API call
     try {
@@ -339,7 +335,8 @@ export default function CheckoutPage() {
                     placeholder="Số điện thoại"
                   />
                 </div>
-                <div className="grid mt-4 items-center gap-1.5">
+
+                {/* <div className="grid mt-4 items-center gap-1.5">
                   <Label className="text-[16px]">Địa chỉ</Label>
                   <Input
                     className="w-full"
@@ -397,10 +394,10 @@ export default function CheckoutPage() {
                       </Command>
                     </PopoverContent>
                   </Popover>
-                </div>
+                </div> */}
 
                 {/* District Selector */}
-                <div className="grid items-center gap-1.5">
+                {/* <div className="grid items-center gap-1.5">
                   <Label className="text-[16px]">Quận huyện</Label>
                   <Popover open={openDistrict} onOpenChange={setOpenDistrict}>
                     <PopoverTrigger asChild>
@@ -448,10 +445,10 @@ export default function CheckoutPage() {
                       </Command>
                     </PopoverContent>
                   </Popover>
-                </div>
+                </div> */}
 
                 {/* Ward Selector */}
-                <div className="grid items-center gap-1.5">
+                {/* <div className="grid items-center gap-1.5">
                   <Label className="text-[16px]">Phường xã</Label>
                   <Popover open={openWard} onOpenChange={setOpenWard}>
                     <PopoverTrigger asChild>
@@ -498,7 +495,8 @@ export default function CheckoutPage() {
                       </Command>
                     </PopoverContent>
                   </Popover>
-                </div>
+                </div> */}
+                
                 <div className="grid mt-4 items-center gap-1.5">
                   <Label className="text-[16px]">Ghi chú</Label>
                   <Textarea
@@ -508,21 +506,8 @@ export default function CheckoutPage() {
                   />
                 </div>
               </div>
-              <div className="xl:w-1/2">
-                <h2 className="text-xl font-bold border-b pb-3">Vận chuyển</h2>
-                <div className="mt-4">
-                  <Button
-                    variant="outline"
-                    className="flex w-full justify-between text-xl h-14 "
-                  >
-                    <div>
-                      <Radio />
-                      Vận chuyển tận nơi
-                    </div>
-                    <div className="text-[1rem]">100.000đ</div>
-                  </Button>
-                </div>
-                <div className="mt-8">
+              <div className="xl:w-1/2">               
+                <div className="">
                   <h2 className="text-2xl font-bold border-b pb-3">
                     Phương thức thanh toán
                   </h2>
@@ -622,7 +607,7 @@ export default function CheckoutPage() {
                     <div key={item.storeId} className="py-2 border-b">
                       <div className="flex gap-7 items-center p-2 border-b">
                         <FaStore size={20} />
-                        <h1 className="text-lg capitalize font-bold">
+                        <h1 className="text-xs capitalize">
                           {item.storeName}
                         </h1>
                       </div>
@@ -676,18 +661,9 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="mt-4 border-t">
-                  <div className="flex items-center my-4">
-                    <input
-                      type="text"
-                      placeholder="Nhập mã giảm giá"
-                      className="border p-2 flex-1 rounded mr-2"
-                    />
-                    <button className="bg-blue-500 text-white px-4 py-2 rounded">
-                      Áp dụng
-                    </button>
-                  </div>
 
-                  <div className="text-sm mb-2">
+
+                  <div className="text-sm my-2">
                     <div className="flex justify-between">
                       <span>Tạm tính</span>
                       <span>
@@ -700,7 +676,16 @@ export default function CheckoutPage() {
                     <div className="flex justify-between">
                       <span>Phí vận chuyển</span>
                       <span>
-                        {cartData?.discount.toLocaleString("vi-VN", {
+                        {cartData?.shippingFee.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "vnd",
+                        })}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Giảm giá</span>
+                      <span>
+                        -{cartData?.discount.toLocaleString("vi-VN", {
                           style: "currency",
                           currency: "vnd",
                         })}
