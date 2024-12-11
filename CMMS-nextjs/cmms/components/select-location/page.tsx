@@ -42,7 +42,7 @@ interface SelectLocationProps {
 export default function SelectLocation({
   setIsDialogOpen,
 }: SelectLocationProps) {
-  const { data: session } = useSession();
+  const { data: session, update  } = useSession();
   const { toast } = useToast();
   const [address, setAddress] = useState<string | null>(
     session?.user.user.address || null
@@ -180,9 +180,24 @@ export default function SelectLocation({
     };
 
     try {
-      const response = await createLocation(Data);
+      const response = await createLocation(Data)
+  ;
 
       if (response.data) {
+        update({
+          ...session, // Keep other session properties intact
+          user: {
+            ...session?.user, // Keep other user properties intact
+            user: {
+              ...session?.user?.user, // Keep nested user properties intact
+              province : tinh || "",
+              district: huyen || "",
+              ward: xa || "",
+              address: address,
+            },
+          },
+        });
+        
         toast({
           title: "Cập nhật địa chỉ thành công.",
           description: response.data.message || "Thành công",
@@ -191,7 +206,7 @@ export default function SelectLocation({
             color: "white",
           },
         });
-        await signIn();
+        // await signIn();
         setIsDialogOpen(false);
       } else {
         toast({

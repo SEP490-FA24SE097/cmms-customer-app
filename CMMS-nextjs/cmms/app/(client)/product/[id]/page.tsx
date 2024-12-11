@@ -51,7 +51,7 @@ import Rating from "@mui/material/Rating";
 import { useToast } from "@/hooks/use-toast";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { CiHeart } from "react-icons/ci";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useGetMaterialById } from "@/lib/actions/materials/react-query/material-query";
 import { useGetQuantityStore } from "@/lib/actions/material_in_store/react-query/material-qty-store-query";
 
@@ -66,6 +66,7 @@ import SelectLocation from "@/components/select-location/page";
 
 export default function DetailsPage() {
   const { data: session } = useSession();
+  const router = useRouter();
   const [isDialogOpen1, setIsDialogOpen1] = useState(false);
   const [isDialogOpen2, setIsDialogOpen2] = useState(false);
 
@@ -380,19 +381,25 @@ export default function DetailsPage() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink className="text-xl" href="/">
-                  Home
-                </BreadcrumbLink>
+                <BreadcrumbLink
+                                  className="text-xl"
+                                  onClick={() => router.push("/")}
+                                >
+                                  Trang chủ
+                                </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink className="text-xl" href="/components">
-                  Components
-                </BreadcrumbLink>
+                <BreadcrumbLink
+                                  className="text-xl"
+                                  onClick={() => router.push("/product")}
+                                >
+                                  Sản phẩm
+                                </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage className="text-xl">Breadcrumb</BreadcrumbPage>
+                <BreadcrumbPage className="text-xl">{materialData?.data?.material.name}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -529,18 +536,10 @@ export default function DetailsPage() {
               <div className="flex items-center space-x-2">
                 <span className="text-3xl font-bold text-red-500">
                   {selectedVariantPrice
-                    ? selectedVariantPrice
-                    : materialData?.data?.material.salePrice.toLocaleString(
-                        "vi-VN",
-                        {
-                          style: "currency",
-                          currency: "vnd",
-                        }
-                      )}
-                </span>
-                <span className="text-gray-500 line-through">
-                  {selectedVariantPrice
-                    ? selectedVariantPrice
+                    ? selectedVariantPrice.toLocaleString("vi-VN",{
+                      style: "currency",
+                      currency: "vnd"
+                    })
                     : materialData?.data?.material.salePrice.toLocaleString(
                         "vi-VN",
                         {
@@ -1100,10 +1099,10 @@ export default function DetailsPage() {
                         <div className="flex w-full justify-between items-center mt-3">
                           <div className="flex gap-2">
                             <div className="text-2xl font-normal text-stone-400 line-through">
-                              {product.price}đ
+                              {product.price}
                             </div>
                             <div className="text-2xl font-semibold">
-                              {product.price}đ
+                              {product.price}
                             </div>
                           </div>
                         </div>

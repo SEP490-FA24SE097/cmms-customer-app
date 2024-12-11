@@ -406,16 +406,7 @@ export default function Listing() {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink
-                  className="text-xl"
-                  onClick={() => router.push("/product")}
-                >
-                  Sản phẩm
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage className="text-xl">Breadcrumb</BreadcrumbPage>
+              <BreadcrumbPage className="text-xl">Sản phẩm</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>

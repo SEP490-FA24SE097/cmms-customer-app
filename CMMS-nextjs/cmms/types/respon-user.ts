@@ -1,14 +1,15 @@
 export type user = {
-  address: string;
-  district: string;
-  dob: string;
-  email: string;
-  fullName: string;
   id: string;
+  fullName: string;
+  email: string;
+  dob: string;
+  phoneNumber: string | null;
+  province: string | null;
+  district: string | null;
+  ward: string | null;
+  address: string | null;
+  taxCode: string | null;
   note: string;
-  phoneNumber: string;
-  province: string;
   status: number;
-  taxCode: string;
-  ward: string;
+  storeId: string | null;
 };

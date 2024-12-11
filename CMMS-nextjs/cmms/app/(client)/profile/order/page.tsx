@@ -145,6 +145,7 @@ export default function Order(
   const { data: invoices, isLoading } = useGetInvoice(searchParams);
   // console.log(invoices);
   const totalPages = invoices?.totalPages || 1;
+  console.log(invoices);
   // Update searchParams whenever currentPage changes
   useEffect(() => {
     setSearchParams((prev) => ({
