@@ -26,6 +26,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { ICheckout } from "@/lib/actions/cart/type/cart-checkout-type";
 import { useSession } from "next-auth/react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CartPage() {
   const { data: session } = useSession();
@@ -34,6 +35,7 @@ export default function CartPage() {
   const isLogin = session?.user;
   const [cartData, setCartData] = useState<ICheckout>();
   const [cartQty1, setCartQty] = useState<number>();
+  const [isloading, setIsloading] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const { toast } = useToast();
@@ -77,21 +79,32 @@ export default function CartPage() {
     }
   };
 
-  const handleOpenCartModal = () => {
+  const handleOpenCartModal = async () => {
     const dataToSend = { cartItems: cartItem };
 
-    startTransition(async () => {
-      const result = await GetCartCheckout(dataToSend);
+    setIsloading(true);
 
-      if (result && result.data) {
-        // Update cartData and reset total price based on response
-        setCartData(result.data);
-      } else {
-        console.log("Failed to fetch cart data");
-      }
-    });
+    setTimeout(async () => {
+      startTransition(async () => {
+        try {
+          const result = await GetCartCheckout(dataToSend);
+
+          if (result && result.data) {
+            setCartData(result.data);
+            console.log("Data fetched successfully");
+          } else {
+            console.log("Failed to fetch cart data");
+          }
+        } catch (error) {
+          console.error("Error fetching cart data:", error);
+        } finally {
+          setIsloading(false);
+        }
+      });
+    }, 1000); // Độ trễ 1 giây để kiểm tra trạng thái
   };
-  // console.log(cartData);
+
+  console.log(isloading);
   useEffect(() => {
     localStorage.setItem("cartItem", JSON.stringify(cartItem));
     setCartQty(cartQty);
@@ -124,7 +137,13 @@ export default function CartPage() {
 
             <div className="flex flex-col lg:flex-row gap-4">
               {/* Cart Items */}
-              {cartData?.items.length === 0 ? (
+              {isloading ? (
+                <div className="w-full lg:w-3/4 bg-white p-4 rounded shadow">
+                  <Skeleton className="h-[30px] w-full rounded-xl" />
+                  <Skeleton className="h-[170px] mt-5 w-full rounded-xl" />
+                  <Skeleton className="h-[30px] mt-5 w-full rounded-xl" />
+                </div>
+              ) : cartData?.items.length === 0 ? (
                 <div className="mx-auto">
                   <img src="/empty_cart.png" alt="Empty cart" />
                   <h2 className="text-[25px] mt-10">
@@ -261,25 +280,31 @@ export default function CartPage() {
                         </div>
                         <div className="flex gap-7 justify-around items-center p-2 px-10 border-t">
                           <div className="flex gap-2 mt-2">
-                            <h1>Tổng tiền: {" "}</h1>
-                            <h1>{item.totalStoreAmount.toLocaleString("vi-VN",{
-                              style: "currency",
-                              currency: "vnd",
-                            })}</h1>
+                            <h1>Tổng tiền: </h1>
+                            <h1>
+                              {item.totalStoreAmount.toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "vnd",
+                              })}
+                            </h1>
                           </div>
                           <div className="flex gap-2 mt-2">
-                            <h1>Phí vận chuyển: {" "}</h1>
-                            <h1>{item.shippngFree.toLocaleString("vi-VN",{
-                              style: "currency",
-                              currency: "vnd",
-                            })}</h1>
+                            <h1>Phí vận chuyển: </h1>
+                            <h1>
+                              {item.shippngFree.toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "vnd",
+                              })}
+                            </h1>
                           </div>
                           <div className="flex font-bold gap-2 mt-2">
-                            <h1>Thành tiền: {" "}</h1>
-                            <h1>{item.finalPrice.toLocaleString("vi-VN",{
-                              style: "currency",
-                              currency: "vnd",
-                            })}</h1>
+                            <h1>Thành tiền: </h1>
+                            <h1>
+                              {item.finalPrice.toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "vnd",
+                              })}
+                            </h1>
                           </div>
                         </div>
                       </div>
@@ -311,7 +336,8 @@ export default function CartPage() {
                       <div className="flex justify-between py-2 border-t">
                         <span>Giảm giá</span>
                         <span>
-                          -{cartData?.discount.toLocaleString("vi-VN", {
+                          -
+                          {cartData?.discount.toLocaleString("vi-VN", {
                             style: "currency",
                             currency: "vnd",
                           })}
