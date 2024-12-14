@@ -13,10 +13,11 @@ export interface PaymentResponse {
   success: boolean;
   message: string;
 }
-export async function createPayment(data: any): Promise<ApiSingleResponse<PaymentResponse>> {
+export async function createPayment(
+  data: any
+): Promise<ApiSingleResponse<PaymentResponse>> {
   noStore();
   const result = await apiRequest(() => axiosAuth.post("/payment", data));
-  console.log(result);
 
   if (!result.success) {
     return { data: null, error: result.error || undefined };
@@ -29,4 +30,21 @@ export async function createPayment(data: any): Promise<ApiSingleResponse<Paymen
   };
 }
 
+export async function createPaymentVNPAY(
+  data: any
+): Promise<ApiSingleResponse<string>> {
+  noStore();
+  console.log(data);
+  const result = await apiRequest(() => axiosAuth.post("/payment", data));
+  console.log(result);
 
+  if (!result.success) {
+    return { data: null, error: result.error || undefined };
+  }
+
+  // Ensure the response data conforms to the expected structure
+  return {
+    data: result.data, // Type assertion if you are sure about the structure
+    error: undefined,
+  };
+}

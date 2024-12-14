@@ -193,7 +193,7 @@ export default function Header() {
                   >
                     <Button
                       variant="outline"
-                      type="button" 
+                      type="button"
                       className="bg-blue-300 ml-2 lg:h-10"
                     >
                       <FaSearch className="h-5 w-5" />
@@ -205,7 +205,7 @@ export default function Header() {
           </div>
           <div className="mx-auto sm:ml-auto sm:mr-0   md:col-span-2">
             <div className="inline-flex gap-5">
-              <Button
+              {/* <Button
                 variant="ghost"
                 className="bg-white text-black hover:bg-slate-200 text-[18px] font-medium"
               >
@@ -215,7 +215,7 @@ export default function Header() {
                     5
                   </span>
                 </div>
-              </Button>
+              </Button> */}
               <Sheet>
                 <SheetTrigger asChild>
                   <Button
@@ -384,11 +384,17 @@ export default function Header() {
                                 </div>
                               </div>
                               <div className="mt-6 flex justify-end space-x-4">
-                                <Link href="/cart">
-                                  <button className="bg-red-500 text-white py-2 px-4 rounded">
+                                {cartData?.storeItems.length === 0 ? (
+                                  <button className="bg-slate-400 text-white py-2 px-4 rounded">
                                     Tiền tới thanh toán
                                   </button>
-                                </Link>
+                                ) : (
+                                  <Link href="/cart">
+                                    <button className="bg-red-500 text-white py-2 px-4 rounded">
+                                      Tiền tới thanh toán
+                                    </button>
+                                  </Link>
+                                )}
                               </div>
                             </div>
                           </div>

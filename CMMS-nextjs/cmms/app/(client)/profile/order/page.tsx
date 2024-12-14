@@ -235,10 +235,7 @@ export default function Order(
             {invoices?.data && invoices.data.length > 0 ? (
               invoices?.data.map((item, index) => (
                 <Accordion key={index} type="single" collapsible>
-                  <AccordionItem
-                    
-                    value={String(item.invoiceDate)}
-                  >
+                  <AccordionItem value={String(item.invoiceDate)}>
                     <AccordionTrigger className="grid border p-3 grid-cols-10 grid-rows-1 gap-0">
                       <div>{index + 1}</div>
                       <div className="col-span-4">
@@ -533,7 +530,9 @@ export default function Order(
                 </Accordion>
               ))
             ) : (
-              <p className="flex justify-center border p-5">Không tìm thấy hóa đơn nào.</p>
+              <p className="flex justify-center border p-5">
+                Không tìm thấy hóa đơn nào.
+              </p>
             )}
           </div>
         </div>

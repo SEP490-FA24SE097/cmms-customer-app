@@ -45,7 +45,7 @@ import {
 } from "@/lib/actions/materials/react-query/material-query";
 import { IMaterial } from "@/lib/actions/materials/type/material-type";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 import { useGetQuantityStore } from "@/lib/actions/material_in_store/react-query/material-qty-store-query";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -97,7 +97,7 @@ const paginatedMaterialsParams = {
 };
 const HomePage: React.FC = () => {
   const router = useRouter();
-  const [isLoadingPage, setIsLoadingPage] = useState(false);
+
   const { role } = useRole();
   const { toast } = useToast();
   const { addCartItem } = useShoppingContext();
@@ -136,10 +136,10 @@ const HomePage: React.FC = () => {
   const { data: storeQuantityData, isLoading: isLoadingStoreQuantity } =
     useGetQuantityStore(searchParamsquantity);
 
-  const handleNavigation = (path: string) => {
-    setIsLoadingPage(true);
-    router.push(path);
-  };
+  // const handleNavigation = (path: string) => {
+  //   setIsLoadingPage(true);
+  //   router.push(path);
+  // };
   const handleVariantNameClick = (variantName: string) => {
     setSelectedVariantName(variantName);
   };
@@ -167,7 +167,6 @@ const HomePage: React.FC = () => {
   };
   const handleAddToCart = () => {
     if (!materialData) return;
-
 
     const materialId = materialData.data?.material.id;
 
@@ -296,14 +295,6 @@ const HomePage: React.FC = () => {
         );
   return (
     <section className="bg-gray-100 pb-10">
-      {isLoadingPage && (
-        <div className="fixed top-0 left-0 w-full h-1 bg-blue-500">
-          <div
-            className="h-full bg-blue-700 transition-all duration-300"
-            style={{ width: "100%" }}
-          ></div>
-        </div>
-      )}
       <div className="w-full sm:h-[700px] h-[40vh] m-auto py-5 relative group">
         <div
           style={{ backgroundImage: `url(${sliders[currentIndex].url})` }}
@@ -399,7 +390,7 @@ const HomePage: React.FC = () => {
                   <CarouselItem
                     key={product.material.id}
                     onClick={() =>
-                      handleNavigation(`/product/${product.material.id}`)
+                      router.push(`/product/${product.material.id}`)
                     }
                     className="pl-5 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 cursor-pointer"
                   >
@@ -690,28 +681,33 @@ const HomePage: React.FC = () => {
                                           chi nhánh còn sản phẩm
                                         </h2>
                                         <div className="h-32">
-                                          <ul className="max-h-32 text-[12px] text-blue-500 overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
-                                            {storeQuantityData?.data &&
-                                              storeQuantityData.data.items.map(
-                                                (item, index) => (
-                                                  <li
-                                                    className="w-full"
-                                                    key={index}
-                                                  >
-                                                    <p className="flex pl-2 items-center gap-3">
-                                                      <FaStore size={30} />
-                                                      <div className="flex w-full justify-between">
-                                                        {item.storeName}
-                                                        &nbsp;
-                                                        <span className="text-end font-bold">
-                                                          {item.quantity}
-                                                        </span>
-                                                      </div>
-                                                    </p>
-                                                  </li>
-                                                )
-                                              )}
-                                          </ul>
+                                          {storeQuantityData?.data?.items
+                                            .length === 0 ? (
+                                            ""
+                                          ) : (
+                                            <ul className="max-h-32 text-[12px] text-blue-500 overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
+                                              {storeQuantityData?.data &&
+                                                storeQuantityData.data.items.map(
+                                                  (item, index) => (
+                                                    <li
+                                                      className="w-full"
+                                                      key={index}
+                                                    >
+                                                      <p className="flex pl-2 items-center gap-3">
+                                                        <FaStore size={30} />
+                                                        <div className="flex w-full justify-between">
+                                                          {item.storeName}
+                                                          &nbsp;
+                                                          <span className="text-end font-bold">
+                                                            {item.quantity}
+                                                          </span>
+                                                        </div>
+                                                      </p>
+                                                    </li>
+                                                  )
+                                                )}
+                                            </ul>
+                                          )}
                                         </div>
                                       </div>
                                     </div>
@@ -745,12 +741,12 @@ const HomePage: React.FC = () => {
                                           className="flex items-center px-6 py-2 bg-red-500 text-white rounded"
                                         >
                                           <i className="fas fa-shopping-cart mr-2"></i>{" "}
-                                          Thêm vào vỏ hàng
+                                          Thêm vào giỏ hàng
                                         </button>
                                       ) : (
                                         <button className="flex items-center px-6 py-2 bg-gray-600 text-white rounded">
                                           <i className="fas fa-shopping-cart mr-2"></i>{" "}
-                                          Thêm vào vỏ hàng
+                                          Sản phẩm đã hết hàng
                                         </button>
                                       )}
                                       <button className="px-2 py-2 border rounded hover:bg-red-500 hover:text-white transition ease-in-out duration-500 hover:-translate-y-2">
@@ -883,9 +879,7 @@ const HomePage: React.FC = () => {
               {filteredProducts?.map((product, index) => (
                 <CarouselItem
                   key={product.material.id}
-                  onClick={() =>
-                    handleNavigation(`/product/${product.material.id}`)
-                  }
+                  onClick={() => router.push(`/product/${product.material.id}`)}
                   className="pl-5 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 cursor-pointer"
                 >
                   <Card
@@ -1174,28 +1168,33 @@ const HomePage: React.FC = () => {
                                         chi nhánh còn sản phẩm
                                       </h2>
                                       <div className="h-32">
-                                        <ul className="max-h-32 text-[12px] text-blue-500 overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
-                                          {storeQuantityData?.data &&
-                                            storeQuantityData.data.items.map(
-                                              (item, index) => (
-                                                <li
-                                                  className="w-full space-y-2"
-                                                  key={index}
-                                                >
-                                                  <p className="flex pl-2 items-center gap-3">
-                                                    <FaStore size={30} />
-                                                    <div className="flex w-full justify-between">
-                                                      {item.storeName}
-                                                      &nbsp;
-                                                      <span className="text-end font-bold">
-                                                        {item.quantity}
-                                                      </span>
-                                                    </div>
-                                                  </p>
-                                                </li>
-                                              )
-                                            )}
-                                        </ul>
+                                        {storeQuantityData?.data?.items
+                                          .length === 0 ? (
+                                          ""
+                                        ) : (
+                                          <ul className="max-h-32 text-[12px] text-blue-500 overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
+                                            {storeQuantityData?.data &&
+                                              storeQuantityData.data.items.map(
+                                                (item, index) => (
+                                                  <li
+                                                    className="w-full"
+                                                    key={index}
+                                                  >
+                                                    <p className="flex pl-2 items-center gap-3">
+                                                      <FaStore size={30} />
+                                                      <div className="flex w-full justify-between">
+                                                        {item.storeName}
+                                                        &nbsp;
+                                                        <span className="text-end font-bold">
+                                                          {item.quantity}
+                                                        </span>
+                                                      </div>
+                                                    </p>
+                                                  </li>
+                                                )
+                                              )}
+                                          </ul>
+                                        )}
                                       </div>
                                     </div>
                                   </div>
@@ -1229,12 +1228,12 @@ const HomePage: React.FC = () => {
                                         className="flex items-center px-6 py-2 bg-red-500 text-white rounded"
                                       >
                                         <i className="fas fa-shopping-cart mr-2"></i>{" "}
-                                        Thêm vào vỏ hàng
+                                        Thêm vào giỏ hàng
                                       </button>
                                     ) : (
                                       <button className="flex items-center px-6 py-2 bg-gray-600 text-white rounded">
                                         <i className="fas fa-shopping-cart mr-2"></i>{" "}
-                                        Thêm vào vỏ hàng
+                                        Sản phẩm đã hết hàng
                                       </button>
                                     )}
                                     <button className="px-2 py-2 border rounded hover:bg-red-500 hover:text-white transition ease-in-out duration-500 hover:-translate-y-2">

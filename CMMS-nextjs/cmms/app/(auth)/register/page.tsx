@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 import { Checkbox } from "@/components/ui/checkbox";
 import { createAccount } from "@/lib/actions/sign_up/action/sign_up";
 import { CiMail } from "react-icons/ci";
@@ -138,7 +138,7 @@ export default function RegisterPage() {
                   <FormItem>
                     <FormLabel>Tài khoản</FormLabel>
                     <FormControl>
-                      <Input placeholder="Username" {...field} />
+                      <Input placeholder="Tên tài khoản" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -152,7 +152,7 @@ export default function RegisterPage() {
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="Password"
+                        placeholder="Mật khẩu"
                         {...field}
                       />
                     </FormControl>
@@ -216,6 +216,15 @@ export default function RegisterPage() {
                 </Button>
               )}
             </form>
+            <p className="mt-3 flex justify-center text-sm font-light text-gray-500 dark:text-gray-400">
+              Tôi đã có tài khoản?&nbsp;
+              <Link
+                href="/login"
+                className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+              >
+                Đang nhập
+              </Link>
+            </p>
           </Form>
         </div>
         <div className="relative hidden md:block">

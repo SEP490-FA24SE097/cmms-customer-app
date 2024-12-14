@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import { FcGoogle } from "react-icons/fc";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
+import { useSearchParams } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { z } from "zod";
@@ -23,7 +24,6 @@ import {
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { jwtDecode } from "jwt-decode";
-
 
 export default function LoginPage() {
   const router = useRouter();
@@ -74,9 +74,9 @@ export default function LoginPage() {
           }
         }
         if (userRole === "Shipper_Store") {
-          handleNavigation("/order-tracking");
+          router.push("/order-tracking");
         } else {
-          handleNavigation("/");
+          router.push("/");
         }
         toast({
           title: "Đăng nhập thành công",
@@ -102,20 +102,20 @@ export default function LoginPage() {
   };
 
   const { toast } = useToast();
-  const handleNavigation = (path: string) => {
-    setIsLoadingPage(true);
-    router.push(path);
-  };
+  // const handleNavigation = (path: string) => {
+  //   setIsLoadingPage(true);
+  //   router.push(path);
+  // };
   return (
     <main className="bg-[#26313c] h-screen flex items-center justify-center p-10">
-      {isLoadingPage && (
+      {/* {isLoadingPage && (
         <div className="fixed top-0 left-0 w-full h-1 bg-blue-500">
           <div
             className="h-full bg-blue-700 transition-all duration-300"
             style={{ width: "100%" }}
           ></div>
         </div>
-      )}
+      )} */}
       <div className="grid w-full h-full grid-cols-1 bg-white md:grid-cols-2 box-animate">
         <div className="bg-[#16202a] text-white flex items-center justify-center flex-col">
           <Avatar>
@@ -188,7 +188,7 @@ export default function LoginPage() {
                   type="submit"
                   className="w-full mt-5 rounded-full font-bold bg-gray-600  "
                 >
-                  Loading...
+                  Đang tải...
                 </Button>
               ) : (
                 <Button

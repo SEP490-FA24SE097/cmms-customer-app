@@ -10,7 +10,7 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 import {
   Command,
   CommandEmpty,
@@ -34,7 +34,10 @@ import { ICart } from "@/lib/actions/cart/type/cart-type";
 import { useShoppingContext } from "@/context/shopping-cart-context";
 import Link from "next/link";
 import axios from "axios";
-import { createPayment } from "@/lib/actions/payment/payment";
+import {
+  createPayment,
+  createPaymentVNPAY,
+} from "@/lib/actions/payment/payment";
 import { useToast } from "@/hooks/use-toast";
 import { ICheckout } from "@/lib/actions/cart/type/cart-checkout-type";
 
@@ -47,6 +50,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { data: session } = useSession();
   const { toast } = useToast();
+  const [isBlocking, setIsBlocking] = useState(false);
   const [name, setName] = useState<string | null>(
     session?.user.user.fullName || null
   );
@@ -66,7 +70,7 @@ export default function CheckoutPage() {
   const [cartData, setCartData] = useState<ICheckout>();
   const [cartQty1, setCartQty] = useState<number>();
   const { cartQty, cartItem } = useShoppingContext();
-
+  const [paymentLoading, setPaymentLoading] = useState(false);
   const [provinces, setProvinces] = useState<Location[]>([]);
   const [districts, setDistricts] = useState<Location[]>([]);
   const [wards, setWards] = useState<Location[]>([]);
@@ -75,23 +79,23 @@ export default function CheckoutPage() {
   const [selectedDistrict, setSelectedDistrict] = useState<string>("");
   const [selectedWard, setSelectedWard] = useState<string>("");
 
-  const [openProvince, setOpenProvince] = useState(false);
-  const [openDistrict, setOpenDistrict] = useState(false);
-  const [openWard, setOpenWard] = useState(false);
-  const fullAddress = `${address ?? ""}, ${
-    selectedWard
-      ? wards.find((ward) => ward.value === selectedWard)?.label + ", "
-      : ""
-  }${
-    selectedDistrict
-      ? districts.find((district) => district.value === selectedDistrict)
-          ?.label + ", "
-      : ""
-  }${
-    selectedProvince
-      ? provinces.find((province) => province.value === selectedProvince)?.label
-      : ""
-  }`.trim();
+  // const [openProvince, setOpenProvince] = useState(false);
+  // const [openDistrict, setOpenDistrict] = useState(false);
+  // const [openWard, setOpenWard] = useState(false);
+  // const fullAddress = `${address ?? ""}, ${
+  //   selectedWard
+  //     ? wards.find((ward) => ward.value === selectedWard)?.label + ", "
+  //     : ""
+  // }${
+  //   selectedDistrict
+  //     ? districts.find((district) => district.value === selectedDistrict)
+  //         ?.label + ", "
+  //     : ""
+  // }${
+  //   selectedProvince
+  //     ? provinces.find((province) => province.value === selectedProvince)?.label
+  //     : ""
+  // }`.trim();
 
   // console.log(paymentType);
   const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -213,40 +217,63 @@ export default function CheckoutPage() {
     // Prepare payment data
     const paymentData = {
       note: note,
+      salePrice: cartData?.salePrice,
       paymentType: paymentType,
       preCheckOutItemCartModel: cartData?.items,
       phoneReceive: phone,
     };
+
     // If validation passes, proceed with the API call
     try {
-      const response = await createPayment(paymentData);
+      setPaymentLoading(true);
 
-      // Check if the response indicates success
-      if (response.data?.success) {
-        toast({
-          title: "Thanh toán đã được thực hiện thành công.",
-          description: "Cảm ơn bạn vì đã chọn mua hàng ở chúng tôi!",
-          style: {
-            backgroundColor: "green",
-            color: "white",
-          },
-        });
+      if (paymentType === 4) {
+        // Call createPaymentVNPAY when paymentType is 4
+        const response = await createPaymentVNPAY(paymentData);
 
-        localStorage.removeItem("cartItem");
-
-        // Redirect to the home page after a short delay
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 2000);
+        if (response.data) {
+          // Redirect to the VNPAY URL
+          router.push(response.data);
+        } else {
+          // Handle error when the URL is not returned
+          toast({
+            title: "Lỗi",
+            description:
+              "Không thể thực hiện thanh toán qua VNPAY. Vui lòng thử lại.",
+            variant: "destructive",
+          });
+          console.error("VNPAY Payment Error:", response.error);
+        }
       } else {
-        // Handle cases where the response indicates failure
-        toast({
-          title: "Lỗi",
-          description: "Đã xảy ra lỗi không xác định. Vui lòng thử lại.",
-          variant: "destructive",
-        });
+        // For other payment types, call the regular createPayment function
+        const response = await createPayment(paymentData);
 
-        console.error("Unexpected Payment Response:", response);
+        if (response.data?.success) {
+          toast({
+            title: "Thanh toán đã được thực hiện thành công.",
+            description: "Cảm ơn bạn vì đã chọn mua hàng ở chúng tôi!",
+            style: {
+              backgroundColor: "green",
+              color: "white",
+            },
+          });
+
+          setPaymentLoading(false);
+          setIsBlocking(true);
+          localStorage.removeItem("cartItem");
+          // Redirect to the home page after a short delay
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 2000);
+        } else {
+          // Handle failure case for regular payments
+          toast({
+            title: "Lỗi",
+            description: "Đã xảy ra lỗi không xác định. Vui lòng thử lại.",
+            variant: "destructive",
+          });
+          console.error("Unexpected Payment Response:", response);
+        }
       }
     } catch (error) {
       // Handle network or unexpected errors
@@ -255,11 +282,11 @@ export default function CheckoutPage() {
         description: "Thanh toán thất bại. Vui lòng thử lại.",
         variant: "destructive",
       });
-
       console.error("Payment failed with exception:", error);
+    } finally {
+      setPaymentLoading(false);
     }
   };
-
   const handleOpenCartModal = () => {
     const dataToSend = { cartItems: cartItem };
 
@@ -290,6 +317,30 @@ export default function CheckoutPage() {
   return (
     <div className="bg-gray-100 py-5">
       <div className="max-w-[85%] 2xl:max-w-[70%] mx-auto">
+        {isBlocking && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              zIndex: 1000,
+              cursor: "not-allowed",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            onClick={(e) => e.preventDefault()} // Chặn mọi sự kiện nhấp chuột
+          >
+            <div
+              className="w-12 h-12 rounded-full animate-spin
+                  border-8 border-solid border-blue-500 border-t-transparent"
+            ></div>
+          </div>
+        )}
+
         <h1 className="text-3xl font-bold mb-6 text-center">Checkout</h1>
         <div className="grid xl:flex gap-10">
           <div className="bg-white lg:w-2/3 py-5 shadow-xl px-8 rounded-md">
@@ -496,7 +547,7 @@ export default function CheckoutPage() {
                     </PopoverContent>
                   </Popover>
                 </div> */}
-                
+
                 <div className="grid mt-4 items-center gap-1.5">
                   <Label className="text-[16px]">Ghi chú</Label>
                   <Textarea
@@ -506,7 +557,7 @@ export default function CheckoutPage() {
                   />
                 </div>
               </div>
-              <div className="xl:w-1/2">               
+              <div className="xl:w-1/2">
                 <div className="">
                   <h2 className="text-2xl font-bold border-b pb-3">
                     Phương thức thanh toán
@@ -528,7 +579,7 @@ export default function CheckoutPage() {
                           <FormControlLabel
                             value={3}
                             control={<Radio />}
-                            label="Thanh toán khi giao hàng (COD)"
+                            label="Thanh toán COD"
                             className="w-full"
                           />
                           <img src="/money.png" className="w-10 h-10" alt="" />
@@ -536,17 +587,21 @@ export default function CheckoutPage() {
                         <Button
                           variant="outline"
                           className="flex w-full justify-between text-xl h-14"
-                          onClick={() => handleButtonClick(2)}
+                          onClick={() => handleButtonClick(4)}
                         >
                           <FormControlLabel
-                            value="2"
+                            value={4}
                             control={<Radio />}
-                            label="Thanh toán ghi nợ"
+                            label="Thanh toán qua VNPAY"
                             className="w-full"
                           />
-                          <img src="/money.png" className="w-10 h-10" alt="" />
+                          <img
+                            src="/vnpay-logo-inkythuatso.svg"
+                            className="w-16 h-16 object-cover"
+                            alt=""
+                          />
                         </Button>
-                        <Button
+                        {/* <Button
                           variant="outline"
                           className="flex w-full justify-between text-xl h-14"
                           onClick={() => handleButtonClick(4)}
@@ -579,7 +634,7 @@ export default function CheckoutPage() {
                             className="w-10 h-10"
                             alt=""
                           />
-                        </Button>
+                        </Button> */}
                       </RadioGroup>
                     </FormControl>
                   </div>
@@ -607,9 +662,7 @@ export default function CheckoutPage() {
                     <div key={item.storeId} className="py-2 border-b">
                       <div className="flex gap-7 items-center p-2 border-b">
                         <FaStore size={20} />
-                        <h1 className="text-xs capitalize">
-                          {item.storeName}
-                        </h1>
+                        <h1 className="text-xs capitalize">{item.storeName}</h1>
                       </div>
                       <div
                         className={`${
@@ -661,8 +714,6 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="mt-4 border-t">
-
-
                   <div className="text-sm my-2">
                     <div className="flex justify-between">
                       <span>Tạm tính</span>
@@ -685,7 +736,8 @@ export default function CheckoutPage() {
                     <div className="flex justify-between">
                       <span>Giảm giá</span>
                       <span>
-                        -{cartData?.discount.toLocaleString("vi-VN", {
+                        -
+                        {cartData?.discount.toLocaleString("vi-VN", {
                           style: "currency",
                           currency: "vnd",
                         })}
@@ -709,12 +761,40 @@ export default function CheckoutPage() {
                     <Link href="/cart" className="text-blue-500 text-sm">
                       &lt; Quay về giỏ hàng
                     </Link>
-                    <button
-                      onClick={handlePaymentClick}
-                      className="bg-blue-500 text-white px-4 py-2 rounded"
-                    >
-                      ĐẶT HÀNG
-                    </button>
+
+                    {paymentLoading ? (
+                      <button
+                        disabled
+                        type="button"
+                        className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 font-medium rounded text-lg px-4 py-2 text-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 inline-flex items-center"
+                      >
+                        <svg
+                          aria-hidden="true"
+                          role="status"
+                          className="inline w-4 h-4 me-3 text-white animate-spin"
+                          viewBox="0 0 100 101"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                            fill="#E5E7EB"
+                          />
+                          <path
+                            d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                            fill="currentColor"
+                          />
+                        </svg>
+                        Đang tải...
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handlePaymentClick}
+                        className="bg-blue-500 text-white px-4 py-2 rounded"
+                      >
+                        ĐẶT HÀNG
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

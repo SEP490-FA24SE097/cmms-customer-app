@@ -63,7 +63,6 @@ import {
 import { useSession } from "next-auth/react";
 import SelectLocation from "@/components/select-location/page";
 
-
 export default function DetailsPage() {
   const { data: session } = useSession();
   const router = useRouter();
@@ -373,7 +372,12 @@ export default function DetailsPage() {
     useGetQuantityStore(searchParamsquantity);
 
   const [radioValue, setRadioValue] = useState("default");
-  const addressFull = session?.user.user.province + ", " +session?.user.user.district + ", " +session?.user.user.ward;
+  const addressFull =
+    session?.user.user.province +
+    ", " +
+    session?.user.user.district +
+    ", " +
+    session?.user.user.ward;
   return (
     <div className="bg-gray-100">
       <div className="max-w-[85%] mx-auto lg:w-[70%]">
@@ -382,24 +386,26 @@ export default function DetailsPage() {
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink
-                                  className="text-xl"
-                                  onClick={() => router.push("/")}
-                                >
-                                  Trang chủ
-                                </BreadcrumbLink>
+                  className="text-xl"
+                  onClick={() => router.push("/")}
+                >
+                  Trang chủ
+                </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
                 <BreadcrumbLink
-                                  className="text-xl"
-                                  onClick={() => router.push("/product")}
-                                >
-                                  Sản phẩm
-                                </BreadcrumbLink>
+                  className="text-xl"
+                  onClick={() => router.push("/product")}
+                >
+                  Sản phẩm
+                </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage className="text-xl">{materialData?.data?.material.name}</BreadcrumbPage>
+                <BreadcrumbPage className="text-xl">
+                  {materialData?.data?.material.name}
+                </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -536,10 +542,10 @@ export default function DetailsPage() {
               <div className="flex items-center space-x-2">
                 <span className="text-3xl font-bold text-red-500">
                   {selectedVariantPrice
-                    ? selectedVariantPrice.toLocaleString("vi-VN",{
-                      style: "currency",
-                      currency: "vnd"
-                    })
+                    ? selectedVariantPrice.toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "vnd",
+                      })
                     : materialData?.data?.material.salePrice.toLocaleString(
                         "vi-VN",
                         {
@@ -599,7 +605,6 @@ export default function DetailsPage() {
                                 <div className="mt-5 mx-20">
                                   <SelectLocation
                                     setIsDialogOpen={setIsDialogOpen1}
-
                                   />
                                 </div>
                               )}
@@ -654,7 +659,6 @@ export default function DetailsPage() {
                               <div className="mt-5 mx-20">
                                 <SelectLocation
                                   setIsDialogOpen={setIsDialogOpen2}
-                                 
                                 />
                               </div>
                             )}
@@ -718,23 +722,27 @@ export default function DetailsPage() {
                     chi nhánh còn sản phẩm
                   </h2>
                   <div className="h-32">
-                    <ul className="max-h-32 text-[12px] text-blue-500 overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
-                      {storeQuantityData?.data &&
-                        storeQuantityData.data.items.map((item, index) => (
-                          <li className="w-full" key={index}>
-                            <p className="flex pl-2 items-center gap-3">
-                              <FaStore size={30} />
-                              <div className="flex w-full justify-between">
-                                {item.storeName}
-                                &nbsp;
-                                <span className="text-end font-bold">
-                                  {item.quantity}
-                                </span>
-                              </div>
-                            </p>
-                          </li>
-                        ))}
-                    </ul>
+                    {storeQuantityData?.data?.items.length === 0 ? (
+                      ""
+                    ) : (
+                      <ul className="max-h-32 text-[12px] text-blue-500 overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
+                        {storeQuantityData?.data &&
+                          storeQuantityData.data.items.map((item, index) => (
+                            <li className="w-full" key={index}>
+                              <p className="flex pl-2 items-center gap-3">
+                                <FaStore size={30} />
+                                <div className="flex w-full justify-between">
+                                  {item.storeName}
+                                  &nbsp;
+                                  <span className="text-end font-bold">
+                                    {item.quantity}
+                                  </span>
+                                </div>
+                              </p>
+                            </li>
+                          ))}
+                      </ul>
+                    )}
                   </div>
                 </div>
               </div>
@@ -760,13 +768,13 @@ export default function DetailsPage() {
                     onClick={handleAddToCart}
                     className="flex items-center px-6 py-2 bg-red-500 text-white rounded"
                   >
-                    <i className="fas fa-shopping-cart mr-2"></i> Thêm vào vỏ
+                    <i className="fas fa-shopping-cart mr-2"></i> Thêm vào giỏ
                     hàng
                   </button>
                 ) : (
                   <button className="flex items-center px-6 py-2 bg-gray-600 text-white rounded">
-                    <i className="fas fa-shopping-cart mr-2"></i> Thêm vào vỏ
-                    hàng
+                    <i className="fas fa-shopping-cart mr-2"></i> Sản phẩm đã
+                    hết hàng
                   </button>
                 )}
                 <button className="px-2 py-2 border rounded hover:bg-red-500 hover:text-white transition ease-in-out duration-500 hover:-translate-y-2">

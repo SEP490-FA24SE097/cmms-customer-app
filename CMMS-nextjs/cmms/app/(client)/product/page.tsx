@@ -71,7 +71,8 @@ import {
   MaterialStore,
   useShoppingContext,
 } from "@/context/shopping-cart-context";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
+import { useSearchParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetBrand } from "@/lib/actions/brand/react-query/brand-query";
 import { useGetCategory } from "@/lib/actions/categories/react-query/category-query";
@@ -86,10 +87,10 @@ export default function Listing() {
   const materialName = sParams.get("keyword");
   const [isLoadingPage, setIsLoadingPage] = useState(false);
 
-  const handleNavigation = (path: string) => {
-    setIsLoadingPage(true);
-    router.push(path);
-  };
+  // const handleNavigation = (path: string) => {
+  //   setIsLoadingPage(true);
+  //   router.push(path);
+  // };
 
   useEffect(() => {
     if (brandId) {
@@ -292,7 +293,6 @@ export default function Listing() {
   const handleAddToCart = () => {
     if (!materialData) return;
 
-
     const materialId = materialData.data?.material.id;
 
     // Retrieve cart from localStorage and parse it
@@ -406,7 +406,7 @@ export default function Listing() {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-              <BreadcrumbPage className="text-xl">Sản phẩm</BreadcrumbPage>
+                <BreadcrumbPage className="text-xl">Sản phẩm</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -554,9 +554,7 @@ export default function Listing() {
               data?.data.map((product, index) => (
                 <div
                   key={product.material.id}
-                  onClick={() =>
-                    handleNavigation(`/product/${product.material.id}`)
-                  }
+                  onClick={() => router.push(`/product/${product.material.id}`)}
                   className="cursor-pointer"
                 >
                   <Card
@@ -845,28 +843,33 @@ export default function Listing() {
                                         chi nhánh còn sản phẩm
                                       </h2>
                                       <div className="h-32">
-                                        <ul className="max-h-32 text-[12px] text-blue-500 overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
-                                          {storeQuantityData?.data &&
-                                            storeQuantityData.data.items.map(
-                                              (item, index) => (
-                                                <li
-                                                  className="w-full"
-                                                  key={index}
-                                                >
-                                                  <p className="flex pl-2 items-center gap-3">
-                                                    <FaStore size={30} />
-                                                    <div className="flex w-full justify-between">
-                                                      {item.storeName}
-                                                      &nbsp;
-                                                      <span className="text-end font-bold">
-                                                        {item.quantity}
-                                                      </span>
-                                                    </div>
-                                                  </p>
-                                                </li>
-                                              )
-                                            )}
-                                        </ul>
+                                        {storeQuantityData?.data?.items
+                                          .length === 0 ? (
+                                          ""
+                                        ) : (
+                                          <ul className="max-h-32 text-[12px] text-blue-500 overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
+                                            {storeQuantityData?.data &&
+                                              storeQuantityData.data.items.map(
+                                                (item, index) => (
+                                                  <li
+                                                    className="w-full"
+                                                    key={index}
+                                                  >
+                                                    <p className="flex pl-2 items-center gap-3">
+                                                      <FaStore size={30} />
+                                                      <div className="flex w-full justify-between">
+                                                        {item.storeName}
+                                                        &nbsp;
+                                                        <span className="text-end font-bold">
+                                                          {item.quantity}
+                                                        </span>
+                                                      </div>
+                                                    </p>
+                                                  </li>
+                                                )
+                                              )}
+                                          </ul>
+                                        )}
                                       </div>
                                     </div>
                                   </div>
@@ -900,12 +903,12 @@ export default function Listing() {
                                         className="flex items-center px-6 py-2 bg-red-500 text-white rounded"
                                       >
                                         <i className="fas fa-shopping-cart mr-2"></i>{" "}
-                                        Thêm vào vỏ hàng
+                                        Thêm vào giỏ hàng
                                       </button>
                                     ) : (
                                       <button className="flex items-center px-6 py-2 bg-gray-600 text-white rounded">
                                         <i className="fas fa-shopping-cart mr-2"></i>{" "}
-                                        Thêm vào vỏ hàng
+                                        Sản phẩm đã hết hàng
                                       </button>
                                     )}
                                     <button className="px-2 py-2 border rounded hover:bg-red-500 hover:text-white transition ease-in-out duration-500 hover:-translate-y-2">
