@@ -280,7 +280,7 @@ export default function Listing() {
         //     src: subImage,
         //     alt: `Sub image ${index + 1}`,
         //   })
-        // ),
+        // ), 
         ...(materialData?.data?.variants || []).map((variant, index) => ({
           src: variant.image,
           alt: `Variant image ${index + 1}`,
