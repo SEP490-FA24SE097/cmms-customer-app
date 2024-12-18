@@ -151,10 +151,6 @@ export default function Listing() {
   >({
     page: currentPage,
     itemPerPage: 12,
-    brandId: "",
-    categoryId: "",
-    lowerPrice: "",
-    upperPrice: "",
   });
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
   const [selectedVariantName, setSelectedVariantName] = useState<string | null>(
@@ -184,7 +180,9 @@ export default function Listing() {
   const [availableQuantity, setAvailableQuantity] = useState<number | null>(
     null
   );
-  const { data, isLoading } = useGetMaterial(searchParams);
+  const { data: data, isLoading: isLoadingMaterial } =
+    useGetMaterial(searchParams);
+  console.log(data);
   const handleSelectChange = (value: string) => {
     setSelectedSort(value); // Update the selected sort option
     setSearchParams((prevParams) => {
@@ -290,7 +288,7 @@ export default function Listing() {
       ]
     : [];
 
-  if (!isLoading) <div>...Loading</div>;
+  if (!isLoadingMaterial) <div>...Loading</div>;
   if (!isLoadingMaterialData) <div>...Loading</div>;
   // console.log(data?.data);
   // console.log(materialData?.data);
@@ -567,7 +565,7 @@ export default function Listing() {
             </div>
           </div>
         </div>
-        {isLoading ? (
+        {isLoadingMaterial ? (
           <div className="flex space-x-10 m-5">
             {Array.from({ length: 4 }).map((_, index) => (
               <div key={index} className="flex flex-col space-y-3">

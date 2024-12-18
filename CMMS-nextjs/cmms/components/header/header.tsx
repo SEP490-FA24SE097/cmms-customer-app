@@ -533,7 +533,7 @@ export default function Header() {
                       <Link href="/profile/changepassword">
                         <DropdownMenuItem className="font-semibold">
                           <FaHistory />
-                          <span>Lịch sử đơn hàng</span>
+                          <span>Đổi mật khẩu</span>
                         </DropdownMenuItem>
                       </Link>
                     </DropdownMenuGroup>

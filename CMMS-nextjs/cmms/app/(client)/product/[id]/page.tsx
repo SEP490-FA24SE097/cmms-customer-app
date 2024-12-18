@@ -52,7 +52,10 @@ import { useToast } from "@/hooks/use-toast";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { CiHeart } from "react-icons/ci";
 import { useParams, useRouter } from "next/navigation";
-import { useGetMaterialById } from "@/lib/actions/materials/react-query/material-query";
+import {
+  useGetMaterial,
+  useGetMaterialById,
+} from "@/lib/actions/materials/react-query/material-query";
 import { useGetQuantityStore } from "@/lib/actions/material_in_store/react-query/material-qty-store-query";
 
 import {
@@ -68,6 +71,18 @@ export default function DetailsPage() {
   const router = useRouter();
   const [isDialogOpen1, setIsDialogOpen1] = useState(false);
   const [isDialogOpen2, setIsDialogOpen2] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchParams, setSearchParams] = useState<
+    Record<string, string | number | boolean>
+  >({
+    page: currentPage,
+    itemPerPage: 3,
+    brandId: "",
+    categoryId: "",
+    lowerPrice: "",
+    upperPrice: "",
+  });
+  const { data, isLoading } = useGetMaterial(searchParams);
 
   const reviews = [
     {
@@ -669,9 +684,6 @@ export default function DetailsPage() {
                   </Dialog>
                 </div>
               </div>
-              <p className="text-gray-600">
-                {materialData?.data?.material.description}
-              </p>
 
               <div>
                 <span className="text-gray-600">Các loại</span>
@@ -696,7 +708,7 @@ export default function DetailsPage() {
                         className="w-12 h-12 object-cover"
                       />
                       <div className="flex-col mt-2">
-                        {variant.attributes.map((attribute, idx) => (
+                        {variant?.attributes?.map((attribute, idx) => (
                           <button
                             key={idx}
                             className="flex text-[14px] items-center"
@@ -798,82 +810,15 @@ export default function DetailsPage() {
             <TabsContent value="info">
               <div className="max-w-full m-10 mx-8">
                 <h1 className="text-red-500 text-2xl font-bold mb-4">
-                  ẤM SIÊU TỐC WMF LONO 0413130011
+                  {materialData?.data?.material.name}
                 </h1>
-                <p className="mb-4">
-                  ẤM SIÊU TỐC WMF LONO 0413130011 là một sản phẩm tiện ích với
-                  thiết kế hiện đại, giúp đun sôi nước nhanh chóng. Ấm được làm
-                  từ inox chất lượng cao, có khả năng chống gỉ và dễ dàng vệ
-                  sinh. Ngoài ra, sản phẩm còn có các tính năng an toàn như tự
-                  ngắt khi nước sôi và đế xoay 360 độ, thuận tiện cho người sử
-                  dụng.
-                </p>
-
-                <h2 className="text-lg font-bold mb-2">Thông số kỹ thuật:</h2>
-                <ul className="list-disc list-inside mb-4">
-                  <li>Màu sắc: Bạc, Đen</li>
-                  <li>Công suất: 2400 W</li>
-                  <li>Dung tích 1.6L</li>
-                  <li>
-                    Chất liệu cao cấp thép không gỉ 18/10 Cromargan bóng mờ, bền
-                    mãi với thời gian
-                  </li>
-                  <li>Vạch đo nước hiển thị bên ngoài thân ấm: Có</li>
-                  <li>Lưới lọc cặn có thể tháo rời</li>
-                  <li>Chống cháy, ngắt tự động khi có sự cố về điện: Có</li>
-                  <li>Chỉ báo mực nước ngoài: Có</li>
-                  <li>
-                    Ấm đun nước không dây với đế thiết bị riêng biệt bao gồm
-                    trạm lắp
-                  </li>
-                  <li>Mở nắp một tay bằng cách ấn nút</li>
-                  <li>Bộ lọc nước với có thể tháo rời, rửa được</li>
-                  <li>Tự động dừng nấu và khóa nắp: Có</li>
-                </ul>
-
-                <h2 className="text-lg font-bold mb-2">Tính năng nổi bật:</h2>
-                <p className="mb-4">
-                  Vẻ bề ngoài hiện đại, sang trọng, thiết kế tinh tế, vượt thời
-                  gian phù hợp với mọi phong cách nhà bếp.
-                </p>
-                <p className="mb-4">
-                  Ấm siêu tốc được làm bằng chất liệu thép không gỉ Cromargan
-                  giúp sản phẩm mang vẻ đẹp hiện đại, thời thượng, bền bỉ cùng
-                  thời gian, có khả năng chống trầy xước tốt, chịu được tính
-                  axit và rất an toàn cho sức khỏe người dùng. Trong khi đó,
-                  nhựa cao cấp giúp cách nhiệt, cách điện giúp sản phẩm an toàn
-                  với người dùng và rất dễ dàng trong quá trình sử dụng.
-                </p>
-                <p className="mb-4">
-                  Với công suất 2400W, bạn có thể đun sôi nước trong khoảng thời
-                  gian ngắn. Dung tích 1.6L rất phù hợp cho việc đun nước pha
-                  trà, pha cà phê trong buổi trà chiều.
-                </p>
-                <p className="mb-4">
-                  Chất liệu Cromargan không những giúp sản phẩm có độ bền cao mà
-                  còn giúp người dùng dễ dàng vệ sinh. Hơn thế nữa, bộ lọc cặn
-                  với có thể tháo rời, dễ dàng hơn trong việc vệ sinh cũng như
-                  đảm bảo vệ sinh trong quá trình sử dụng.
-                </p>
-                <p className="mb-4">
-                  Thiết kế thông minh, an toàn với chế độ cháy khô, bảo vệ quá
-                  nhiệt, tự động ngừng nấu và khóa nắp ấm. Bộ phận làm nóng bằng
-                  thép không gỉ được thiết kế an bền trong và cũng an toàn.
-                </p>
-
-                <h2 className="text-lg font-bold mb-2">
-                  Hãy liên hệ với VLXDgixdat để được tư vấn chọn sản phẩm phù
-                  hợp cho gia đình.
-                </h2>
-                <p className="mb-4">Hotline tư vấn: 0938619989</p>
-                <p className="mb-4">
-                  VLXDgixdat cam kết chỉ bán hàng chính hãng, nói không với hàng
-                  nhái hàng giả và hàng kém chất lượng
-                </p>
-                <p className="mb-4">
-                  Tư vấn chân thành, nhiệt tình và chế độ bảo hành tốt.
-                </p>
-                <p className="mb-4">Miễn phí giao hàng</p>
+                <div>
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: materialData?.data?.material.description || "",
+                    }}
+                  />
+                </div>
               </div>
             </TabsContent>
             <TabsContent value="rating">
@@ -982,103 +927,37 @@ export default function DetailsPage() {
             className="w-full max-w-full py-5"
           >
             <CarouselContent className="-ml-1">
-              {fakeProducts.map((product, index) => (
+              {data?.data.map((product, index) => (
                 <CarouselItem
                   key={index}
                   className="pl-1 md:basis-1/2 xl:basis-1/3 2xl:basis-1/4"
                 >
                   <div className="p-2">
                     <Card
-                      className="pt-6 max-h-[550px] overflow-hidden hover:overflow-y-auto [&::-webkit-scrollbar]:w-2 rounded-xl
-                        [&::-webkit-scrollbar-track]:bg-gray-100
-                        [&::-webkit-scrollbar-thumb]:bg-gray-300 cursor-pointer group"
+                      className="pt-6 max-h-[550px] overflow-hidden hover:overflow-y-auto [&::-webkit-scrollbar]:w-2 rounded-sm
+                [&::-webkit-scrollbar-track]:bg-gray-100
+                [&::-webkit-scrollbar-thumb]:bg-gray-300 cursor-pointer group"
                     >
                       <CardContent className="flex flex-col items-center">
                         <img
-                          src={product.imgSrc}
-                          alt={product.title}
-                          className="w-full h-72 object-cover mb-4 group-hover:scale-110 ease-in-out duration-300"
+                          src={product.material.imageUrl}
+                          alt={product.material.name}
+                          className="w-full h-64 lg:h-60 2xl:h-72 object-cover mb-4 group-hover:scale-110 ease-in-out duration-300"
                         />
                         <div className="flex w-full justify-between">
-                          <div className="bg-blue-400 px-2 py-1 rounded-sm my-1">
-                            {product.discount}
+                          <div className="bg-blue-400 text-white px-2 py-1 rounded-sm my-1">
+                            {/* {product.discount} */} Mới
                           </div>
-                          <div className="flex items-center gap-2 mr-2">
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  className="text-stone-500 hover:text-black hover:bg-white"
-                                >
-                                  <HoverCard>
-                                    <HoverCardTrigger>
-                                      <FaRegEye size={25} />
-                                    </HoverCardTrigger>
-                                    <HoverCardContent
-                                      side="top"
-                                      className="w-fit p-2 bg-slate-950 text-white border-none"
-                                    >
-                                      Xem nhanh
-                                    </HoverCardContent>
-                                  </HoverCard>
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="sm:max-w-[425px]">
-                                <DialogHeader>
-                                  <DialogTitle>Edit profile</DialogTitle>
-                                  <DialogDescription>
-                                    Make changes to your profile here. Click
-                                    save when youre done.
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <div className="grid gap-4 py-4">
-                                  <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label
-                                      htmlFor="name"
-                                      className="text-right"
-                                    >
-                                      Name
-                                    </Label>
-                                    <Input
-                                      id="name"
-                                      defaultValue="Pedro Duarte"
-                                      className="col-span-3"
-                                    />
-                                  </div>
-                                  <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label
-                                      htmlFor="username"
-                                      className="text-right"
-                                    >
-                                      Username
-                                    </Label>
-                                    <Input
-                                      id="username"
-                                      defaultValue="@peduarte"
-                                      className="col-span-3"
-                                    />
-                                  </div>
-                                </div>
-                                <DialogFooter>
-                                  <Button type="submit">Save changes</Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
-
+                          <div
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex items-center gap-2 mr-2"
+                          >
                             <HoverCard>
                               <HoverCardTrigger>
-                                {product.isFavorite && (
-                                  <CiHeart
-                                    className="text-stone-500 hover:text-black"
-                                    size={25}
-                                  />
-                                )}
-                                {!product.isFavorite && (
-                                  <FaHeart
-                                    className="text-blue-300"
-                                    size={25}
-                                  />
-                                )}
+                                <CiHeart
+                                  className="text-stone-500 hover:text-black"
+                                  size={25}
+                                />
                               </HoverCardTrigger>
                               <HoverCardContent
                                 side="top"
@@ -1089,31 +968,44 @@ export default function DetailsPage() {
                             </HoverCard>
                           </div>
                         </div>
-                        <h2 className="text-lg font-semibold text-start w-full my-2 lg:h-[55px] hover:text-blue-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
-                          {product.title}
+                        <h2 className="text-lg capitalize font-semibold text-start w-full my-2 lg:h-[55px] hover:text-blue-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
+                          {product.material.name}
                         </h2>
                         <div className="flex w-full justify-start items-center gap-4">
                           <Rating
-                            size="small"
                             name="product-rating"
-                            value={product.rating}
+                            value={4} //{product.rating}
                             precision={0.5}
+                            className="text-xl 2xl:text-2xl"
                             readOnly
                           />
                           <span className="text-black text-sm font-semibold">
-                            {product.rating}
+                            {/* {product.rating} */} 4
                           </span>
-                          <span className="text-gray-600 text-sm overflow-hidden text-ellipsis line-clamp-1">
-                            ({product.reviews} reviews)
+                          <span className="text-gray-600 text-sm">
+                            {/* ({product.reviews} reviews) */}
+                            (10 reviews)
                           </span>
                         </div>
                         <div className="flex w-full justify-between items-center mt-3">
                           <div className="flex gap-2">
-                            <div className="text-2xl font-normal text-stone-400 line-through">
-                              {product.price}
+                            <div className="text-xl sm:text-[16px] 2xl:text-xl font-normal text-stone-400 line-through">
+                              {product.material.salePrice.toLocaleString(
+                                "vi-VN",
+                                {
+                                  style: "currency",
+                                  currency: "vnd",
+                                }
+                              )}
                             </div>
-                            <div className="text-2xl font-semibold">
-                              {product.price}
+                            <div className="text-xl sm:text-[16px] 2xl:text-xl font-semibold">
+                              {product.material.salePrice.toLocaleString(
+                                "vi-VN",
+                                {
+                                  style: "currency",
+                                  currency: "vnd",
+                                }
+                              )}
                             </div>
                           </div>
                         </div>

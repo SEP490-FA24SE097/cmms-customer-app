@@ -58,6 +58,7 @@ export type IShippingDetailVM = {
   address: string;
   phoneReceive: string;
   shipperName: string;
+  shippingFee: number;
   shipperCode: string;
   shippingDate: string | null; // ISO Date string
   estimatedArrival: string; // ISO Date string

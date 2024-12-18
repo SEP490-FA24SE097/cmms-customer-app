@@ -264,7 +264,7 @@ export default function Order(
                           ""
                         )}
                         <TableHeader className="bg-slate-200">
-                          <TableRow>
+                          <TableRow className="text-[14px] border">
                             <TableHead className="w-[100px] font-bold">
                               Mã đơn
                             </TableHead>
@@ -279,7 +279,7 @@ export default function Order(
                             <TableHead className="text-right w-[50px]"></TableHead>
                           </TableRow>
                         </TableHeader>
-                        <TableBody>
+                        <TableBody className="text-[14px] border">
                           {item.invoices && item.invoices.length > 0 ? (
                             item.invoices.map((invoice) => {
                               const statusInfo = getInvoiceStatus(
@@ -366,7 +366,8 @@ export default function Order(
                                               </div>
                                               <div className="text-md flex-[2]">
                                                 <h1>
-                                                  <strong>Địa chỉ</strong>:{" "}
+                                                  <strong>Số điện thoại</strong>
+                                                  :{" "}
                                                   {invoice.shippingDetailVM
                                                     ?.phoneReceive || ""}
                                                 </h1>
@@ -462,6 +463,21 @@ export default function Order(
                                                   <h1>
                                                     {invoice?.discount !== null
                                                       ? invoice.discount.toLocaleString(
+                                                          "vi-VN",
+                                                          {
+                                                            style: "currency",
+                                                            currency: "vnd",
+                                                          }
+                                                        )
+                                                      : "0 ₫"}
+                                                  </h1>
+                                                </div>
+                                                <div className="flex justify-between p-2">
+                                                  <h1>Phí vận chuyển</h1>
+                                                  <h1>
+                                                    {invoice?.shippingDetailVM
+                                                      .shippingFee !== null
+                                                      ? invoice.shippingDetailVM.shippingFee.toLocaleString(
                                                           "vi-VN",
                                                           {
                                                             style: "currency",
