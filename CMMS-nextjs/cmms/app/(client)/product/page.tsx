@@ -179,7 +179,7 @@ export default function Listing() {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedName, setSelectedName] = useState<string>("");
   const [selectedSort, setSelectedSort] = useState<string>("");
-  const [value, setValue] = useState<number[]>([0, 1000000]); // initial price range
+  const [value, setValue] = useState<number[]>([0, 10000000]); // initial price range
 
   const [availableQuantity, setAvailableQuantity] = useState<number | null>(
     null
@@ -253,7 +253,7 @@ export default function Listing() {
       `${window.location.pathname}?${params.toString()}`,
       undefined
     );
-    setValue([0, 1000000]); // Reset price range to initial values
+    setValue([0, 10000000]); // Reset price range to initial values
   };
 
   const handlePageChange = (page: number) => {
@@ -303,7 +303,13 @@ export default function Listing() {
     if (!materialData) return;
 
     const materialId = materialData.data?.material.id;
-
+    if (!session?.user.user.ward) {
+      toast({
+        title: "Bạn chưa có địa chỉ vui lòng chọn địa chỉ.",
+        style: { backgroundColor: "#f87171", color: "#ffffff" }, // Red background for error
+      });
+      return;
+    }
     // Retrieve cart from localStorage and parse it
     const cart = JSON.parse(localStorage.getItem("cartItem") || "[]");
 
@@ -397,6 +403,15 @@ export default function Listing() {
     session?.user.user.district +
     ", " +
     session?.user.user.ward;
+  const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value.replace(/\./g, ""); // Remove dots for parsing
+    setValue([Number(newValue), value[1]]);
+  };
+
+  const handleToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value.replace(/\./g, ""); // Remove dots for parsing
+    setValue([value[0], Number(newValue)]);
+  };
   return (
     <div className="bg-gray-100">
       {isLoadingPage && (
@@ -462,7 +477,7 @@ export default function Listing() {
               <Slider
                 min={0}
                 step={10000}
-                max={1000000}
+                max={10000000}
                 getAriaLabel={() => "Khoản tiền"}
                 value={value}
                 onChange={handleChange}
@@ -472,8 +487,8 @@ export default function Listing() {
                 <TextField
                   label="Từ"
                   size="small"
-                  value={value[0]}
-                  onChange={(e) => setValue([Number(e.target.value), value[1]])}
+                  value={value[0].toLocaleString("vi-VN")}
+                  onChange={handleFromChange}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">đ</InputAdornment>
@@ -484,14 +499,15 @@ export default function Listing() {
                 <TextField
                   label="Đến"
                   size="small"
-                  value={value[1]}
-                  onChange={(e) => setValue([value[0], Number(e.target.value)])}
+                  value={value[1].toLocaleString("vi-VN")}
+                  onChange={handleToChange}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">đ</InputAdornment>
                     ),
                   }}
                   variant="outlined"
+                  sx={{ width: "220px" }}
                 />
               </div>
             </div>
@@ -756,7 +772,7 @@ export default function Listing() {
                                         ? selectedVariantValue
                                         : materialData?.data?.material
                                             ?.salePrice ||
-                                          "Product Price Not Available"
+                                          "Giá sản phẩm không có sẵn"
                                       ).toLocaleString("vi-VN", {
                                         style: "currency",
                                         currency: "VND",
@@ -768,7 +784,7 @@ export default function Listing() {
                                         ? selectedVariantValue
                                         : materialData?.data?.material
                                             ?.salePrice ||
-                                          "Product Price Not Available"
+                                          "Giá sản phẩm không có sẵn"
                                       ).toLocaleString("vi-VN", {
                                         style: "currency",
                                         currency: "VND",
@@ -932,11 +948,6 @@ export default function Listing() {
                                       </Dialog>
                                     </div>
                                   </div>
-                                  <p className="text-gray-600">
-                                    {materialData?.data?.material
-                                      ?.description ||
-                                      "Product Description Not Available"}
-                                  </p>
 
                                   <div>
                                     <span className="text-gray-600">
@@ -973,7 +984,7 @@ export default function Listing() {
                                                 className="w-12 h-12 object-cover"
                                               />
                                               <div className="flex-col mt-2">
-                                                {variant.attributes.map(
+                                                {variant?.attributes?.map(
                                                   (attribute, idx) => (
                                                     <button
                                                       key={idx}
@@ -1068,7 +1079,7 @@ export default function Listing() {
                                       .totalQuantityInAllStore > 0 ? (
                                       <button
                                         onClick={handleAddToCart}
-                                        className="flex items-center px-6 py-2 bg-red-500 text-white rounded"
+                                        className="flex items-center px-6 py-2 bg-blue-500 text-white rounded"
                                       >
                                         <i className="fas fa-shopping-cart mr-2"></i>{" "}
                                         Thêm vào giỏ hàng
@@ -1079,7 +1090,7 @@ export default function Listing() {
                                         Sản phẩm đã hết hàng
                                       </button>
                                     )}
-                                    <button className="px-2 py-2 border rounded hover:bg-red-500 hover:text-white transition ease-in-out duration-500 hover:-translate-y-2">
+                                    <button className="px-2 py-2 border rounded hover:bg-blue-500 hover:text-white transition ease-in-out duration-500 hover:-translate-y-2">
                                       <CiHeart
                                         size={25}
                                         className="font-bold"
@@ -1089,7 +1100,15 @@ export default function Listing() {
                                 </div>
                               </div>
                               <hr className="mt-5" />
-                              <div className="mx-auto">Xem chi tiet</div>
+                              <Button
+                                onClick={() =>
+                                  router.push(`/product/${product.material.id}`)
+                                }
+                                variant="ghost"
+                                className=""
+                              >
+                                Xem chi tiết sản phẩm
+                              </Button>
                             </DialogContent>
                           </Dialog>
 

@@ -5,13 +5,14 @@ export type ICheckout = {
   discount: number;
   salePrice: number;
   shippingFee: number;
-  isOver200km: boolean;
+
   items: IItem[];
 };
 
 export type IItem = {
   storeId: string;
   storeName: string;
+  isOver200km: boolean;
   totalStoreAmount: number;
   shippngFree: number;
   finalPrice: number;

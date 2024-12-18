@@ -177,7 +177,13 @@ const HomePage: React.FC = () => {
     if (!materialData) return;
 
     const materialId = materialData.data?.material.id;
-
+    if (!session?.user.user.ward) {
+      toast({
+        title: "Bạn chưa có địa chỉ vui lòng chọn địa chỉ.",
+        style: { backgroundColor: "#f87171", color: "#ffffff" }, // Red background for error
+      });
+      return;
+    }
     // Retrieve cart from localStorage and parse it
     const cart = JSON.parse(localStorage.getItem("cartItem") || "[]");
 
@@ -422,8 +428,8 @@ const HomePage: React.FC = () => {
                           className="w-full h-64 lg:h-60 2xl:h-72 object-cover mb-4 group-hover:scale-110 ease-in-out duration-300"
                         />
                         <div className="flex w-full justify-between">
-                          <div className="bg-blue-400 px-2 py-1 rounded-sm my-1">
-                            {/* {product.discount} */} 20%
+                          <div className="bg-blue-400 text-white px-2 py-1 rounded-sm my-1">
+                            {/* {product.discount} */} Mới
                           </div>
                           <div
                             onClick={(e) => e.stopPropagation()}
@@ -594,7 +600,7 @@ const HomePage: React.FC = () => {
                                           ? selectedVariantValue
                                           : materialData?.data?.material
                                               ?.salePrice ||
-                                            "Product Price Not Available"
+                                            "Giá sản phẩm không có sẵn"
                                         ).toLocaleString("vi-VN", {
                                           style: "currency",
                                           currency: "VND",
@@ -606,14 +612,14 @@ const HomePage: React.FC = () => {
                                           ? selectedVariantValue
                                           : materialData?.data?.material
                                               ?.salePrice ||
-                                            "Product Price Not Available"
+                                            "Giá sản phẩm không có sẵn"
                                         ).toLocaleString("vi-VN", {
                                           style: "currency",
                                           currency: "VND",
                                         })}
                                       </span>
                                       <span className="text-red-500 text-sm">
-                                        00%
+                                        Mới
                                       </span>
                                     </div>
                                     <div className="flex justify-between items-center">
@@ -771,11 +777,6 @@ const HomePage: React.FC = () => {
                                         </Dialog>
                                       </div>
                                     </div>
-                                    <p className="text-gray-600">
-                                      {materialData?.data?.material
-                                        ?.description ||
-                                        "Product Description Not Available"}
-                                    </p>
 
                                     <div>
                                       <span className="text-gray-600">
@@ -813,7 +814,7 @@ const HomePage: React.FC = () => {
                                                   className="w-12 h-12 object-cover"
                                                 />
                                                 <div className="flex-col mt-2">
-                                                  {variant.attributes.map(
+                                                  {variant?.attributes?.map(
                                                     (attribute, idx) => (
                                                       <button
                                                         key={idx}
@@ -1064,8 +1065,8 @@ const HomePage: React.FC = () => {
                         className="w-full h-64 lg:h-60 2xl:h-72 object-cover mb-4 group-hover:scale-110 ease-in-out duration-300"
                       />
                       <div className="flex w-full justify-between">
-                        <div className="bg-blue-400 px-2 py-1 rounded-sm my-1">
-                          {/* {product.discount} */} 00%
+                        <div className="bg-blue-400 text-white px-2 py-1 rounded-sm my-1">
+                          {/* {product.discount} */} Mới
                         </div>
                         <div
                           onClick={(e) => e.stopPropagation()}
@@ -1236,7 +1237,7 @@ const HomePage: React.FC = () => {
                                         ? selectedVariantValue
                                         : materialData?.data?.material
                                             ?.salePrice ||
-                                          "Product Price Not Available"
+                                          "Giá sản phẩm không có sẵn"
                                       ).toLocaleString("vi-VN", {
                                         style: "currency",
                                         currency: "VND",
@@ -1248,14 +1249,14 @@ const HomePage: React.FC = () => {
                                         ? selectedVariantValue
                                         : materialData?.data?.material
                                             ?.salePrice ||
-                                          "Product Price Not Available"
+                                          "Giá sản phẩm không có sẵn"
                                       ).toLocaleString("vi-VN", {
                                         style: "currency",
                                         currency: "VND",
                                       })}
                                     </span>
                                     <span className="text-red-500 text-sm">
-                                      20%
+                                      Mới
                                     </span>
                                   </div>
                                   <div className="flex justify-between items-center">
@@ -1412,11 +1413,6 @@ const HomePage: React.FC = () => {
                                       </Dialog>
                                     </div>
                                   </div>
-                                  <p className="text-gray-600">
-                                    {materialData?.data?.material
-                                      ?.description ||
-                                      "Product Description Not Available"}
-                                  </p>
 
                                   <div>
                                     <span className="text-gray-600">
@@ -1453,7 +1449,7 @@ const HomePage: React.FC = () => {
                                                 className="w-12 h-12 object-cover"
                                               />
                                               <div className="flex-col mt-2">
-                                                {variant.attributes.map(
+                                                {variant?.attributes?.map(
                                                   (attribute, idx) => (
                                                     <button
                                                       key={idx}
@@ -1720,7 +1716,7 @@ const HomePage: React.FC = () => {
 
               {/* Trending Products */}
               <div>
-                <h2 className="text-2xl font-bold mb-4">Trending Products</h2>
+                <h2 className="text-2xl font-bold mb-4">Thịnh hành</h2>
                 <div className="border-b-2 border-stone-300 mb-4"></div>
                 <div className="space-y-10">
                   {isLoadingPaginatedMaterials ? (
@@ -1794,7 +1790,7 @@ const HomePage: React.FC = () => {
 
               {/* Recently Added */}
               <div>
-                <h2 className="text-2xl font-bold mb-4">Recently Added</h2>
+                <h2 className="text-2xl font-bold mb-4">Mua nhiều nhất</h2>
                 <div className="border-b-2 border-stone-300 mb-4"></div>
                 <div className="space-y-10">
                   {isLoadingPaginatedMaterials ? (

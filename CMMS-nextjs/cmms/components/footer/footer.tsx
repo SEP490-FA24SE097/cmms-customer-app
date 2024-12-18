@@ -73,7 +73,7 @@ export default function Footer() {
             <h3 className="font-semibold mb-4">Địa chỉ</h3>
             <ul className="text-sm space-y-2">
               {storeData?.data.map((item) => (
-                <li>{item.name}</li>
+                <li key={item.id}>{item.name}</li>
               ))}
             </ul>
           </div>

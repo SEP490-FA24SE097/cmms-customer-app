@@ -90,7 +90,7 @@ interface Category {
 export default function Header() {
   // const [isLogin, setIsLogin] = useState(false);
   const pathname = usePathname();
-  const isCartOrCheckout = pathname === "" || pathname === "/checkout";
+  const isCartOrCheckout = pathname === "/cart" || pathname === "/checkout";
   // Lấy đường dẫn hiện tại
   const { data: brandData, isLoading: isLoadingBrand } = useGetBrand();
   const { data: categoryData, isLoading: isLoadingCategory } = useGetCategory();

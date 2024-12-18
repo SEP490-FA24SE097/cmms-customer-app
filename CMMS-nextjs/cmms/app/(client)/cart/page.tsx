@@ -59,8 +59,10 @@ export default function CartPage() {
   };
 
   // Check if there is any item with insufficient quantity
-  const hasInsufficientQuantity = cartData?.items.some((item) =>
-    item.storeItems.some((storeItem) => storeItem.isChangeQuantity)
+  const hasInsufficientQuantity = cartData?.items.some(
+    (item) =>
+      item.storeItems.some((storeItem) => storeItem.isChangeQuantity) ||
+      item.isOver200km
   );
 
   // Prevent checkout if any item has insufficient quantity
@@ -79,7 +81,12 @@ export default function CartPage() {
       showWarningToast();
     }
   };
-
+  useEffect(() => {
+    // Call handleOpenCartModal when session.user.ward changes
+    if (session?.user.user.ward) {
+      handleOpenCartModal();
+    }
+  }, [session?.user.user.ward]);
   const handleOpenCartModal = async () => {
     const dataToSend = { cartItems: cartItem }; // Sử dụng cartItem mới nhất
 
@@ -242,7 +249,6 @@ export default function CartPage() {
                             {item.storeName}
                           </h1>
                         </div>
-
                         {/* Store Items */}
                         <div
                           className={`m-5 ${
@@ -393,33 +399,45 @@ export default function CartPage() {
 
                         {/* Store Footer */}
                         <div className="flex gap-7 justify-around items-center p-2 px-10 border-t">
-                          <div className="flex gap-2 mt-2">
-                            <h1>Tổng tiền: </h1>
-                            <h1>
-                              {item.totalStoreAmount.toLocaleString("vi-VN", {
-                                style: "currency",
-                                currency: "vnd",
-                              })}
+                          {item.isOver200km ? (
+                            <h1 className="mt-1 text-red-500 capitalize">
+                              Địa chỉ của bạn đã vượt quá khoảng cách giao hàng.
+                              Nếu bạn muốn tiếp tục, hãy liên hệ 0902011122.
                             </h1>
-                          </div>
-                          <div className="flex gap-2 mt-2">
-                            <h1>Phí vận chuyển: </h1>
-                            <h1>
-                              {item.shippngFree.toLocaleString("vi-VN", {
-                                style: "currency",
-                                currency: "vnd",
-                              })}
-                            </h1>
-                          </div>
-                          <div className="flex font-bold gap-2 mt-2">
-                            <h1>Thành tiền: </h1>
-                            <h1>
-                              {item.finalPrice.toLocaleString("vi-VN", {
-                                style: "currency",
-                                currency: "vnd",
-                              })}
-                            </h1>
-                          </div>
+                          ) : (
+                            <div className="flex gap-7 justify-around items-center p-2 px-10">
+                              <div className="flex gap-2 mt-2">
+                                <h1>Tổng tiền: </h1>
+                                <h1>
+                                  {item.totalStoreAmount.toLocaleString(
+                                    "vi-VN",
+                                    {
+                                      style: "currency",
+                                      currency: "VND",
+                                    }
+                                  )}
+                                </h1>
+                              </div>
+                              <div className="flex gap-2 mt-2">
+                                <h1>Phí vận chuyển: </h1>
+                                <h1>
+                                  {item.shippngFree.toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                  })}
+                                </h1>
+                              </div>
+                              <div className="flex font-bold gap-2 mt-2">
+                                <h1>Thành tiền: </h1>
+                                <h1>
+                                  {item.finalPrice.toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                  })}
+                                </h1>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
