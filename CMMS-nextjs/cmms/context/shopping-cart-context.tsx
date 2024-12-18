@@ -31,7 +31,8 @@ interface ShoppingContextType {
   updateQuantity: (
     materialId: string,
     variantId: string | null,
-    qty: number
+    qty: number,
+    inStock: number
   ) => void;
 }
 
@@ -141,10 +142,11 @@ export const ShoppingContextProvider = ({
   const updateQuantity = (
     materialId: string,
     variantId: string | null,
-    qty: number
+    qty: number,
+    inStock: number
   ) => {
     // Ensure the quantity is valid and greater than or equal to 1
-    if (qty < 1) return;
+    if (qty < 1 || qty > inStock) return;
 
     setCartItem((currentCart) =>
       currentCart.map((item) =>

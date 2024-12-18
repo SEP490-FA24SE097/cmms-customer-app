@@ -219,7 +219,13 @@ export default function DetailsPage() {
     if (!materialData) return;
 
     const materialId = materialData.data?.material.id;
-
+    if (!session?.user.user.ward) {
+      toast({
+        title: "Bạn chưa có địa chỉ vui lòng chọn địa chỉ.",
+        style: { backgroundColor: "#f87171", color: "#ffffff" }, // Red background for error
+      });
+      return;
+    }
     // Retrieve cart from localStorage and parse it
     const cart = JSON.parse(localStorage.getItem("cartItem") || "[]");
 
@@ -492,7 +498,7 @@ export default function DetailsPage() {
                             onClick={() => goToSlide(slideIndex)}
                             className={`border-2 h-20 w-20 rounded-sm cursor-pointer ${
                               currentIndex === slideIndex
-                                ? " border-red-300"
+                                ? " border-blue-300"
                                 : ""
                             }`}
                           />
@@ -518,11 +524,6 @@ export default function DetailsPage() {
 
             {/* Right Column */}
             <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <span className="bg-pink-200 text-pink-600 text-xs font-semibold px-2 py-1 rounded">
-                  Sale Off
-                </span>
-              </div>
               <h1 className="text-3xl font-bold">
                 {selectedVariantName
                   ? selectedVariantName
@@ -554,7 +555,6 @@ export default function DetailsPage() {
                         }
                       )}
                 </span>
-                <span className="text-red-500 text-sm">20%</span>
               </div>
               <div className="flex justify-between items-center">
                 <div className="flex gap-2 items-center">
@@ -686,8 +686,8 @@ export default function DetailsPage() {
                       }}
                       className={`flex items-center border p-1 ${
                         selectedVariant === variant.variantId
-                          ? "bg-red-100 text-red-600"
-                          : "hover:bg-red-100 hover:text-red-600"
+                          ? "bg-blue-100 text-blue-600"
+                          : "hover:bg-blue-100 hover:text-blue-600"
                       } `}
                     >
                       <img
@@ -766,7 +766,7 @@ export default function DetailsPage() {
                 storeQuantityData.data.totalQuantityInAllStore > 0 ? (
                   <button
                     onClick={handleAddToCart}
-                    className="flex items-center px-6 py-2 bg-red-500 text-white rounded"
+                    className="flex items-center px-6 py-2 bg-blue-500 text-white rounded"
                   >
                     <i className="fas fa-shopping-cart mr-2"></i> Thêm vào giỏ
                     hàng
@@ -777,7 +777,7 @@ export default function DetailsPage() {
                     hết hàng
                   </button>
                 )}
-                <button className="px-2 py-2 border rounded hover:bg-red-500 hover:text-white transition ease-in-out duration-500 hover:-translate-y-2">
+                <button className="px-2 py-2 border rounded hover:bg-blue-500 hover:text-white transition ease-in-out duration-500 hover:-translate-y-2">
                   <CiHeart size={25} className="font-bold" />
                 </button>
               </div>
@@ -797,7 +797,7 @@ export default function DetailsPage() {
             </TabsList>
             <TabsContent value="info">
               <div className="max-w-full m-10 mx-8">
-                <h1 className="text-red-600 text-2xl font-bold mb-4">
+                <h1 className="text-red-500 text-2xl font-bold mb-4">
                   ẤM SIÊU TỐC WMF LONO 0413130011
                 </h1>
                 <p className="mb-4">
@@ -958,7 +958,7 @@ export default function DetailsPage() {
                     />
                   </div>
                   <button
-                    className="px-6 py-3 bg-red-500 text-white rounded-lg"
+                    className="px-6 py-3 bg-blue-500 text-white rounded-lg"
                     type="submit"
                   >
                     Submit Review
@@ -1074,7 +1074,10 @@ export default function DetailsPage() {
                                   />
                                 )}
                                 {!product.isFavorite && (
-                                  <FaHeart className="text-red-300" size={25} />
+                                  <FaHeart
+                                    className="text-blue-300"
+                                    size={25}
+                                  />
                                 )}
                               </HoverCardTrigger>
                               <HoverCardContent
@@ -1086,7 +1089,7 @@ export default function DetailsPage() {
                             </HoverCard>
                           </div>
                         </div>
-                        <h2 className="text-lg font-semibold text-start w-full my-2 lg:h-[55px] hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
+                        <h2 className="text-lg font-semibold text-start w-full my-2 lg:h-[55px] hover:text-blue-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
                           {product.title}
                         </h2>
                         <div className="flex w-full justify-start items-center gap-4">

@@ -32,6 +32,15 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
@@ -45,13 +54,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useShoppingContext } from "@/context/shopping-cart-context";
 import { createAndGetCart } from "@/lib/actions/cart/action/cart";
 import { ICart } from "@/lib/actions/cart/type/cart-type";
 import { useGetBrand } from "@/lib/actions/brand/react-query/brand-query";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useGetCategory } from "@/lib/actions/categories/react-query/category-query";
+import SelectLocation from "../select-location/page";
+import { FaMapLocationDot } from "react-icons/fa6";
 interface Category {
   title: string;
   icon: React.ReactNode;
@@ -77,10 +89,13 @@ interface Category {
 
 export default function Header() {
   // const [isLogin, setIsLogin] = useState(false);
+  const pathname = usePathname();
+  const isCartOrCheckout = pathname === "" || pathname === "/checkout";
+  // Lấy đường dẫn hiện tại
   const { data: brandData, isLoading: isLoadingBrand } = useGetBrand();
   const { data: categoryData, isLoading: isLoadingCategory } = useGetCategory();
   const [searchKeyword, setSearchKeyword] = useState("");
-
+  const [isDialogOpen2, setIsDialogOpen2] = useState(false);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchKeyword(e.target.value); // Cập nhật giá trị input
   };
@@ -114,12 +129,24 @@ export default function Header() {
   // console.log(session?.user.accessToken);
 
   const isLogin = session?.user;
+  const TruncatedText = ({ text }: any) => {
+    const maxLength = 15;
+    const truncatedText =
+      text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
 
+    return <div>{truncatedText}</div>;
+  };
   // const [isOpenCart, setIsOpenCart] = useState(false);
   const [cartData, setCartData] = useState<ICart>();
   const [cartQty1, setCartQty] = useState<number>();
   const [isPending, startTransition] = useTransition();
-
+  const [radioValue, setRadioValue] = useState("default");
+  const addressFull =
+    session?.user.user.province +
+    ", " +
+    session?.user.user.district +
+    ", " +
+    session?.user.user.ward;
   const {
     cartQty,
     cartItem,
@@ -194,7 +221,7 @@ export default function Header() {
                     <Button
                       variant="outline"
                       type="button"
-                      className="bg-blue-300 ml-2 lg:h-10"
+                      className="bg-blue-500 ml-2 lg:h-10"
                     >
                       <FaSearch className="h-5 w-5" />
                     </Button>
@@ -204,7 +231,7 @@ export default function Header() {
             </div>
           </div>
           <div className="mx-auto sm:ml-auto sm:mr-0   md:col-span-2">
-            <div className="inline-flex gap-5">
+            <div className="inline-flex gap-5 items-center">
               {/* <Button
                 variant="ghost"
                 className="bg-white text-black hover:bg-slate-200 text-[18px] font-medium"
@@ -216,16 +243,74 @@ export default function Header() {
                   </span>
                 </div>
               </Button> */}
+              <Dialog open={isDialogOpen2} onOpenChange={setIsDialogOpen2}>
+                <DialogTrigger asChild>
+                  <Button variant="outline">
+                    <FaMapLocationDot className="text-blue-500" size={25} />{" "}
+                    {session?.user.user.ward ? (
+                      <div className="text-xs">
+                        {" "}
+                        <TruncatedText text={addressFull} />
+                      </div>
+                    ) : (
+                      "Chọn địa chỉ?"
+                    )}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Địa chỉ giao hàng</DialogTitle>
+                    <DialogDescription>
+                      <div>
+                        <p>
+                          Hãy chọn địa chỉ nhận hàng để được dự báo thời gian
+                          giao hàng cùng phí đóng gói, vận chuyển một cách chính
+                          xác nhất.
+                        </p>
+                        <hr className="my-5" />
+                        <RadioGroup
+                          className="text-black"
+                          value={radioValue}
+                          onValueChange={(value) => setRadioValue(value)} // Cập nhật state khi thay đổi
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="default" id="r1" />
+                            <Label htmlFor="r1">
+                              {session?.user.user.ward
+                                ? `${addressFull}`
+                                : "Hãy chọn khu vực giao hàng"}
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="comfortable" id="r2" />
+                            <Label htmlFor="r2">
+                              Chọn khu vực giao hàng khác
+                            </Label>
+                          </div>
+                        </RadioGroup>
+                        {radioValue === "comfortable" && (
+                          <div className="mt-5 mx-20">
+                            <SelectLocation
+                              setIsDialogOpen={setIsDialogOpen2}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </DialogDescription>
+                  </DialogHeader>
+                </DialogContent>
+              </Dialog>
               <Sheet>
                 <SheetTrigger asChild>
                   <Button
                     onClick={() => handleOpenCartModal()}
+                    disabled={isCartOrCheckout}
                     className="bg-white text-black hover:bg-slate-200 text-[18px] font-medium"
                   >
                     <div className="relative">
                       <TbShoppingCart size={25} />
                       {cartQty1 === 0 ? undefined : (
-                        <span className="absolute top-0 right-0 grid min-h-[10px] min-w-[18px] text-[12px] font-bold translate-x-2/4 -translate-y-2/4 place-items-center rounded-full bg-red-400 text-white">
+                        <span className="absolute top-0 right-0 grid min-h-[10px] min-w-[18px] text-[12px] font-bold translate-x-2/4 -translate-y-2/4 place-items-center rounded-full bg-blue-400 text-white">
                           {cartQty1}
                         </span>
                       )}
@@ -311,7 +396,8 @@ export default function Header() {
                                                   updateQuantity(
                                                     product.materialId,
                                                     product.variantId ?? null,
-                                                    Number(e.target.value)
+                                                    Number(e.target.value),
+                                                    product.inStock
                                                   )
                                                 }
                                                 className="w-8 text-center border-l border-r"
@@ -390,7 +476,7 @@ export default function Header() {
                                   </button>
                                 ) : (
                                   <Link href="/cart">
-                                    <button className="bg-red-500 text-white py-2 px-4 rounded">
+                                    <button className="bg-blue-500 text-white py-2 px-4 rounded">
                                       Tiền tới thanh toán
                                     </button>
                                   </Link>
@@ -444,14 +530,12 @@ export default function Header() {
                           <span>Lịch sử đơn hàng</span>
                         </DropdownMenuItem>
                       </Link>
-                      <DropdownMenuItem className="font-semibold">
-                        <FaHistory />
-                        <span>chưa bt</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="font-semibold">
-                        <FaHistory />
-                        <span>Chưa bt luôn</span>
-                      </DropdownMenuItem>
+                      <Link href="/profile/changepassword">
+                        <DropdownMenuItem className="font-semibold">
+                          <FaHistory />
+                          <span>Lịch sử đơn hàng</span>
+                        </DropdownMenuItem>
+                      </Link>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
@@ -475,7 +559,7 @@ export default function Header() {
               <Link href="/">
                 <Button
                   size="lg"
-                  className="text-xl font-semibold text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none py-7"
+                  className="text-xl font-semibold text-black hover:text-blue-400 bg-white hover:bg-slate-100 border-none shadow-none py-7"
                 >
                   Trang chủ
                 </Button>
@@ -487,7 +571,7 @@ export default function Header() {
                   <Button
                     // onClick={() => router.push("/product")}
                     size="lg"
-                    className="text-xl font-semibold text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none py-7"
+                    className="text-xl font-semibold text-black hover:text-blue-400 bg-white hover:bg-slate-100 border-none shadow-none py-7"
                   >
                     Sản phẩm <IoIosArrowDown />
                   </Button>
@@ -512,7 +596,7 @@ export default function Header() {
                                     <Link
                                       href={`/product?categoryId=${item.id}`}
                                     >
-                                      <Label className="ml-8 text-[18px] hover:text-red-200 capitalize    ">
+                                      <Label className="ml-8 text-[18px] hover:text-blue-200 capitalize    ">
                                         {item.name}
                                       </Label>
                                     </Link>
@@ -540,7 +624,7 @@ export default function Header() {
                 <PopoverTrigger asChild>
                   <Button
                     size="lg"
-                    className="text-xl font-semibold text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none py-7"
+                    className="text-xl font-semibold text-black hover:text-blue-400 bg-white hover:bg-slate-100 border-none shadow-none py-7"
                   >
                     Thương hiệu <IoIosArrowDown />
                   </Button>
@@ -556,7 +640,7 @@ export default function Header() {
                         brandData?.data.map((item, index) => (
                           <li key={index} id={item.id} className="border-b">
                             <Link href={`/product?brandId=${item.id}`}>
-                              <Button className="w-full text-[18px] font-normal text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none">
+                              <Button className="w-full text-[18px] font-normal text-black hover:text-blue-400 bg-white hover:bg-slate-100 border-none shadow-none">
                                 {item.name}
                               </Button>
                             </Link>
@@ -571,7 +655,7 @@ export default function Header() {
             <li>
               <Button
                 size="lg"
-                className="text-xl font-semibold text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none py-7"
+                className="text-xl font-semibold text-black hover:text-blue-400 bg-white hover:bg-slate-100 border-none shadow-none py-7"
               >
                 Giới thiệu
               </Button>
@@ -579,7 +663,7 @@ export default function Header() {
             <li>
               <Button
                 size="lg"
-                className="text-xl font-semibold text-black hover:text-red-400 bg-white hover:bg-slate-100 border-none shadow-none py-7"
+                className="text-xl font-semibold text-black hover:text-blue-400 bg-white hover:bg-slate-100 border-none shadow-none py-7"
               >
                 Liên hệ
               </Button>

@@ -39,10 +39,13 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { MdLocationOn } from "react-icons/md";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   useGetMaterial,
   useGetMaterialById,
 } from "@/lib/actions/materials/react-query/material-query";
+
 import { IMaterial } from "@/lib/actions/materials/type/material-type";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "nextjs-toploader/app";
@@ -54,6 +57,9 @@ import {
 } from "@/context/shopping-cart-context";
 import Link from "next/link";
 import { useRole } from "@/providers/role-context";
+import { useSession } from "next-auth/react";
+import { Label } from "@/components/ui/label";
+import SelectLocation from "@/components/select-location/page";
 
 const fakeData = [
   {
@@ -97,7 +103,9 @@ const paginatedMaterialsParams = {
 };
 const HomePage: React.FC = () => {
   const router = useRouter();
-
+  const { data: session } = useSession();
+  const [isDialogOpen1, setIsDialogOpen1] = useState(false);
+  const [isDialogOpen2, setIsDialogOpen2] = useState(false);
   const { role } = useRole();
   const { toast } = useToast();
   const { addCartItem } = useShoppingContext();
@@ -293,6 +301,14 @@ const HomePage: React.FC = () => {
       : dataMaterialsWithPrice?.data.filter(
           (product) => product.material.category === selectedCategory
         );
+
+  const [radioValue, setRadioValue] = useState("default");
+  const addressFull =
+    session?.user.user.province +
+    ", " +
+    session?.user.user.district +
+    ", " +
+    session?.user.user.ward;
   return (
     <section className="bg-gray-100 pb-10">
       <div className="w-full sm:h-[700px] h-[40vh] m-auto py-5 relative group">
@@ -600,7 +616,161 @@ const HomePage: React.FC = () => {
                                         00%
                                       </span>
                                     </div>
-
+                                    <div className="flex justify-between items-center">
+                                      <div className="flex gap-2 items-center">
+                                        <MdLocationOn size={20} />
+                                        <h1>Giao đến:</h1>
+                                        {!session?.user?.user?.ward ? (
+                                          <Dialog
+                                            open={isDialogOpen1}
+                                            onOpenChange={setIsDialogOpen1}
+                                          >
+                                            <DialogTrigger asChild>
+                                              <Button
+                                                className="text-blue-500"
+                                                variant="ghost"
+                                              >
+                                                Bạn muốn giao tới đâu?
+                                              </Button>
+                                            </DialogTrigger>
+                                            <DialogContent>
+                                              <DialogHeader>
+                                                <DialogTitle>
+                                                  Địa chỉ giao hàng
+                                                </DialogTitle>
+                                                <DialogDescription>
+                                                  <div>
+                                                    <p>
+                                                      Hãy chọn địa chỉ nhận hàng
+                                                      để được dự báo thời gian
+                                                      giao hàng cùng phí đóng
+                                                      gói, vận chuyển một cách
+                                                      chính xác nhất.
+                                                    </p>
+                                                    <hr className="my-5" />
+                                                    <RadioGroup
+                                                      className="text-black"
+                                                      value={radioValue}
+                                                      onValueChange={(value) =>
+                                                        setRadioValue(value)
+                                                      } // Cập nhật state khi thay đổi
+                                                    >
+                                                      <div className="flex items-center space-x-2">
+                                                        <RadioGroupItem
+                                                          value="default"
+                                                          id="r1"
+                                                        />
+                                                        <Label htmlFor="r1">
+                                                          {session?.user.user
+                                                            .ward
+                                                            ? `${addressFull}`
+                                                            : "Hãy chọn khu vực giao hàng"}
+                                                        </Label>
+                                                      </div>
+                                                      <div className="flex items-center space-x-2">
+                                                        <RadioGroupItem
+                                                          value="comfortable"
+                                                          id="r2"
+                                                        />
+                                                        <Label htmlFor="r2">
+                                                          Chọn khu vực giao hàng
+                                                          khác
+                                                        </Label>
+                                                      </div>
+                                                    </RadioGroup>
+                                                    {radioValue ===
+                                                      "comfortable" && (
+                                                      <div className="mt-5 mx-20">
+                                                        <SelectLocation
+                                                          setIsDialogOpen={
+                                                            setIsDialogOpen1
+                                                          }
+                                                        />
+                                                      </div>
+                                                    )}
+                                                  </div>
+                                                </DialogDescription>
+                                              </DialogHeader>
+                                            </DialogContent>
+                                          </Dialog>
+                                        ) : (
+                                          <p>{addressFull}</p>
+                                        )}
+                                      </div>
+                                      <div>
+                                        <Dialog
+                                          open={isDialogOpen2}
+                                          onOpenChange={setIsDialogOpen2}
+                                        >
+                                          <DialogTrigger asChild>
+                                            <Button
+                                              className="text-blue-500"
+                                              variant="ghost"
+                                            >
+                                              Đổi
+                                            </Button>
+                                          </DialogTrigger>
+                                          <DialogContent>
+                                            <DialogHeader>
+                                              <DialogTitle>
+                                                Địa chỉ giao hàng
+                                              </DialogTitle>
+                                              <DialogDescription>
+                                                <div>
+                                                  <p>
+                                                    Hãy chọn địa chỉ nhận hàng
+                                                    để được dự báo thời gian
+                                                    giao hàng cùng phí đóng gói,
+                                                    vận chuyển một cách chính
+                                                    xác nhất.
+                                                  </p>
+                                                  <hr className="my-5" />
+                                                  <RadioGroup
+                                                    className="text-black"
+                                                    value={radioValue}
+                                                    onValueChange={(value) =>
+                                                      setRadioValue(value)
+                                                    } // Cập nhật state khi thay đổi
+                                                  >
+                                                    <div className="flex items-center space-x-2">
+                                                      <RadioGroupItem
+                                                        value="default"
+                                                        id="r1"
+                                                      />
+                                                      <Label htmlFor="r1">
+                                                        {session?.user.user.ward
+                                                          ? `${addressFull}`
+                                                          : "Hãy chọn khu vực giao hàng"}
+                                                      </Label>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2">
+                                                      <RadioGroupItem
+                                                        value="comfortable"
+                                                        id="r2"
+                                                      />
+                                                      <Label htmlFor="r2">
+                                                        Chọn khu vực giao hàng
+                                                        khác
+                                                      </Label>
+                                                    </div>
+                                                  </RadioGroup>
+                                                  {radioValue ===
+                                                    "comfortable" && (
+                                                    <div className="mt-5 mx-20">
+                                                      <SelectLocation
+                                                        setIsDialogOpen={
+                                                          setIsDialogOpen2
+                                                        }
+                                                      />
+                                                    </div>
+                                                  )}
+                                                </div>
+                                              </DialogDescription>
+                                            </DialogHeader>
+                                          </DialogContent>
+                                        </Dialog>
+                                      </div>
+                                    </div>
                                     <p className="text-gray-600">
                                       {materialData?.data?.material
                                         ?.description ||
@@ -738,7 +908,7 @@ const HomePage: React.FC = () => {
                                         .totalQuantityInAllStore > 0 ? (
                                         <button
                                           onClick={handleAddToCart}
-                                          className="flex items-center px-6 py-2 bg-red-500 text-white rounded"
+                                          className="flex items-center px-6 py-2 bg-blue-500 text-white rounded"
                                         >
                                           <i className="fas fa-shopping-cart mr-2"></i>{" "}
                                           Thêm vào giỏ hàng
@@ -749,7 +919,7 @@ const HomePage: React.FC = () => {
                                           Sản phẩm đã hết hàng
                                         </button>
                                       )}
-                                      <button className="px-2 py-2 border rounded hover:bg-red-500 hover:text-white transition ease-in-out duration-500 hover:-translate-y-2">
+                                      <button className="px-2 py-2 border rounded hover:bg-blue-500 hover:text-white transition ease-in-out duration-500 hover:-translate-y-2">
                                         <CiHeart
                                           size={25}
                                           className="font-bold"
@@ -779,7 +949,7 @@ const HomePage: React.FC = () => {
                             </HoverCard>
                           </div>
                         </div>
-                        <h2 className="text-lg capitalize font-semibold text-start w-full my-2 lg:h-[55px] hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
+                        <h2 className="text-lg capitalize font-semibold text-start w-full my-2 lg:h-[55px] hover:text-blue-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
                           {product.material.name}
                         </h2>
                         <div className="flex w-full justify-start items-center gap-4">
@@ -1088,7 +1258,160 @@ const HomePage: React.FC = () => {
                                       20%
                                     </span>
                                   </div>
-
+                                  <div className="flex justify-between items-center">
+                                    <div className="flex gap-2 items-center">
+                                      <MdLocationOn size={20} />
+                                      <h1>Giao đến:</h1>
+                                      {!session?.user?.user?.ward ? (
+                                        <Dialog
+                                          open={isDialogOpen1}
+                                          onOpenChange={setIsDialogOpen1}
+                                        >
+                                          <DialogTrigger asChild>
+                                            <Button
+                                              className="text-blue-500"
+                                              variant="ghost"
+                                            >
+                                              Bạn muốn giao tới đâu?
+                                            </Button>
+                                          </DialogTrigger>
+                                          <DialogContent>
+                                            <DialogHeader>
+                                              <DialogTitle>
+                                                Địa chỉ giao hàng
+                                              </DialogTitle>
+                                              <DialogDescription>
+                                                <div>
+                                                  <p>
+                                                    Hãy chọn địa chỉ nhận hàng
+                                                    để được dự báo thời gian
+                                                    giao hàng cùng phí đóng gói,
+                                                    vận chuyển một cách chính
+                                                    xác nhất.
+                                                  </p>
+                                                  <hr className="my-5" />
+                                                  <RadioGroup
+                                                    className="text-black"
+                                                    value={radioValue}
+                                                    onValueChange={(value) =>
+                                                      setRadioValue(value)
+                                                    } // Cập nhật state khi thay đổi
+                                                  >
+                                                    <div className="flex items-center space-x-2">
+                                                      <RadioGroupItem
+                                                        value="default"
+                                                        id="r1"
+                                                      />
+                                                      <Label htmlFor="r1">
+                                                        {session?.user.user.ward
+                                                          ? `${addressFull}`
+                                                          : "Hãy chọn khu vực giao hàng"}
+                                                      </Label>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2">
+                                                      <RadioGroupItem
+                                                        value="comfortable"
+                                                        id="r2"
+                                                      />
+                                                      <Label htmlFor="r2">
+                                                        Chọn khu vực giao hàng
+                                                        khác
+                                                      </Label>
+                                                    </div>
+                                                  </RadioGroup>
+                                                  {radioValue ===
+                                                    "comfortable" && (
+                                                    <div className="mt-5 mx-20">
+                                                      <SelectLocation
+                                                        setIsDialogOpen={
+                                                          setIsDialogOpen1
+                                                        }
+                                                      />
+                                                    </div>
+                                                  )}
+                                                </div>
+                                              </DialogDescription>
+                                            </DialogHeader>
+                                          </DialogContent>
+                                        </Dialog>
+                                      ) : (
+                                        <p>{addressFull}</p>
+                                      )}
+                                    </div>
+                                    <div>
+                                      <Dialog
+                                        open={isDialogOpen2}
+                                        onOpenChange={setIsDialogOpen2}
+                                      >
+                                        <DialogTrigger asChild>
+                                          <Button
+                                            className="text-blue-500"
+                                            variant="ghost"
+                                          >
+                                            Đổi
+                                          </Button>
+                                        </DialogTrigger>
+                                        <DialogContent>
+                                          <DialogHeader>
+                                            <DialogTitle>
+                                              Địa chỉ giao hàng
+                                            </DialogTitle>
+                                            <DialogDescription>
+                                              <div>
+                                                <p>
+                                                  Hãy chọn địa chỉ nhận hàng để
+                                                  được dự báo thời gian giao
+                                                  hàng cùng phí đóng gói, vận
+                                                  chuyển một cách chính xác
+                                                  nhất.
+                                                </p>
+                                                <hr className="my-5" />
+                                                <RadioGroup
+                                                  className="text-black"
+                                                  value={radioValue}
+                                                  onValueChange={(value) =>
+                                                    setRadioValue(value)
+                                                  } // Cập nhật state khi thay đổi
+                                                >
+                                                  <div className="flex items-center space-x-2">
+                                                    <RadioGroupItem
+                                                      value="default"
+                                                      id="r1"
+                                                    />
+                                                    <Label htmlFor="r1">
+                                                      {session?.user.user.ward
+                                                        ? `${addressFull}`
+                                                        : "Hãy chọn khu vực giao hàng"}
+                                                    </Label>
+                                                  </div>
+                                                  <div className="flex items-center space-x-2">
+                                                    <RadioGroupItem
+                                                      value="comfortable"
+                                                      id="r2"
+                                                    />
+                                                    <Label htmlFor="r2">
+                                                      Chọn khu vực giao hàng
+                                                      khác
+                                                    </Label>
+                                                  </div>
+                                                </RadioGroup>
+                                                {radioValue ===
+                                                  "comfortable" && (
+                                                  <div className="mt-5 mx-20">
+                                                    <SelectLocation
+                                                      setIsDialogOpen={
+                                                        setIsDialogOpen2
+                                                      }
+                                                    />
+                                                  </div>
+                                                )}
+                                              </div>
+                                            </DialogDescription>
+                                          </DialogHeader>
+                                        </DialogContent>
+                                      </Dialog>
+                                    </div>
+                                  </div>
                                   <p className="text-gray-600">
                                     {materialData?.data?.material
                                       ?.description ||
@@ -1225,7 +1548,7 @@ const HomePage: React.FC = () => {
                                       .totalQuantityInAllStore > 0 ? (
                                       <button
                                         onClick={handleAddToCart}
-                                        className="flex items-center px-6 py-2 bg-red-500 text-white rounded"
+                                        className="flex items-center px-6 py-2 bg-blue-500 text-white rounded"
                                       >
                                         <i className="fas fa-shopping-cart mr-2"></i>{" "}
                                         Thêm vào giỏ hàng
@@ -1236,7 +1559,7 @@ const HomePage: React.FC = () => {
                                         Sản phẩm đã hết hàng
                                       </button>
                                     )}
-                                    <button className="px-2 py-2 border rounded hover:bg-red-500 hover:text-white transition ease-in-out duration-500 hover:-translate-y-2">
+                                    <button className="px-2 py-2 border rounded hover:bg-blue-500 hover:text-white transition ease-in-out duration-500 hover:-translate-y-2">
                                       <CiHeart
                                         size={25}
                                         className="font-bold"
@@ -1266,7 +1589,7 @@ const HomePage: React.FC = () => {
                           </HoverCard>
                         </div>
                       </div>
-                      <h2 className="text-lg capitalize font-semibold text-start w-full my-2 lg:h-[55px] hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
+                      <h2 className="text-lg capitalize font-semibold text-start w-full my-2 lg:h-[55px] hover:text-blue-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
                         {product.material.name}
                       </h2>
                       <div className="flex w-full justify-start items-center gap-4">
@@ -1350,7 +1673,7 @@ const HomePage: React.FC = () => {
                             src={product.material.imageUrl}
                           />
                           <div className="ml-8">
-                            <h3 className="text-lg capitalize font-semibold group-hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
+                            <h3 className="text-lg capitalize font-semibold group-hover:text-blue-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
                               {product.material.name}
                             </h3>
                             <div className="flex w-full justify-start items-center gap-4">
@@ -1424,7 +1747,7 @@ const HomePage: React.FC = () => {
                             src={product.material.imageUrl}
                           />
                           <div className="ml-8">
-                            <h3 className="text-lg capitalize font-semibold group-hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
+                            <h3 className="text-lg capitalize font-semibold group-hover:text-blue-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
                               {product.material.name}
                             </h3>
                             <div className="flex w-full justify-start items-center gap-4">
@@ -1498,7 +1821,7 @@ const HomePage: React.FC = () => {
                             src={product.material.imageUrl}
                           />
                           <div className="ml-8">
-                            <h3 className="text-lg capitalize font-semibold group-hover:text-red-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
+                            <h3 className="text-lg capitalize font-semibold group-hover:text-blue-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
                               {product.material.name}
                             </h3>
                             <div className="flex w-full justify-start items-center gap-4">

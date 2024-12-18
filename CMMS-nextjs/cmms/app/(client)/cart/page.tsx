@@ -23,11 +23,12 @@ import {
   createAndGetCart,
   GetCartCheckout,
 } from "@/lib/actions/cart/action/cart";
+
 import { useToast } from "@/hooks/use-toast";
 import { ICheckout } from "@/lib/actions/cart/type/cart-checkout-type";
 import { useSession } from "next-auth/react";
 import { Skeleton } from "@/components/ui/skeleton";
-
+import "react-tooltip";
 export default function CartPage() {
   const { data: session } = useSession();
   // console.log(session?.user.accessToken);
@@ -80,37 +81,106 @@ export default function CartPage() {
   };
 
   const handleOpenCartModal = async () => {
-    const dataToSend = { cartItems: cartItem };
+    const dataToSend = { cartItems: cartItem }; // Sử dụng cartItem mới nhất
 
     setIsloading(true);
 
-    setTimeout(async () => {
-      startTransition(async () => {
-        try {
-          const result = await GetCartCheckout(dataToSend);
-
-          if (result && result.data) {
-            setCartData(result.data);
-            console.log("Data fetched successfully");
-          } else {
-            console.log("Failed to fetch cart data");
-          }
-        } catch (error) {
-          console.error("Error fetching cart data:", error);
-        } finally {
-          setIsloading(false);
-        }
+    try {
+      const result = await GetCartCheckout(dataToSend);
+      if (result && result.data) {
+        setCartData(result.data);
+        console.log("Data fetched successfully");
+      } else {
+        console.log("Failed to fetch cart data");
+        toast({
+          title: "Có lỗi xảy ra vui lòng thử lại sau!!!",
+          variant: "destructive",
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching cart data:", error);
+      toast({
+        title: "Có lỗi xảy ra vui lòng thử lại sau!!!",
+        variant: "destructive",
+        duration: 3000,
       });
-    }, 1000); // Độ trễ 1 giây để kiểm tra trạng thái
+    } finally {
+      setIsloading(false);
+    }
   };
 
-  console.log(isloading);
   useEffect(() => {
-    localStorage.setItem("cartItem", JSON.stringify(cartItem));
     setCartQty(cartQty);
     handleOpenCartModal();
+  }, []);
+  //[cartItem]
+  type Quantities = {
+    [key: string]: number; // Key là chuỗi, value là số
+  };
+
+  const [quantities, setQuantities] = useState<Quantities>({});
+
+  useEffect(() => {
+    const initialQuantities: Quantities = {}; // Khai báo kiểu rõ ràng
+    cartItem.forEach((product) => {
+      const key = `${product.materialId}-${product.variantId ?? "null"}`;
+      initialQuantities[key] = product.quantity; // Lưu giá trị quantity ban đầu
+    });
+    setQuantities(initialQuantities);
   }, [cartItem]);
 
+  const handleQuantityChange = (
+    materialId: string,
+    variantId: string | null,
+    newQuantity: number
+  ) => {
+    const key = `${materialId}-${variantId ?? "null"}`;
+
+    // Find the corresponding product in cartData
+    const product = cartData?.items
+      .flatMap((item) => item.storeItems) // Flatten the storeItems array
+      .find(
+        (p) =>
+          p.materialId === materialId &&
+          (p.variantId ?? "null") === (variantId ?? "null")
+      );
+
+    if (product) {
+      // Adjust to inStock if exceeded
+      if (newQuantity > product.inStock) {
+        newQuantity = product.inStock; // Set to max stock
+        updateQuantity(materialId, variantId, newQuantity, product.inStock);
+        toast({
+          title: "Thông báo",
+          description: `Số lượng không được vượt quá ${product.inStock}.`,
+          variant: "destructive",
+        });
+      }
+    }
+
+    setQuantities((prev) => ({
+      ...prev,
+      [key]: newQuantity,
+    }));
+  };
+  const handleRemoveCartItem = async (
+    materialId: string,
+    variantId: string | null
+  ) => {
+    // Gọi removeCartItem để xóa sản phẩm
+    removeCartItem(materialId, variantId);
+
+    // Không cần setTimeout, chỉ cần chờ cartItem được cập nhật
+  };
+  useEffect(() => {
+    if (cartItem.length === 0) {
+      handleOpenCartModal();
+    } else {
+      // Nếu cartItem có sản phẩm, mở modal với dữ liệu mới
+      handleOpenCartModal();
+    }
+  }, [cartItem]);
   return (
     <div className="bg-gray-100">
       <div className="max-w-[85%] mx-auto">
@@ -151,7 +221,7 @@ export default function CartPage() {
                   </h2>
                   <div className="mt-5 flex justify-center">
                     <Link href="/product">
-                      <Button className="bg-red-500 hover:bg-red-300">
+                      <Button className="bg-blue-500 hover:bg-blue-300">
                         Tiếp tục mua hàng
                       </Button>
                     </Link>
@@ -165,119 +235,163 @@ export default function CartPage() {
                         key={item.storeId}
                         className="border mb-10 rounded-sm shadow-md py-2"
                       >
+                        {/* Store Header */}
                         <div className="flex gap-7 items-center p-2 px-10 border-b">
                           <FaStore size={30} />
                           <h1 className="text-xl capitalize">
                             {item.storeName}
                           </h1>
                         </div>
+
+                        {/* Store Items */}
                         <div
                           className={`m-5 ${
                             item.storeItems.length === 1 ? "" : "border"
                           }`}
                         >
-                          {item.storeItems.map((product, index) => (
-                            <div
-                              key={product.materialId} // Add a key for each product
-                              className={`flex justify-between gap-5 items-center p-5 ${
-                                index < item.storeItems.length - 1
-                                  ? "border-b"
-                                  : ""
-                              }`}
-                            >
-                              <img
-                                className="w-20 h-20 object-cover"
-                                src={product.imageUrl}
-                                alt=""
-                              />
-                              <h1 className="text-md w-40 capitalize font-medium overflow-hidden line-clamp-2 text-ellipsis">
-                                {product.itemName}
-                              </h1>
-                              {product.isChangeQuantity === true ? (
-                                <h1 className="capitalize text-sm w-20 text-red-500 font-medium">
-                                  Sản phẩm không đủ số lượng
-                                </h1>
-                              ) : (
-                                ""
-                              )}
-                              <h1 className="">
-                                {product.salePrice.toLocaleString("vi-VN", {
-                                  style: "currency",
-                                  currency: "vnd",
-                                })}
-                              </h1>
-                              <div className="flex items-center">
-                                <div className="border rounded-sm w-12 lg:w-auto bg-gray-100 hover:bg-white group">
-                                  <button
-                                    onClick={() =>
-                                      decreateQty(
-                                        product.materialId,
-                                        product.variantId ?? null
-                                      )
-                                    }
-                                    className="px-3 py-2 w-full lg:w-auto text-gray-400 hover:text-black font-bold"
-                                  >
-                                    -
-                                  </button>
-                                  <input
-                                    type="text"
-                                    value={product.quantity}
-                                    onChange={(e) =>
-                                      updateQuantity(
-                                        product.materialId,
-                                        product.variantId ?? null,
-                                        Number(e.target.value)
-                                      )
-                                    }
-                                    className="w-12 text-center bg-gray-100 group-hover:bg-white lg:border-l lg:border-r"
-                                  />
-                                  <button
-                                    onClick={() =>
-                                      inscreateQty(
-                                        product.materialId,
-                                        product.variantId ?? null
-                                      )
-                                    }
-                                    className="px-3 py-2 w-full lg:w-auto text-gray-400 hover:text-black font-bold"
-                                  >
-                                    +
-                                  </button>
-                                </div>
-                              </div>
-                              <h1 className="w-[100px] flex justify-end">
-                                {product.itemTotalPrice.toLocaleString(
-                                  "vi-VN",
-                                  {
-                                    style: "currency",
-                                    currency: "vnd",
-                                  }
-                                )}
-                              </h1>
-                              <div>
-                                <HoverCard openDelay={50} closeDelay={100}>
+                          {item.storeItems.map((product, index) => {
+                            const productKey = `${product.materialId}-${
+                              product.variantId ?? "null"
+                            }`;
+                            return (
+                              <div
+                                key={productKey} // Ensure a unique key
+                                className={`flex justify-between gap-5 items-center p-5 ${
+                                  index < item.storeItems.length - 1
+                                    ? "border-b"
+                                    : ""
+                                }`}
+                              >
+                                <img
+                                  className="w-20 h-20 object-cover"
+                                  src={product.imageUrl}
+                                  alt={product.itemName}
+                                />
+                                <HoverCard openDelay={100} closeDelay={200}>
                                   <HoverCardTrigger>
-                                    <RiDeleteBin6Line
-                                      onClick={() =>
-                                        removeCartItem(
-                                          product.materialId,
-                                          product.variantId ?? null
-                                        )
-                                      }
-                                      className="text-red-400 hover:text-red-500 cursor-pointer"
-                                      size={25}
-                                    />
+                                    <h1 className="text-md w-40 capitalize font-medium overflow-hidden line-clamp-2 text-ellipsis">
+                                      {product.itemName}
+                                    </h1>
                                   </HoverCardTrigger>
-                                  <HoverCardContent
-                                    side="top"
-                                    className="w-fit p-2 bg-slate-950 text-white border-none"
-                                  >
-                                    Xóa
+                                  <HoverCardContent>
+                                    {product.itemName}
                                   </HoverCardContent>
                                 </HoverCard>
+
+                                {product.isChangeQuantity && (
+                                  <h1 className="capitalize text-sm w-20 text-red-500 font-medium">
+                                    Sản phẩm không đủ số lượng
+                                  </h1>
+                                )}
+                                <h1>
+                                  {product.salePrice.toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "vnd",
+                                  })}
+                                </h1>
+                                <div className="flex items-center">
+                                  <div className="border rounded-sm w-12 lg:w-auto bg-gray-100 hover:bg-white group">
+                                    <button
+                                      onClick={() => {
+                                        decreateQty(
+                                          product.materialId,
+                                          product.variantId ?? null
+                                        );
+                                        handleQuantityChange(
+                                          product.materialId,
+                                          product.variantId,
+                                          (quantities[productKey] ||
+                                            product.quantity) - 1
+                                        );
+                                      }}
+                                      className="px-3 py-2 w-full lg:w-auto text-gray-400 hover:text-black font-bold"
+                                    >
+                                      -
+                                    </button>
+                                    <input
+                                      type="text"
+                                      value={
+                                        quantities[productKey] ||
+                                        product.quantity
+                                      } // Using state
+                                      onChange={(e) => {
+                                        const newQuantity = Number(
+                                          e.target.value
+                                        );
+                                        handleQuantityChange(
+                                          product.materialId,
+                                          product.variantId,
+                                          newQuantity
+                                        );
+                                        updateQuantity(
+                                          product.materialId,
+                                          product.variantId ?? null,
+                                          newQuantity,
+                                          product.inStock
+                                        );
+                                      }}
+                                      className="w-12 text-center bg-gray-100 group-hover:bg-white lg:border-l lg:border-r"
+                                    />
+                                    <button
+                                      onClick={() => {
+                                        inscreateQty(
+                                          product.materialId,
+                                          product.variantId ?? null
+                                        );
+                                        handleQuantityChange(
+                                          product.materialId,
+                                          product.variantId,
+                                          (quantities[productKey] ||
+                                            product.quantity) + 1
+                                        );
+                                      }}
+                                      disabled={
+                                        (quantities[productKey] ||
+                                          product.quantity) >= product.inStock
+                                      }
+                                      className="px-3 py-2 w-full lg:w-auto text-gray-400 hover:text-black font-bold"
+                                    >
+                                      +
+                                    </button>
+                                  </div>
+                                </div>
+                                <h1 className="w-[100px] flex justify-end">
+                                  {product.itemTotalPrice.toLocaleString(
+                                    "vi-VN",
+                                    {
+                                      style: "currency",
+                                      currency: "vnd",
+                                    }
+                                  )}
+                                </h1>
+                                <div>
+                                  <HoverCard openDelay={50} closeDelay={100}>
+                                    <HoverCardTrigger>
+                                      <RiDeleteBin6Line
+                                        onClick={() =>
+                                          handleRemoveCartItem(
+                                            product.materialId,
+                                            product.variantId ?? null
+                                          )
+                                        }
+                                        className="text-red-400 hover:text-red-500 cursor-pointer"
+                                        size={25}
+                                      />
+                                    </HoverCardTrigger>
+                                    <HoverCardContent
+                                      side="top"
+                                      className="w-fit p-2 bg-slate-950 text-white border-none"
+                                    >
+                                      Xóa
+                                    </HoverCardContent>
+                                  </HoverCard>
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
+
+                        {/* Store Footer */}
                         <div className="flex gap-7 justify-around items-center p-2 px-10 border-t">
                           <div className="flex gap-2 mt-2">
                             <h1>Tổng tiền: </h1>
@@ -355,7 +469,7 @@ export default function CartPage() {
                       <Button
                         disabled={hasInsufficientQuantity}
                         onClick={handleCheckoutClick}
-                        className="bg-red-300 text-2xl text-white w-full py-7 mt-4"
+                        className="bg-blue-500 font-bold hover:bg-blue-600 text-2xl text-white w-full py-7 mt-4"
                       >
                         <Link href={isLogin ? "/checkout" : "/login"}>
                           Tiến hành thanh toán

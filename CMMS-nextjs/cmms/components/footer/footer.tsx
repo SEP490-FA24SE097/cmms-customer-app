@@ -6,7 +6,6 @@ import { FaTruck, FaHeadset, FaLock, FaTags } from "react-icons/fa";
 
 export default function Footer() {
   const { data: storeData, isLoading: isLoadingStore } = useGetStore();
-  console.log(storeData);
   return (
     <div className="bg-gray-100">
       {/* Top Section */}

@@ -30,6 +30,7 @@ import {
 
 import { useToast } from "@/hooks/use-toast";
 import { createLocation } from "@/lib/actions/delivery-address/address";
+import { cn } from "@/lib/utils";
 
 type Location = {
   value: string;
@@ -42,7 +43,7 @@ interface SelectLocationProps {
 export default function SelectLocation({
   setIsDialogOpen,
 }: SelectLocationProps) {
-  const { data: session, update  } = useSession();
+  const { data: session, update } = useSession();
   const { toast } = useToast();
   const [address, setAddress] = useState<string | null>(
     session?.user.user.address || null
@@ -180,9 +181,7 @@ export default function SelectLocation({
     };
 
     try {
-      const response = await createLocation(Data)
-  ;
-
+      const response = await createLocation(Data);
       if (response.data) {
         update({
           ...session, // Keep other session properties intact
@@ -190,14 +189,14 @@ export default function SelectLocation({
             ...session?.user, // Keep other user properties intact
             user: {
               ...session?.user?.user, // Keep nested user properties intact
-              province : tinh || "",
+              province: tinh || "",
               district: huyen || "",
               ward: xa || "",
               address: address,
             },
           },
         });
-        
+
         toast({
           title: "Cập nhật địa chỉ thành công.",
           description: response.data.message || "Thành công",
@@ -251,7 +250,7 @@ export default function SelectLocation({
               <CommandInput placeholder="Tìm kiếm tỉnh..." />
               <CommandList className="max-h-[300px] overflow-y-auto">
                 <CommandEmpty>Không tìm thấy!</CommandEmpty>
-                <CommandGroup>
+                <CommandGroup className={cn("overflow-y-auto")}>
                   {provinces.map((province) => (
                     <CommandItem
                       key={province.value}
