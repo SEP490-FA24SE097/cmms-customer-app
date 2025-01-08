@@ -113,123 +113,10 @@ export default function DetailsPage() {
         "https://phunuso.mediacdn.vn/603486343963435008/2023/11/3/faker-instagram-1-169898142287573429224-1698982303099-1698982303212197077047.png",
     },
   ];
-  const fakeProducts = [
-    {
-      category: "vat_tu_noi_that",
-      discount: "Up to 35% off",
-      isFavorite: false,
-      imgSrc:
-        "https://storage.googleapis.com/a1aa/image/kTGOfrYVKoTrQyvha64sqOyzbE5EXYyDfkfFuc2T26QN74WnA.jpg",
-      title: 'Apple iMac 27", 1TB HDD, Retina 5K Display, M3 Max',
-      rating: 5.0,
-      reviews: 455,
-      delivery: "Fast Delivery",
-      price: "1,699,699",
-      shippingIcon: "fas fa-shipping-fast",
-      priceIcon: "fas fa-tag",
-    },
-    {
-      category: "gach",
-      discount: "Up to 15% off",
-      isFavorite: true,
-      imgSrc:
-        "https://storage.googleapis.com/a1aa/image/HK1eMFUFPXWtOSupifnfYkSQgwdMqxyU1FzRvDN4kjyR74WnA.jpg",
-      title: "Apple iPhone 15 Pro Max, 256GB, Blue Titanium",
-      rating: 4.5,
-      reviews: 1233,
-      delivery: "Best Seller",
-      price: "1,199,199",
-      shippingIcon: "fas fa-crown",
-      priceIcon: "fas fa-tag",
-    },
-    {
-      category: "vat_tu_noi_that",
-      discount: "Up to 35% off",
-      isFavorite: false,
-      imgSrc:
-        "https://storage.googleapis.com/a1aa/image/7FaRzFXljfSIZSMnL8Ny6WNdTbyIgMoteB0uhfFJ0QrS74WnA.jpg",
-      title: "iPad Pro 13-Inch (M4): XDR Display, 512GB",
-      rating: 4,
-      reviews: 879,
-      delivery: "Shipping Today",
-      price: "799,199",
-      shippingIcon: "fas fa-shipping-fast",
-      priceIcon: "fas fa-tag",
-    },
-    {
-      category: "gach",
-      discount: "Up to 10% off",
-      isFavorite: false,
-      imgSrc:
-        "https://storage.googleapis.com/a1aa/image/w9j3qd5LMxLjG1P0FaAkJoBScpkxfJJfw5edDawzmJlK74WnA.jpg",
-      title: "PlayStation®5 Console – 1TB, PRO Controller",
-      rating: 4.5,
-      reviews: 2957,
-      delivery: "Fast Delivery",
-      price: "499,199",
-      shippingIcon: "fas fa-shipping-fast",
-      priceIcon: "fas fa-tag",
-    },
-    {
-      category: "san",
-      discount: "Up to 35% off",
-      isFavorite: true,
-      imgSrc:
-        "https://storage.googleapis.com/a1aa/image/kTGOfrYVKoTrQyvha64sqOyzbE5EXYyDfkfFuc2T26QN74WnA.jpg",
-      title: 'Apple iMac 27", 1TB HDD, Retina 5K Display, M3 Max',
-      rating: 3.0,
-      reviews: 455,
-      delivery: "Fast Delivery",
-      price: "1,699,199",
-      shippingIcon: "fas fa-shipping-fast",
-      priceIcon: "fas fa-tag",
-    },
-    {
-      category: "vat_tu_noi_that",
-      discount: "Up to 15% off",
-      isFavorite: false,
-      imgSrc:
-        "https://storage.googleapis.com/a1aa/image/HK1eMFUFPXWtOSupifnfYkSQgwdMqxyU1FzRvDN4kjyR74WnA.jpg",
-      title: "Apple iPhone 15 Pro Max, 256GB, Blue Titanium",
-      rating: 4.5,
-      reviews: 1233,
-      delivery: "Best Seller",
-      price: "1,199,199",
-      shippingIcon: "fas fa-crown",
-      priceIcon: "fas fa-tag",
-    },
-    {
-      category: "vat_tu_noi_that",
-      discount: "Up to 35% off",
-      isFavorite: false,
-      imgSrc:
-        "https://storage.googleapis.com/a1aa/image/7FaRzFXljfSIZSMnL8Ny6WNdTbyIgMoteB0uhfFJ0QrS74WnA.jpg",
-      title: "iPad Pro 13-Inch (M4): XDR Display, 512GB",
-      rating: 4,
-      reviews: 879,
-      delivery: "Shipping Today",
-      price: "799,199",
-      shippingIcon: "fas fa-shipping-fast",
-      priceIcon: "fas fa-tag",
-    },
-    {
-      category: "san",
-      discount: "Up to 10% off",
-      isFavorite: false,
-      imgSrc:
-        "https://storage.googleapis.com/a1aa/image/w9j3qd5LMxLjG1P0FaAkJoBScpkxfJJfw5edDawzmJlK74WnA.jpg",
-      title: "PlayStation®5 Console – 1TB, PRO Controller",
-      rating: 3.5,
-      reviews: 2957,
-      delivery: "Fast Delivery",
-      price: "499,199",
-      shippingIcon: "fas fa-shipping-fast",
-      priceIcon: "fas fa-tag",
-    },
-  ];
+
   const { toast } = useToast();
   const { addCartItem } = useShoppingContext();
-
+  const [backgroundImage, setBackgroundImage] = useState("");
   const handleAddToCart = () => {
     if (!materialData) return;
 
@@ -292,7 +179,12 @@ export default function DetailsPage() {
       src: materialData?.data?.material.imageUrl,
       alt: "Main product image",
     },
-
+    ...(materialData?.data?.material.subImages || []).map(
+      (subImage, index) => ({
+        src: subImage.subImageUrl,
+        alt: `Sub image ${index + 1}`,
+      })
+    ),
     ...(materialData?.data?.variants || []).map((variant, index) => ({
       src: variant.image,
       alt: `Variant image ${index + 1}`,
@@ -316,6 +208,12 @@ export default function DetailsPage() {
   const [selectedVariantPrice, setSelectedVariantPrice] = useState<
     number | null
   >(materialData?.data?.variants[0]?.price ?? null);
+  const [selectedVariantDiscount, setSelectedVariantDiscount] = useState<
+    string | null
+  >(materialData?.data?.variants[0]?.discount ?? null);
+  const [selectedVariantAfter, setSelectedVariantAfter] = useState<
+    number | null
+  >(materialData?.data?.variants[0]?.afterDiscountPrice ?? null);
   // const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
   const [count, setCount] = useState(1);
   const [comment, setComment] = useState("");
@@ -352,6 +250,7 @@ export default function DetailsPage() {
     }
   };
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    setBackgroundImage("");
     if (e.target !== e.currentTarget) {
       return;
     }
@@ -373,7 +272,13 @@ export default function DetailsPage() {
   const handleVariantPriceClick = (variantPrice: number) => {
     setSelectedVariantPrice(variantPrice);
   };
-
+  const handleVariantDiscountClick = (discount: string) => {
+    setSelectedVariantDiscount(discount);
+    // Now you can use parsedDiscount as a number
+  };
+  const handleVariantAfterClick = (variantAfter: number) => {
+    setSelectedVariantAfter(variantAfter);
+  };
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
     if (value > 0) {
@@ -440,10 +345,16 @@ export default function DetailsPage() {
                 ) : (
                   <div
                     style={{
-                      backgroundImage: `url(${images[currentIndex].src})`,
+                      backgroundImage: `url(${
+                        backgroundImage
+                          ? backgroundImage
+                          : images[currentIndex].src
+                      })`,
+                      backgroundRepeat: "no-repeat", // Prevent image repeating
+                      backgroundSize: "contain", // Ensure the image covers the container
                     }}
                     onClick={handleClick}
-                    className="w-full h-full rounded-xl bg-center bg-cover duration-500 cursor-pointer"
+                    className="w-full h-full rounded-xl bg-center duration-500 cursor-pointer"
                   >
                     {/* Left Arrow */}
                     <div
@@ -506,6 +417,7 @@ export default function DetailsPage() {
                         <CarouselItem
                           key={slideIndex}
                           className="pl-1 basis-1/4"
+                          onClick={() => setBackgroundImage("")}
                         >
                           <img
                             src={slide.src}
@@ -545,7 +457,7 @@ export default function DetailsPage() {
                   : materialData?.data?.material.name}
               </h1>
 
-              <div className="flex items-center">
+              {/* <div className="flex items-center">
                 <Rating
                   name="half-rating-read"
                   defaultValue={4}
@@ -553,23 +465,63 @@ export default function DetailsPage() {
                   readOnly
                 />
                 <span className="text-gray-600 ml-2">(32 reviews)</span>
-              </div>
+              </div> */}
 
               <div className="flex items-center space-x-2">
                 <span className="text-3xl font-bold text-red-500">
-                  {selectedVariantPrice
-                    ? selectedVariantPrice.toLocaleString("vi-VN", {
+                  {materialData?.data?.variants.length === 0
+                    ? materialData.data.material.discount
+                      ? materialData.data.material.afterDiscountPrice?.toLocaleString(
+                          "vi-VN",
+                          {
+                            style: "currency",
+                            currency: "vnd",
+                          }
+                        )
+                      : materialData.data.material.salePrice?.toLocaleString(
+                          "vi-VN",
+                          {
+                            style: "currency",
+                            currency: "vnd",
+                          }
+                        )
+                    : selectedVariantDiscount
+                    ? selectedVariantAfter?.toLocaleString("vi-VN", {
                         style: "currency",
                         currency: "vnd",
                       })
-                    : materialData?.data?.material.salePrice.toLocaleString(
-                        "vi-VN",
-                        {
-                          style: "currency",
-                          currency: "vnd",
-                        }
-                      )}
+                    : selectedVariantPrice?.toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "vnd",
+                      })}
                 </span>
+                {materialData?.data?.material.discount ? (
+                  <span className="text-gray-500 line-through">
+                    {(
+                      materialData?.data?.material?.salePrice ||
+                      "Giá sản phẩm không có sẵn"
+                    ).toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })}
+                  </span>
+                ) : (
+                  ""
+                )}
+                {selectedVariantDiscount ? (
+                  <span className="text-gray-500 line-through">
+                    {(selectedVariantPrice
+                      ? selectedVariantPrice
+                      : materialData?.data?.material?.salePrice ||
+                        "Giá sản phẩm không có sẵn"
+                    ).toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })}
+                  </span>
+                ) : (
+                  ""
+                )}
               </div>
               <div className="flex justify-between items-center">
                 <div className="flex gap-2 items-center">
@@ -693,8 +645,13 @@ export default function DetailsPage() {
                       key={index}
                       onClick={() => {
                         handleVariantPriceClick(variant.price);
+                        handleVariantDiscountClick(variant.discount || "");
+                        handleVariantAfterClick(
+                          variant.afterDiscountPrice || 0
+                        );
                         handleVariantClick(variant.variantId);
                         handleVariantNameClick(variant.sku);
+                        setBackgroundImage(variant.image);
                       }}
                       className={`flex items-center border p-1 ${
                         selectedVariant === variant.variantId
@@ -702,11 +659,14 @@ export default function DetailsPage() {
                           : "hover:bg-blue-100 hover:text-blue-600"
                       } `}
                     >
-                      <img
+                      {/* <img
                         src={variant.image}
                         alt={`Variant ${index + 1}`}
                         className="w-12 h-12 object-cover"
-                      />
+                      /> */}
+                      <div className="p-2">
+                        <h1>{variant.sku}</h1>
+                      </div>
                       <div className="flex-col mt-2">
                         {variant?.attributes?.map((attribute, idx) => (
                           <button

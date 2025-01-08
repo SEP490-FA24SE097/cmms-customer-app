@@ -18,7 +18,7 @@ export async function getMaterials(
   searchParams: Record<string, string | number | boolean>
 ): Promise<ApiListResponse<IMaterial>> {
   noStore();
-
+  console.log(searchParams);
   const result = await fetchListDataWithPagi<IMaterial>(
     "/materials",
     searchParams

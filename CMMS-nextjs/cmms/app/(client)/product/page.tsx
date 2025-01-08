@@ -103,29 +103,9 @@ export default function Listing() {
   useEffect(() => {
     if (brandId) {
       setSelectedBrand(brandId);
-
-      // Remove brandId from the URL
-      const params = new URLSearchParams(window.location.search);
-      params.delete("brandId");
-
-      // Use shallow routing to update the URL without refreshing the page
-      router.replace(
-        `${window.location.pathname}?${params.toString()}`,
-        undefined
-      );
     }
     if (categoryId) {
       setSelectedCategory(categoryId);
-
-      // Remove brandId from the URL
-      const params = new URLSearchParams(window.location.search);
-      params.delete("categoryId");
-
-      // Use shallow routing to update the URL without refreshing the page
-      router.replace(
-        `${window.location.pathname}?${params.toString()}`,
-        undefined
-      );
     }
     if (materialName) {
       setSelectedName(materialName);
@@ -171,6 +151,7 @@ export default function Listing() {
   const handleVariantValueClick = (variantValue: number) => {
     setSelectedVariantValue(variantValue);
   };
+  const [backgroundImage, setBackgroundImage] = useState("");
   const [selectedBrand, setSelectedBrand] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedName, setSelectedName] = useState<string>("");
@@ -228,28 +209,27 @@ export default function Listing() {
 
   const clearFilters = () => {
     // Reset all filter states
-    setSelectedBrand("");
+    setSelectedBrand(""); // Assuming null is the reset value
     setSelectedCategory("");
-    setSelectedSort("");
+    setSelectedName("");
+    setValue([0, 10000000]); // Replace with your default price range if applicable
+    setCurrentPage(1); // Reset to the first page
 
-    setValue([0, 10000000]);
+    // Update searchParams to reflect cleared filters
+    setSearchParams({
+      page: 1, // Reset to the first page
+      itemPerPage: 12, // Keep default item per page value
+    });
+
+    // Update the URL to remove filter-related query params
     const params = new URLSearchParams(window.location.search);
+    params.delete("brandId");
+    params.delete("categoryId");
     params.delete("keyword");
     router.replace(
       `${window.location.pathname}?${params.toString()}`,
       undefined
     );
-    setSelectedName("");
-    // Cập nhật searchParams
-    setSearchParams({
-      page: 1, // Nếu bạn muốn quay lại trang đầu tiên
-      itemPerPage: 12,
-      brandId: "",
-      categoryId: "",
-      lowerPrice: "",
-      upperPrice: "",
-      materialName: "",
-    });
   };
 
   const handlePageChange = (page: number) => {
@@ -272,13 +252,13 @@ export default function Listing() {
           src: materialData?.data?.material.imageUrl,
           alt: "Main product image",
         },
-        // Spread the subImages array, if it exists
-        // ...(materialData?.data?.material.subImages || []).map(
-        //   (subImage, index) => ({
-        //     src: subImage,
-        //     alt: `Sub image ${index + 1}`,
-        //   })
-        // ),
+
+        ...(materialData?.data?.material.subImages || []).map(
+          (subImage, index) => ({
+            src: subImage.subImageUrl,
+            alt: `Sub image ${index + 1}`,
+          })
+        ),
         ...(materialData?.data?.variants || []).map((variant, index) => ({
           src: variant.image,
           alt: `Variant image ${index + 1}`,
@@ -380,6 +360,7 @@ export default function Listing() {
     }
   };
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    setBackgroundImage("");
     if (e.target !== e.currentTarget) {
       return;
     }
@@ -645,7 +626,13 @@ export default function Listing() {
                                       images[currentIndex] ? (
                                       <div
                                         style={{
-                                          backgroundImage: `url(${images[currentIndex].src})`,
+                                          backgroundImage: `url(${
+                                            backgroundImage
+                                              ? backgroundImage
+                                              : images[currentIndex].src
+                                          })`,
+                                          backgroundRepeat: "no-repeat", // Prevent image repeating
+                                          backgroundSize: "contain", // Ensure the image covers the container
                                         }}
                                         onClick={handleClick}
                                         className="w-full h-full rounded-xl bg-center bg-cover duration-500 cursor-pointer"
@@ -666,7 +653,7 @@ export default function Listing() {
                                         </div>
                                       </div>
                                     ) : (
-                                      <p>No image available</p>
+                                      <p>Không có ảnh</p>
                                     )}
                                   </div>
 
@@ -713,6 +700,9 @@ export default function Listing() {
                                             <CarouselItem
                                               key={slideIndex}
                                               className="pl-1 basis-1/4"
+                                              onClick={() =>
+                                                setBackgroundImage("")
+                                              }
                                             >
                                               <img
                                                 src={slide.src}
@@ -965,6 +955,9 @@ export default function Listing() {
                                                 );
                                                 handleVariantValueClick(
                                                   variant.price
+                                                );
+                                                setBackgroundImage(
+                                                  variant.image
                                                 );
                                               }}
                                               className={`flex items-center border p-1 ${

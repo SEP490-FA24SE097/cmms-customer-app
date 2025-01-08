@@ -110,7 +110,7 @@ const HomePage: React.FC = () => {
   const { toast } = useToast();
   const { addCartItem } = useShoppingContext();
   const [currentIndex, setCurrentIndex] = useState(0);
-
+  const [backgroundImage, setBackgroundImage] = useState("");
   const [materialId, setMaterialId] = useState<string | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
   const [selectedVariantName, setSelectedVariantName] = useState<string | null>(
@@ -230,13 +230,12 @@ const HomePage: React.FC = () => {
           src: materialData?.data?.material.imageUrl,
           alt: "Main product image",
         },
-        // Spread the subImages array, if it exists
-        // ...(materialData?.data?.material.subImages || []).map(
-        //   (subImage, index) => ({
-        //     src: subImage,
-        //     alt: `Sub image ${index + 1}`,
-        //   })
-        // ),
+        ...(materialData?.data?.material.subImages || []).map(
+          (subImage, index) => ({
+            src: subImage.subImageUrl,
+            alt: `Sub image ${index + 1}`,
+          })
+        ),
         ...(materialData?.data?.variants || []).map((variant, index) => ({
           src: variant.image,
           alt: `Variant image ${index + 1}`,
@@ -287,6 +286,7 @@ const HomePage: React.FC = () => {
     }
   };
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    setBackgroundImage("");
     if (e.target !== e.currentTarget) {
       return;
     }
@@ -477,7 +477,13 @@ const HomePage: React.FC = () => {
                                         images[currentIndex] ? (
                                         <div
                                           style={{
-                                            backgroundImage: `url(${images[currentIndex].src})`,
+                                            backgroundImage: `url(${
+                                              backgroundImage
+                                                ? backgroundImage
+                                                : images[currentIndex].src
+                                            })`,
+                                            backgroundRepeat: "no-repeat", // Prevent image repeating
+                                            backgroundSize: "contain", // Ensure the image covers the container
                                           }}
                                           onClick={handleClick}
                                           className="w-full h-full rounded-xl bg-center bg-cover duration-500 cursor-pointer"
@@ -498,7 +504,7 @@ const HomePage: React.FC = () => {
                                           </div>
                                         </div>
                                       ) : (
-                                        <p>No image available</p>
+                                        <p>Không có ảnh</p>
                                       )}
                                     </div>
 
@@ -545,6 +551,9 @@ const HomePage: React.FC = () => {
                                               <CarouselItem
                                                 key={slideIndex}
                                                 className="pl-1 basis-1/4"
+                                                onClick={() =>
+                                                  setBackgroundImage("")
+                                                }
                                               >
                                                 <img
                                                   src={slide.src}
@@ -799,6 +808,9 @@ const HomePage: React.FC = () => {
                                                   );
                                                   handleVariantValueClick(
                                                     variant.price
+                                                  );
+                                                  setBackgroundImage(
+                                                    variant.image
                                                   );
                                                 }}
                                                 className={`flex items-center border p-1 ${
@@ -1114,7 +1126,13 @@ const HomePage: React.FC = () => {
                                       images[currentIndex] ? (
                                       <div
                                         style={{
-                                          backgroundImage: `url(${images[currentIndex].src})`,
+                                          backgroundImage: `url(${
+                                            backgroundImage
+                                              ? backgroundImage
+                                              : images[currentIndex].src
+                                          })`,
+                                          backgroundRepeat: "no-repeat", // Prevent image repeating
+                                          backgroundSize: "contain", // Ensure the image covers the container
                                         }}
                                         onClick={handleClick}
                                         className="w-full h-full rounded-xl bg-center bg-cover duration-500 cursor-pointer"
@@ -1135,7 +1153,7 @@ const HomePage: React.FC = () => {
                                         </div>
                                       </div>
                                     ) : (
-                                      <p>No image available</p>
+                                      <p>Không có ảnh</p>
                                     )}
                                   </div>
 
@@ -1182,6 +1200,9 @@ const HomePage: React.FC = () => {
                                             <CarouselItem
                                               key={slideIndex}
                                               className="pl-1 basis-1/4"
+                                              onClick={() =>
+                                                setBackgroundImage("")
+                                              }
                                             >
                                               <img
                                                 src={slide.src}
@@ -1434,6 +1455,9 @@ const HomePage: React.FC = () => {
                                                 );
                                                 handleVariantValueClick(
                                                   variant.price
+                                                );
+                                                setBackgroundImage(
+                                                  variant.image
                                                 );
                                               }}
                                               className={`flex items-center border p-1 ${

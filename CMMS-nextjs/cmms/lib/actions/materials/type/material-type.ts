@@ -9,10 +9,16 @@ export type IMaterialChild = {
   barCode: number;
   category: string;
   unit: string;
+  materialCode: string;
   supplier: string;
   description: string;
   salePrice: number;
+  costPrice: number;
+  weightValue: number;
   minStock: number;
+  discount: string;
+  afterDiscountPrice: number;
+  isActive: boolean;
   brand: string;
   isRewardEligible: boolean;
   imageUrl: string;
@@ -24,6 +30,9 @@ export type IVariants = {
   sku: string;
   price: number;
   image: string;
+  costPrice: number;
+  discount: string | null;
+  afterDiscountPrice: number | null;
   attributes: IAttribute[];
 };
 
@@ -32,6 +41,6 @@ export type IAttribute = {
   value: string;
 };
 export type ISubimage = {
-  materialId: string;
+  id: string;
   subImageUrl: string;
 };
