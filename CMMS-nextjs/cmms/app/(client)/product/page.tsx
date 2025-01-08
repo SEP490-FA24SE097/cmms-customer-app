@@ -177,12 +177,9 @@ export default function Listing() {
   const [selectedSort, setSelectedSort] = useState<string>("");
   const [value, setValue] = useState<number[]>([0, 10000000]); // initial price range
 
-  const [availableQuantity, setAvailableQuantity] = useState<number | null>(
-    null
-  );
   const { data: data, isLoading: isLoadingMaterial } =
     useGetMaterial(searchParams);
-  console.log(data);
+
   const handleSelectChange = (value: string) => {
     setSelectedSort(value); // Update the selected sort option
     setSearchParams((prevParams) => {
@@ -230,8 +227,22 @@ export default function Listing() {
   }, [selectedName, currentPage, selectedBrand, selectedCategory, value]);
 
   const clearFilters = () => {
+    // Reset all filter states
+    setSelectedBrand("");
+    setSelectedCategory("");
+    setSelectedSort("");
+
+    setValue([0, 10000000]);
+    const params = new URLSearchParams(window.location.search);
+    params.delete("keyword");
+    router.replace(
+      `${window.location.pathname}?${params.toString()}`,
+      undefined
+    );
+    setSelectedName("");
+    // Cập nhật searchParams
     setSearchParams({
-      page: 1,
+      page: 1, // Nếu bạn muốn quay lại trang đầu tiên
       itemPerPage: 12,
       brandId: "",
       categoryId: "",
@@ -239,19 +250,6 @@ export default function Listing() {
       upperPrice: "",
       materialName: "",
     });
-    setSelectedBrand("");
-    setSelectedCategory("");
-    setSelectedSort("");
-    setSelectedName("");
-    const params = new URLSearchParams(window.location.search);
-    params.delete("keyword");
-
-    // Use shallow routing to update the URL without refreshing the page
-    router.replace(
-      `${window.location.pathname}?${params.toString()}`,
-      undefined
-    );
-    setValue([0, 10000000]); // Reset price range to initial values
   };
 
   const handlePageChange = (page: number) => {
@@ -280,7 +278,7 @@ export default function Listing() {
         //     src: subImage,
         //     alt: `Sub image ${index + 1}`,
         //   })
-        // ), 
+        // ),
         ...(materialData?.data?.variants || []).map((variant, index) => ({
           src: variant.image,
           alt: `Variant image ${index + 1}`,

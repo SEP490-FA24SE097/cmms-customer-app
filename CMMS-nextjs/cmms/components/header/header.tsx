@@ -396,8 +396,7 @@ export default function Header() {
                                                   updateQuantity(
                                                     product.materialId,
                                                     product.variantId ?? null,
-                                                    Number(e.target.value),
-                                                    product.inStock
+                                                    Number(e.target.value)
                                                   )
                                                 }
                                                 className="w-8 text-center border-l border-r"

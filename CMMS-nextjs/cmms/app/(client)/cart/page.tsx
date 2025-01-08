@@ -10,6 +10,14 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
@@ -38,7 +46,7 @@ export default function CartPage() {
   const [cartQty1, setCartQty] = useState<number>();
   const [isloading, setIsloading] = useState(false);
   const [isPending, startTransition] = useTransition();
-
+  const [cartUpdate, setCartUpdate] = useState<ICart>();
   const { toast } = useToast();
   const {
     cartQty,
@@ -57,12 +65,31 @@ export default function CartPage() {
       duration: 3000, // 3 seconds duration
     });
   };
+  const handleOpenCartModalUpdate = () => {
+    const dataToSend = { cartItems: cartItem };
 
+    startTransition(async () => {
+      const result = await createAndGetCart(dataToSend);
+      // console.log(result.data);
+
+      if (result && result.data) {
+        // Update cartData and reset total price based on response
+        setCartUpdate(result.data);
+      } else {
+        console.log("Failed to fetch cart data");
+      }
+    });
+  };
+
+  // console.log(cartData);
+
+  useEffect(() => {
+    localStorage.setItem("cartItem", JSON.stringify(cartItem));
+    handleOpenCartModalUpdate(); // Update modal data with latest cart information
+  }, [cartItem]);
   // Check if there is any item with insufficient quantity
-  const hasInsufficientQuantity = cartData?.items.some(
-    (item) =>
-      item.storeItems.some((storeItem) => storeItem.isChangeQuantity) ||
-      item.isOver200km
+  const hasInsufficientQuantity = cartUpdate?.storeItems.some(
+    (item) => item.isChangeQuantity
   );
 
   // Prevent checkout if any item has insufficient quantity
@@ -122,72 +149,7 @@ export default function CartPage() {
     handleOpenCartModal();
   }, []);
   //[cartItem]
-  type Quantities = {
-    [key: string]: number; // Key là chuỗi, value là số
-  };
 
-  const [quantities, setQuantities] = useState<Quantities>({});
-
-  useEffect(() => {
-    const initialQuantities: Quantities = {}; // Khai báo kiểu rõ ràng
-    cartItem.forEach((product) => {
-      const key = `${product.materialId}-${product.variantId ?? "null"}`;
-      initialQuantities[key] = product.quantity; // Lưu giá trị quantity ban đầu
-    });
-    setQuantities(initialQuantities);
-  }, [cartItem]);
-
-  const handleQuantityChange = (
-    materialId: string,
-    variantId: string | null,
-    newQuantity: number
-  ) => {
-    const key = `${materialId}-${variantId ?? "null"}`;
-
-    // Find the corresponding product in cartData
-    const product = cartData?.items
-      .flatMap((item) => item.storeItems) // Flatten the storeItems array
-      .find(
-        (p) =>
-          p.materialId === materialId &&
-          (p.variantId ?? "null") === (variantId ?? "null")
-      );
-
-    if (product) {
-      // Adjust to inStock if exceeded
-      if (newQuantity > product.inStock) {
-        newQuantity = product.inStock; // Set to max stock
-        updateQuantity(materialId, variantId, newQuantity, product.inStock);
-        toast({
-          title: "Thông báo",
-          description: `Số lượng không được vượt quá ${product.inStock}.`,
-          variant: "destructive",
-        });
-      }
-    }
-
-    setQuantities((prev) => ({
-      ...prev,
-      [key]: newQuantity,
-    }));
-  };
-  const handleRemoveCartItem = async (
-    materialId: string,
-    variantId: string | null
-  ) => {
-    // Gọi removeCartItem để xóa sản phẩm
-    removeCartItem(materialId, variantId);
-
-    // Không cần setTimeout, chỉ cần chờ cartItem được cập nhật
-  };
-  useEffect(() => {
-    if (cartItem.length === 0) {
-      handleOpenCartModal();
-    } else {
-      // Nếu cartItem có sản phẩm, mở modal với dữ liệu mới
-      handleOpenCartModal();
-    }
-  }, [cartItem]);
   return (
     <div className="bg-gray-100">
       <div className="max-w-[85%] mx-auto">
@@ -296,69 +258,8 @@ export default function CartPage() {
                                   })}
                                 </h1>
                                 <div className="flex items-center">
-                                  <div className="border rounded-sm w-12 lg:w-auto bg-gray-100 hover:bg-white group">
-                                    <button
-                                      onClick={() => {
-                                        decreateQty(
-                                          product.materialId,
-                                          product.variantId ?? null
-                                        );
-                                        handleQuantityChange(
-                                          product.materialId,
-                                          product.variantId,
-                                          (quantities[productKey] ||
-                                            product.quantity) - 1
-                                        );
-                                      }}
-                                      className="px-3 py-2 w-full lg:w-auto text-gray-400 hover:text-black font-bold"
-                                    >
-                                      -
-                                    </button>
-                                    <input
-                                      type="text"
-                                      value={
-                                        quantities[productKey] ||
-                                        product.quantity
-                                      } // Using state
-                                      onChange={(e) => {
-                                        const newQuantity = Number(
-                                          e.target.value
-                                        );
-                                        handleQuantityChange(
-                                          product.materialId,
-                                          product.variantId,
-                                          newQuantity
-                                        );
-                                        updateQuantity(
-                                          product.materialId,
-                                          product.variantId ?? null,
-                                          newQuantity,
-                                          product.inStock
-                                        );
-                                      }}
-                                      className="w-12 text-center bg-gray-100 group-hover:bg-white lg:border-l lg:border-r"
-                                    />
-                                    <button
-                                      onClick={() => {
-                                        inscreateQty(
-                                          product.materialId,
-                                          product.variantId ?? null
-                                        );
-                                        handleQuantityChange(
-                                          product.materialId,
-                                          product.variantId,
-                                          (quantities[productKey] ||
-                                            product.quantity) + 1
-                                        );
-                                      }}
-                                      disabled={
-                                        (quantities[productKey] ||
-                                          product.quantity) >= product.inStock
-                                      }
-                                      className="px-3 py-2 w-full lg:w-auto text-gray-400 hover:text-black font-bold"
-                                    >
-                                      +
-                                    </button>
+                                  <div className="border rounded-sm w-12 px-7 py-1 lg:w-auto bg-gray-100 hover:bg-white group">
+                                    {product.quantity}
                                   </div>
                                 </div>
                                 <h1 className="w-[100px] flex justify-end">
@@ -370,28 +271,7 @@ export default function CartPage() {
                                     }
                                   )}
                                 </h1>
-                                <div>
-                                  <HoverCard openDelay={50} closeDelay={100}>
-                                    <HoverCardTrigger>
-                                      <RiDeleteBin6Line
-                                        onClick={() =>
-                                          handleRemoveCartItem(
-                                            product.materialId,
-                                            product.variantId ?? null
-                                          )
-                                        }
-                                        className="text-red-400 hover:text-red-500 cursor-pointer"
-                                        size={25}
-                                      />
-                                    </HoverCardTrigger>
-                                    <HoverCardContent
-                                      side="top"
-                                      className="w-fit p-2 bg-slate-950 text-white border-none"
-                                    >
-                                      Xóa
-                                    </HoverCardContent>
-                                  </HoverCard>
-                                </div>
+                                <div></div>
                               </div>
                             );
                           })}
@@ -493,6 +373,212 @@ export default function CartPage() {
                           Tiến hành thanh toán
                         </Link>
                       </Button>
+                    </div>
+                    <div className="flex justify-center mt-5">
+                      <Sheet
+                        onOpenChange={(isOpen) => {
+                          if (!isOpen) {
+                            handleOpenCartModal(); // Gọi hàm khi Sheet đóng
+                          }
+                        }}
+                      >
+                        <SheetTrigger asChild>
+                          <Button className="bg-blue-500 font-bold hover:bg-blue-600 text-xl text-white">
+                            Cập nhật số lượng
+                          </Button>
+                        </SheetTrigger>
+                        <SheetContent className="w-[400px] sm:w-[600px]">
+                          <SheetHeader>
+                            <SheetTitle className="text-2xl pb-5">
+                              Giỏ hàng của bạn
+                            </SheetTitle>
+                            <SheetDescription>
+                              <div className="border-t">
+                                <div className="max-w-2xl mx-auto bg-white text-black">
+                                  <div>
+                                    <div className="max-h-[50vh] 2xl:max-h-[60vh] overflow-hidden overflow-y-auto">
+                                      <table className="w-full text-left">
+                                        <thead className="bg-gray-100">
+                                          <tr>
+                                            <th className="py-2 px-4">
+                                              Tên sản phẩm
+                                            </th>
+                                            <th className="py-2 px-4">
+                                              Số lượng
+                                            </th>
+                                            <th className="py-2 px-4">Giá</th>
+                                            <th className="py-2 px-4">Xóa</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          {cartUpdate?.storeItems.length ===
+                                          0 ? (
+                                            <tr>
+                                              <td
+                                                colSpan={4}
+                                                className="text-center py-4"
+                                              >
+                                                <img
+                                                  src="/empty_cart.png"
+                                                  alt="Empty cart"
+                                                />
+                                                <h2 className="text-[25px] mt-10">
+                                                  Bạn chưa có sản phẩm nào trong
+                                                  vỏ hàng
+                                                </h2>
+                                              </td>
+                                            </tr>
+                                          ) : (
+                                            <>
+                                              {cartUpdate?.storeItems.map(
+                                                (product) => (
+                                                  <tr
+                                                    key={product.materialId}
+                                                    className="border-b"
+                                                  >
+                                                    <td className="py-2 px-4 capitalize flex items-center">
+                                                      <img
+                                                        src={product.imageUrl}
+                                                        alt={product.itemName}
+                                                        className="w-20 h-20 mr-4"
+                                                        width="50"
+                                                        height="50"
+                                                      />
+                                                      {product.itemName}
+                                                      {product.isChangeQuantity && (
+                                                        <span className="ml-2 text-sm text-red-500">
+                                                          Không đủ sản phẩm
+                                                        </span>
+                                                      )}
+                                                    </td>
+                                                    <td className="py-2 px-4">
+                                                      <div className="flex items-center justify-center">
+                                                        <button
+                                                          onClick={() =>
+                                                            decreateQty(
+                                                              product.materialId,
+                                                              product.variantId ??
+                                                                null
+                                                            )
+                                                          }
+                                                          className="px-2 py-2"
+                                                        >
+                                                          -
+                                                        </button>
+                                                        <input
+                                                          type="text"
+                                                          value={
+                                                            product.quantity
+                                                          }
+                                                          onChange={(e) =>
+                                                            updateQuantity(
+                                                              product.materialId,
+                                                              product.variantId ??
+                                                                null,
+                                                              Number(
+                                                                e.target.value
+                                                              )
+                                                            )
+                                                          }
+                                                          className="w-8 text-center border-l border-r"
+                                                        />
+                                                        <button
+                                                          onClick={() =>
+                                                            inscreateQty(
+                                                              product.materialId,
+                                                              product.variantId ??
+                                                                null
+                                                            )
+                                                          }
+                                                          className="px-2 py-2"
+                                                        >
+                                                          +
+                                                        </button>
+                                                      </div>
+                                                    </td>
+                                                    <td className="py-2 px-4">
+                                                      {product.itemTotalPrice.toLocaleString(
+                                                        "vi-VN",
+                                                        {
+                                                          style: "currency",
+                                                          currency: "vnd",
+                                                        }
+                                                      )}
+                                                    </td>
+                                                    <td className="px-4">
+                                                      <HoverCard
+                                                        openDelay={50}
+                                                        closeDelay={100}
+                                                      >
+                                                        <HoverCardTrigger>
+                                                          <RiDeleteBin6Line
+                                                            onClick={() =>
+                                                              removeCartItem(
+                                                                product.materialId,
+                                                                product.variantId ??
+                                                                  null
+                                                              )
+                                                            }
+                                                            className="text-red-400 hover:text-red-500 cursor-pointer"
+                                                            size={25}
+                                                          />
+                                                        </HoverCardTrigger>
+                                                        <HoverCardContent
+                                                          side="top"
+                                                          className="w-fit p-2 bg-slate-950 text-white border-none"
+                                                        >
+                                                          Xóa
+                                                        </HoverCardContent>
+                                                      </HoverCard>
+                                                    </td>
+                                                  </tr>
+                                                )
+                                              )}
+                                            </>
+                                          )}
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                    <div>
+                                      <div className="mt-6">
+                                        <hr className="my-2" />
+                                        <div className="flex justify-between py-1 font-bold">
+                                          <span>Thành tiền:</span>
+                                          <span>
+                                            {cartUpdate?.total.toLocaleString(
+                                              "vi-VN",
+                                              {
+                                                style: "currency",
+                                                currency: "vnd",
+                                              }
+                                            )}
+                                          </span>
+                                        </div>
+                                      </div>
+                                      <div className="mt-6 flex justify-end space-x-4">
+                                        {hasInsufficientQuantity ? (
+                                          <button className="bg-slate-400 text-white py-2 px-4 rounded">
+                                            Cập nhật
+                                          </button>
+                                        ) : (
+                                          <button
+                                            onClick={() =>
+                                              handleOpenCartModal()
+                                            }
+                                            className="bg-blue-500 text-white py-2 px-4 rounded"
+                                          >
+                                            Cập nhật
+                                          </button>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </SheetDescription>
+                          </SheetHeader>
+                        </SheetContent>
+                      </Sheet>
                     </div>
                   </div>
                 </>
