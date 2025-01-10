@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 // Define Zod schema for form validation
 const registerSchema = z.object({
   fullName: z.string().min(1, "Họ và tên không được bỏ trống."),
@@ -29,6 +30,10 @@ const registerSchema = z.object({
   userName: z.string().min(6, "Tên tài khoản phải có ít nhất 6 ký tự."),
   password: z.string().min(1, "Mật khẩu không được bỏ trống."),
   taxCode: z.string().optional(),
+  phoneNumber: z
+    .string()
+    .regex(/^0[983][0-9]{8}$/, "Số điện thoại không hợp lệ.")
+    .optional(),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -47,6 +52,7 @@ export default function RegisterPage() {
       email: "",
       userName: "",
       password: "",
+      phoneNumber: "",
       taxCode: undefined,
     },
   });
@@ -84,7 +90,7 @@ export default function RegisterPage() {
       setLoading(false);
     }
   };
-  console.log(isRegistered);
+
   // const onSubmit = async (values: RegisterFormValues) => {
   //   console.log(values);
   // };
@@ -160,6 +166,22 @@ export default function RegisterPage() {
                   </FormItem>
                 )}
               />
+              <FormField
+                name="phoneNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Số điện thoại</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="tel"
+                        placeholder="Số điện thoại"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               {isChecked && (
                 <FormField
                   name="taxCode"
@@ -186,10 +208,11 @@ export default function RegisterPage() {
               </div>
               {loading ? (
                 <Button
-                  type="submit"
+                  disabled
                   className="w-full mt-5 rounded-full font-bold bg-slate-500"
                 >
-                  Loading...
+                  <Loader2 />
+                  Đang xử lý...
                 </Button>
               ) : isRegistered ? (
                 <Link href="/login">

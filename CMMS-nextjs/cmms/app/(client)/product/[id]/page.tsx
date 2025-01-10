@@ -508,7 +508,7 @@ export default function DetailsPage() {
                 ) : (
                   ""
                 )}
-                {selectedVariantDiscount ? (
+                {selectedVariantDiscount && selectedVariantDiscount !== "0" ? (
                   <span className="text-gray-500 line-through">
                     {(selectedVariantPrice
                       ? selectedVariantPrice

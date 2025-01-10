@@ -1,8 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import Rating from "@mui/material/Rating";
-import Stack from "@mui/material/Stack";
+
 import { FaRegEye } from "react-icons/fa";
 import { CiHeart } from "react-icons/ci";
 import { Button } from "@/components/ui/button";
@@ -164,6 +163,19 @@ const HomePage: React.FC = () => {
   const handleVariantClick = (variantId: string) => {
     setSelectedVariant(variantId);
     setSelectedStoreId("");
+  };
+  const [selectedVariantDiscount, setSelectedVariantDiscount] = useState<
+    string | null
+  >(null);
+  const [selectedVariantAfter, setSelectedVariantAfter] = useState<
+    number | null
+  >(null);
+  const handleVariantDiscountClick = (discount: string) => {
+    setSelectedVariantDiscount(discount);
+    // Now you can use parsedDiscount as a number
+  };
+  const handleVariantAfterClick = (variantAfter: number) => {
+    setSelectedVariantAfter(variantAfter);
   };
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
@@ -428,9 +440,15 @@ const HomePage: React.FC = () => {
                           className="w-full h-64 lg:h-60 2xl:h-72 object-cover mb-4 group-hover:scale-110 ease-in-out duration-300"
                         />
                         <div className="flex w-full justify-between">
-                          <div className="bg-blue-400 text-white px-2 py-1 rounded-sm my-1">
-                            {/* {product.discount} */} Mới
-                          </div>
+                          {product.material.discount &&
+                          product.material.discount !== "0" ? (
+                            <div className="bg-blue-400 text-white px-2 py-1 rounded-sm my-1">
+                              {product.material.discount}
+                            </div>
+                          ) : (
+                            <div></div>
+                          )}
+
                           <div
                             onClick={(e) => e.stopPropagation()}
                             className="flex items-center gap-2 mr-2"
@@ -450,6 +468,13 @@ const HomePage: React.FC = () => {
                                     );
                                     handleVariantValueClick(
                                       product.variants[0]?.price
+                                    );
+                                    handleVariantDiscountClick(
+                                      product.variants[0]?.discount || ""
+                                    );
+                                    handleVariantAfterClick(
+                                      product.variants[0]?.afterDiscountPrice ||
+                                        0
                                     );
                                   }}
                                   className="text-stone-500 hover:text-black hover:bg-white"
@@ -579,11 +604,11 @@ const HomePage: React.FC = () => {
 
                                   {/* Right Column */}
                                   <div className="space-y-4">
-                                    <div className="flex items-center space-x-2">
+                                    {/* <div className="flex items-center space-x-2">
                                       <span className="bg-pink-200 text-pink-600 text-xs font-semibold px-2 py-1 rounded">
                                         Sale Off
                                       </span>
-                                    </div>
+                                    </div> */}
                                     <h1 className="text-3xl font-bold capitalize">
                                       {selectedVariantName
                                         ? selectedVariantName
@@ -591,33 +616,65 @@ const HomePage: React.FC = () => {
                                           "Product Name Not Available"}
                                     </h1>
 
-                                    <div className="flex items-center">
-                                      <Rating
-                                        name="half-rating-read"
-                                        defaultValue={4}
-                                        precision={0.5}
-                                        readOnly
-                                      />
-                                      <span className="text-gray-600 ml-2">
-                                        (32 reviews)
-                                      </span>
-                                    </div>
-
                                     <div className="flex items-center space-x-2">
                                       <span className="text-3xl font-bold text-red-500">
-                                        {(selectedVariantValue
-                                          ? selectedVariantValue
-                                          : materialData?.data?.material
-                                              ?.salePrice ||
-                                            "Giá sản phẩm không có sẵn"
-                                        ).toLocaleString("vi-VN", {
-                                          style: "currency",
-                                          currency: "VND",
-                                        })}
+                                        {materialData?.data?.variants
+                                          ?.length === 0
+                                          ? materialData.data.material
+                                              ?.discount &&
+                                            materialData.data.material
+                                              ?.discount !== "0"
+                                            ? materialData.data.material?.afterDiscountPrice?.toLocaleString(
+                                                "vi-VN",
+                                                {
+                                                  style: "currency",
+                                                  currency: "vnd",
+                                                }
+                                              )
+                                            : materialData.data.material?.salePrice?.toLocaleString(
+                                                "vi-VN",
+                                                {
+                                                  style: "currency",
+                                                  currency: "vnd",
+                                                }
+                                              )
+                                          : selectedVariantDiscount
+                                          ? selectedVariantAfter?.toLocaleString(
+                                              "vi-VN",
+                                              {
+                                                style: "currency",
+                                                currency: "vnd",
+                                              }
+                                            )
+                                          : selectedVariantValue?.toLocaleString(
+                                              "vi-VN",
+                                              {
+                                                style: "currency",
+                                                currency: "vnd",
+                                              }
+                                            )}
                                       </span>
 
-                                      <span className="text-gray-500 line-through">
-                                        {(selectedVariantValue
+                                      {materialData?.data?.material?.discount &&
+                                      materialData?.data?.material?.discount !==
+                                        "0" ? (
+                                        <span className="text-gray-500 line-through">
+                                          {(
+                                            materialData?.data?.material
+                                              ?.salePrice ||
+                                            "Giá sản phẩm không có sẵn"
+                                          ).toLocaleString("vi-VN", {
+                                            style: "currency",
+                                            currency: "VND",
+                                          })}
+                                        </span>
+                                      ) : (
+                                        ""
+                                      )}
+                                      {selectedVariantDiscount &&
+                                      selectedVariantDiscount !== "0" ? (
+                                        <span className="text-gray-500 line-through">
+                                          {/* {(selectedVariantValue
                                           ? selectedVariantValue
                                           : materialData?.data?.material
                                               ?.salePrice ||
@@ -625,8 +682,18 @@ const HomePage: React.FC = () => {
                                         ).toLocaleString("vi-VN", {
                                           style: "currency",
                                           currency: "VND",
-                                        })}
-                                      </span>
+                                        })} */}
+                                          {selectedVariantValue?.toLocaleString(
+                                            "vi-VN",
+                                            {
+                                              style: "currency",
+                                              currency: "vnd",
+                                            }
+                                          )}
+                                        </span>
+                                      ) : (
+                                        ""
+                                      )}
                                       <span className="text-red-500 text-sm">
                                         Mới
                                       </span>
@@ -809,6 +876,16 @@ const HomePage: React.FC = () => {
                                                   handleVariantValueClick(
                                                     variant.price
                                                   );
+                                                  handleVariantDiscountClick(
+                                                    variant.discount || ""
+                                                  );
+                                                  handleVariantAfterClick(
+                                                    variant.afterDiscountPrice ||
+                                                      0
+                                                  );
+                                                  handleVariantValueClick(
+                                                    variant.price || 0
+                                                  );
                                                   setBackgroundImage(
                                                     variant.image
                                                   );
@@ -965,42 +1042,42 @@ const HomePage: React.FC = () => {
                         <h2 className="text-lg capitalize font-semibold text-start w-full my-2 lg:h-[55px] hover:text-blue-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
                           {product.material.name}
                         </h2>
-                        <div className="flex w-full justify-start items-center gap-4">
-                          <Rating
-                            name="product-rating"
-                            value={4} //{product.rating}
-                            precision={0.5}
-                            className="text-xl 2xl:text-2xl"
-                            readOnly
-                          />
-                          <span className="text-black text-sm font-semibold">
-                            {/* {product.rating} */} 4
-                          </span>
-                          <span className="text-gray-600 text-sm">
-                            {/* ({product.reviews} reviews) */}
-                            (10 reviews)
-                          </span>
-                        </div>
+
                         <div className="flex w-full justify-between items-center mt-3">
                           <div className="flex gap-2">
                             <div className="text-xl sm:text-[16px] 2xl:text-xl font-normal text-stone-400 line-through">
-                              {product.material.salePrice.toLocaleString(
-                                "vi-VN",
-                                {
-                                  style: "currency",
-                                  currency: "vnd",
-                                }
-                              )}
+                              {product.material.discount &&
+                                product.material.discount !== "0" &&
+                                product.material.salePrice.toLocaleString(
+                                  "vi-VN",
+                                  {
+                                    style: "currency",
+                                    currency: "vnd",
+                                  }
+                                )}
                             </div>
-                            <div className="text-xl sm:text-[16px] 2xl:text-xl font-semibold">
-                              {product.material.salePrice.toLocaleString(
-                                "vi-VN",
-                                {
-                                  style: "currency",
-                                  currency: "vnd",
-                                }
-                              )}
-                            </div>
+                            {product.material.discount &&
+                            product.material.discount !== "0" ? (
+                              <div className="text-xl sm:text-[16px] 2xl:text-xl font-semibold">
+                                {product.material.afterDiscountPrice.toLocaleString(
+                                  "vi-VN",
+                                  {
+                                    style: "currency",
+                                    currency: "vnd",
+                                  }
+                                )}
+                              </div>
+                            ) : (
+                              <div className="text-xl sm:text-[16px] 2xl:text-xl font-semibold">
+                                {product.material.salePrice.toLocaleString(
+                                  "vi-VN",
+                                  {
+                                    style: "currency",
+                                    currency: "vnd",
+                                  }
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </CardContent>
@@ -1077,9 +1154,14 @@ const HomePage: React.FC = () => {
                         className="w-full h-64 lg:h-60 2xl:h-72 object-cover mb-4 group-hover:scale-110 ease-in-out duration-300"
                       />
                       <div className="flex w-full justify-between">
-                        <div className="bg-blue-400 text-white px-2 py-1 rounded-sm my-1">
-                          {/* {product.discount} */} Mới
-                        </div>
+                        {product.material.discount &&
+                        product.material.discount !== "0" ? (
+                          <div className="bg-blue-400 text-white px-2 py-1 rounded-sm my-1">
+                            {product.material.discount}
+                          </div>
+                        ) : (
+                          <div></div>
+                        )}
                         <div
                           onClick={(e) => e.stopPropagation()}
                           className="flex items-center gap-2 mr-2"
@@ -1099,6 +1181,12 @@ const HomePage: React.FC = () => {
                                   );
                                   handleVariantValueClick(
                                     product.variants[0]?.price
+                                  );
+                                  handleVariantDiscountClick(
+                                    product.variants[0]?.discount || ""
+                                  );
+                                  handleVariantAfterClick(
+                                    product.variants[0]?.afterDiscountPrice || 0
                                   );
                                 }}
                                 className="text-stone-500 hover:text-black hover:bg-white"
@@ -1228,11 +1316,11 @@ const HomePage: React.FC = () => {
 
                                 {/* Right Column */}
                                 <div className="space-y-4">
-                                  <div className="flex items-center space-x-2">
+                                  {/* <div className="flex items-center space-x-2">
                                     <span className="bg-pink-200 text-pink-600 text-xs font-semibold px-2 py-1 rounded">
                                       Sale Off
                                     </span>
-                                  </div>
+                                  </div> */}
                                   <h1 className="text-3xl font-bold capitalize">
                                     {selectedVariantName
                                       ? selectedVariantName
@@ -1240,42 +1328,81 @@ const HomePage: React.FC = () => {
                                         "Product Name Not Available"}
                                   </h1>
 
-                                  <div className="flex items-center">
-                                    <Rating
-                                      name="half-rating-read"
-                                      defaultValue={4}
-                                      precision={0.5}
-                                      readOnly
-                                    />
-                                    <span className="text-gray-600 ml-2">
-                                      (32 reviews)
-                                    </span>
-                                  </div>
-
                                   <div className="flex items-center space-x-2">
                                     <span className="text-3xl font-bold text-red-500">
-                                      {(selectedVariantValue
-                                        ? selectedVariantValue
-                                        : materialData?.data?.material
-                                            ?.salePrice ||
-                                          "Giá sản phẩm không có sẵn"
-                                      ).toLocaleString("vi-VN", {
-                                        style: "currency",
-                                        currency: "VND",
-                                      })}
+                                      {materialData?.data?.variants?.length ===
+                                      0
+                                        ? materialData.data.material
+                                            ?.discount &&
+                                          materialData.data.material
+                                            ?.discount !== "0"
+                                          ? materialData.data.material?.afterDiscountPrice?.toLocaleString(
+                                              "vi-VN",
+                                              {
+                                                style: "currency",
+                                                currency: "vnd",
+                                              }
+                                            )
+                                          : materialData.data.material?.salePrice?.toLocaleString(
+                                              "vi-VN",
+                                              {
+                                                style: "currency",
+                                                currency: "vnd",
+                                              }
+                                            )
+                                        : selectedVariantDiscount
+                                        ? selectedVariantAfter?.toLocaleString(
+                                            "vi-VN",
+                                            {
+                                              style: "currency",
+                                              currency: "vnd",
+                                            }
+                                          )
+                                        : selectedVariantValue?.toLocaleString(
+                                            "vi-VN",
+                                            {
+                                              style: "currency",
+                                              currency: "vnd",
+                                            }
+                                          )}
                                     </span>
 
-                                    <span className="text-gray-500 line-through">
-                                      {(selectedVariantValue
-                                        ? selectedVariantValue
-                                        : materialData?.data?.material
+                                    {materialData?.data?.material?.discount &&
+                                    materialData?.data?.material?.discount !==
+                                      "0" ? (
+                                      <span className="text-gray-500 line-through">
+                                        {(
+                                          materialData?.data?.material
                                             ?.salePrice ||
                                           "Giá sản phẩm không có sẵn"
-                                      ).toLocaleString("vi-VN", {
-                                        style: "currency",
-                                        currency: "VND",
-                                      })}
-                                    </span>
+                                        ).toLocaleString("vi-VN", {
+                                          style: "currency",
+                                          currency: "VND",
+                                        })}
+                                      </span>
+                                    ) : (
+                                      ""
+                                    )}
+                                    {selectedVariantDiscount &&
+                                    selectedVariantDiscount !== "0" ? (
+                                      <span className="text-gray-500 line-through">
+                                        {/* {(selectedVariantValue
+                                          ? selectedVariantValue
+                                          : materialData?.data?.material
+                                              ?.salePrice ||
+                                            "Giá sản phẩm không có sẵn"
+                                        ).toLocaleString("vi-VN", {
+                                          style: "currency",
+                                          currency: "VND",
+                                        })} */}
+                                        {selectedVariantValue?.toLocaleString(
+                                          "vi-VN",
+                                          { style: "currency", currency: "vnd" }
+                                        )}
+                                      </span>
+                                    ) : (
+                                      ""
+                                    )}
                                     <span className="text-red-500 text-sm">
                                       Mới
                                     </span>
@@ -1456,6 +1583,16 @@ const HomePage: React.FC = () => {
                                                 handleVariantValueClick(
                                                   variant.price
                                                 );
+                                                handleVariantDiscountClick(
+                                                  variant.discount || ""
+                                                );
+                                                handleVariantAfterClick(
+                                                  variant.afterDiscountPrice ||
+                                                    0
+                                                );
+                                                handleVariantValueClick(
+                                                  variant.price || 0
+                                                );
                                                 setBackgroundImage(
                                                   variant.image
                                                 );
@@ -1612,42 +1749,42 @@ const HomePage: React.FC = () => {
                       <h2 className="text-lg capitalize font-semibold text-start w-full my-2 lg:h-[55px] hover:text-blue-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
                         {product.material.name}
                       </h2>
-                      <div className="flex w-full justify-start items-center gap-4">
-                        <Rating
-                          name="product-rating"
-                          value={4} //{product.rating}
-                          precision={0.5}
-                          className="text-xl 2xl:text-2xl"
-                          readOnly
-                        />
-                        <span className="text-black text-sm font-semibold">
-                          {/* {product.rating} */} 4
-                        </span>
-                        <span className="text-gray-600 text-sm">
-                          {/* ({product.reviews} reviews) */}
-                          (10 reviews)
-                        </span>
-                      </div>
-                      <div className="flex w-full justify-between items-center mt-3">
+
+                      <div className="flex w-full justify-between items-center">
                         <div className="flex gap-2">
                           <div className="text-xl sm:text-[16px] 2xl:text-xl font-normal text-stone-400 line-through">
-                            {product.material.salePrice.toLocaleString(
-                              "vi-VN",
-                              {
-                                style: "currency",
-                                currency: "vnd",
-                              }
-                            )}
+                            {product.material.discount &&
+                              product.material.discount !== "0" &&
+                              product.material.salePrice.toLocaleString(
+                                "vi-VN",
+                                {
+                                  style: "currency",
+                                  currency: "vnd",
+                                }
+                              )}
                           </div>
-                          <div className="text-xl sm:text-[16px] 2xl:text-xl font-semibold">
-                            {product.material.salePrice.toLocaleString(
-                              "vi-VN",
-                              {
-                                style: "currency",
-                                currency: "vnd",
-                              }
-                            )}
-                          </div>
+                          {product.material.discount &&
+                          product.material.discount !== "0" ? (
+                            <div className="text-xl sm:text-[16px] 2xl:text-xl font-semibold">
+                              {product.material.afterDiscountPrice.toLocaleString(
+                                "vi-VN",
+                                {
+                                  style: "currency",
+                                  currency: "vnd",
+                                }
+                              )}
+                            </div>
+                          ) : (
+                            <div className="text-xl sm:text-[16px] 2xl:text-xl font-semibold">
+                              {product.material.salePrice.toLocaleString(
+                                "vi-VN",
+                                {
+                                  style: "currency",
+                                  currency: "vnd",
+                                }
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </CardContent>
@@ -1696,37 +1833,42 @@ const HomePage: React.FC = () => {
                             <h3 className="text-lg capitalize font-semibold group-hover:text-blue-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
                               {product.material.name}
                             </h3>
-                            <div className="flex w-full justify-start items-center gap-4">
-                              <Rating
-                                name="product-rating"
-                                value={4}
-                                precision={0.5}
-                                className="text-xl 2xl:text-2xl"
-                                readOnly
-                              />
-                              <span className="text-black text-sm font-semibold">
-                                (4)
-                              </span>
-                            </div>
+
                             <div className="flex w-full justify-between items-center mt-3">
                               <div className="flex flex-col gap-0 sm:gap-0">
-                                <div className="text-xl sm:text-[18px] font-semibold">
-                                  {product.material.salePrice.toLocaleString(
-                                    "vi-VN",
-                                    {
-                                      style: "currency",
-                                      currency: "vnd",
-                                    }
-                                  )}
-                                </div>
+                                {product.material.discount &&
+                                product.material.discount !== "0" ? (
+                                  <div className="text-xl sm:text-[16px] 2xl:text-xl font-semibold">
+                                    {product.material.afterDiscountPrice.toLocaleString(
+                                      "vi-VN",
+                                      {
+                                        style: "currency",
+                                        currency: "vnd",
+                                      }
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className="text-xl sm:text-[18px] font-semibold">
+                                    {product.material.salePrice.toLocaleString(
+                                      "vi-VN",
+                                      {
+                                        style: "currency",
+                                        currency: "vnd",
+                                      }
+                                    )}
+                                  </div>
+                                )}
+
                                 <div className="ml-1 text-lg sm:text-[14px] font-normal text-stone-400 line-through">
-                                  {product.material.salePrice.toLocaleString(
-                                    "vi-VN",
-                                    {
-                                      style: "currency",
-                                      currency: "vnd",
-                                    }
-                                  )}
+                                  {product.material.discount &&
+                                    product.material.discount !== "0" &&
+                                    product.material.salePrice.toLocaleString(
+                                      "vi-VN",
+                                      {
+                                        style: "currency",
+                                        currency: "vnd",
+                                      }
+                                    )}
                                 </div>
                               </div>
                             </div>
@@ -1770,37 +1912,41 @@ const HomePage: React.FC = () => {
                             <h3 className="text-lg capitalize font-semibold group-hover:text-blue-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
                               {product.material.name}
                             </h3>
-                            <div className="flex w-full justify-start items-center gap-4">
-                              <Rating
-                                name="product-rating"
-                                value={4}
-                                precision={0.5}
-                                className="text-xl 2xl:text-2xl"
-                                readOnly
-                              />
-                              <span className="text-black text-sm font-semibold">
-                                (4)
-                              </span>
-                            </div>
+
                             <div className="flex w-full justify-between items-center mt-3">
                               <div className="flex flex-col gap-0 sm:gap-0">
-                                <div className="text-xl sm:text-[18px] font-semibold">
-                                  {product.material.salePrice.toLocaleString(
-                                    "vi-VN",
-                                    {
-                                      style: "currency",
-                                      currency: "vnd",
-                                    }
-                                  )}
-                                </div>
+                                {product.material.discount &&
+                                product.material.discount !== "0" ? (
+                                  <div className="text-xl sm:text-[16px] 2xl:text-xl font-semibold">
+                                    {product.material.afterDiscountPrice.toLocaleString(
+                                      "vi-VN",
+                                      {
+                                        style: "currency",
+                                        currency: "vnd",
+                                      }
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className="text-xl sm:text-[18px] font-semibold">
+                                    {product.material.salePrice.toLocaleString(
+                                      "vi-VN",
+                                      {
+                                        style: "currency",
+                                        currency: "vnd",
+                                      }
+                                    )}
+                                  </div>
+                                )}
                                 <div className="ml-1 text-lg sm:text-[14px] font-normal text-stone-400 line-through">
-                                  {product.material.salePrice.toLocaleString(
-                                    "vi-VN",
-                                    {
-                                      style: "currency",
-                                      currency: "vnd",
-                                    }
-                                  )}
+                                  {product.material.discount &&
+                                    product.material.discount !== "0" &&
+                                    product.material.salePrice.toLocaleString(
+                                      "vi-VN",
+                                      {
+                                        style: "currency",
+                                        currency: "vnd",
+                                      }
+                                    )}
                                 </div>
                               </div>
                             </div>
@@ -1844,37 +1990,41 @@ const HomePage: React.FC = () => {
                             <h3 className="text-lg capitalize font-semibold group-hover:text-blue-300 transition ease-in-out duration-300 overflow-hidden line-clamp-2 text-ellipsis">
                               {product.material.name}
                             </h3>
-                            <div className="flex w-full justify-start items-center gap-4">
-                              <Rating
-                                name="product-rating"
-                                value={4}
-                                precision={0.5}
-                                className="text-xl 2xl:text-2xl"
-                                readOnly
-                              />
-                              <span className="text-black text-sm font-semibold">
-                                (4)
-                              </span>
-                            </div>
+
                             <div className="flex w-full justify-between items-center mt-3">
                               <div className="flex flex-col gap-0 sm:gap-0">
-                                <div className="text-xl sm:text-[18px] font-semibold">
-                                  {product.material.salePrice.toLocaleString(
-                                    "vi-VN",
-                                    {
-                                      style: "currency",
-                                      currency: "vnd",
-                                    }
-                                  )}
-                                </div>
+                                {product.material.discount &&
+                                product.material.discount !== "0" ? (
+                                  <div className="text-xl sm:text-[16px] 2xl:text-xl font-semibold">
+                                    {product.material.afterDiscountPrice.toLocaleString(
+                                      "vi-VN",
+                                      {
+                                        style: "currency",
+                                        currency: "vnd",
+                                      }
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className="text-xl sm:text-[18px] font-semibold">
+                                    {product.material.salePrice.toLocaleString(
+                                      "vi-VN",
+                                      {
+                                        style: "currency",
+                                        currency: "vnd",
+                                      }
+                                    )}
+                                  </div>
+                                )}
                                 <div className="ml-1 text-lg sm:text-[14px] font-normal text-stone-400 line-through">
-                                  {product.material.salePrice.toLocaleString(
-                                    "vi-VN",
-                                    {
-                                      style: "currency",
-                                      currency: "vnd",
-                                    }
-                                  )}
+                                  {product.material.discount &&
+                                    product.material.discount !== "0" &&
+                                    product.material.salePrice.toLocaleString(
+                                      "vi-VN",
+                                      {
+                                        style: "currency",
+                                        currency: "vnd",
+                                      }
+                                    )}
                                 </div>
                               </div>
                             </div>
