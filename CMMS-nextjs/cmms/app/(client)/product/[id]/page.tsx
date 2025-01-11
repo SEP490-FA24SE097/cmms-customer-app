@@ -695,17 +695,17 @@ export default function DetailsPage() {
                   <h2>
                     Hiện tại có{" "}
                     <span className="font-bold">
-                      {storeQuantityData?.data?.items.length}
+                      {storeQuantityData?.data?.items?.length}
                     </span>{" "}
                     chi nhánh còn sản phẩm
                   </h2>
                   <div className="h-32">
-                    {storeQuantityData?.data?.items.length === 0 ? (
+                    {!storeQuantityData?.data?.totalQuantityInAllStore ? (
                       ""
                     ) : (
                       <ul className="max-h-32 text-[12px] text-blue-500 overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
                         {storeQuantityData?.data &&
-                          storeQuantityData.data.items.map((item, index) => (
+                          storeQuantityData.data.items?.map((item, index) => (
                             <li className="w-full" key={index}>
                               <p className="flex pl-2 items-center gap-3">
                                 <FaStore size={30} />
