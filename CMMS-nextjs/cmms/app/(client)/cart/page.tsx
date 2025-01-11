@@ -92,6 +92,8 @@ export default function CartPage() {
     (item) => item.isChangeQuantity
   );
 
+  const hasOver200 = cartData?.items.some((item) => item.isOver200km === true);
+
   // Prevent checkout if any item has insufficient quantity
   const handleCheckoutClick = (e: React.MouseEvent) => {
     if (!isLogin) {
@@ -251,12 +253,30 @@ export default function CartPage() {
                                     Sản phẩm không đủ số lượng
                                   </h1>
                                 )}
-                                <h1>
-                                  {product.salePrice.toLocaleString("vi-VN", {
-                                    style: "currency",
-                                    currency: "vnd",
-                                  })}
-                                </h1>
+                                <div>
+                                  <h1>
+                                    {(product.isDiscount
+                                      ? product.salePrice
+                                      : product.beforeDiscountPrice
+                                    ).toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "vnd",
+                                    })}
+                                  </h1>
+                                  {product.isDiscount ? (
+                                    <h1 className="line-through text-[10px] text-red-500 text-center">
+                                      {product.beforeDiscountPrice.toLocaleString(
+                                        "vi-VN",
+                                        {
+                                          style: "currency",
+                                          currency: "vnd",
+                                        }
+                                      )}
+                                    </h1>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
                                 <div className="flex items-center">
                                   <div className="border rounded-sm w-12 px-7 py-1 lg:w-auto bg-gray-100 hover:bg-white group">
                                     {product.quantity}
@@ -365,7 +385,7 @@ export default function CartPage() {
                         </span>
                       </div>
                       <Button
-                        disabled={hasInsufficientQuantity}
+                        disabled={hasOver200}
                         onClick={handleCheckoutClick}
                         className="bg-blue-500 font-bold hover:bg-blue-600 text-2xl text-white w-full py-7 mt-4"
                       >

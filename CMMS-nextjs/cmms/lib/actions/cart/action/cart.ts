@@ -34,7 +34,6 @@ export async function GetCartCheckout(
   const result = await apiRequest(() =>
     axiosAuth.post("/payment/pre-checkout", data)
   );
-
   if (!result.success) {
     return { data: null, error: result.error };
   }

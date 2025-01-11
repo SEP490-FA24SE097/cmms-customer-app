@@ -415,13 +415,30 @@ export default function Header() {
                                             </div>
                                           </td>
                                           <td className="py-2 px-4">
-                                            {product.itemTotalPrice.toLocaleString(
-                                              "vi-VN",
-                                              {
-                                                style: "currency",
-                                                currency: "vnd",
-                                              }
-                                            )}
+                                            <div>
+                                              <h1>
+                                                {(product.isDiscount
+                                                  ? product.salePrice
+                                                  : product.beforeDiscountPrice
+                                                ).toLocaleString("vi-VN", {
+                                                  style: "currency",
+                                                  currency: "vnd",
+                                                })}
+                                              </h1>
+                                              {product.isDiscount ? (
+                                                <h1 className="line-through text-[10px] text-red-500 text-center">
+                                                  {product.beforeDiscountPrice.toLocaleString(
+                                                    "vi-VN",
+                                                    {
+                                                      style: "currency",
+                                                      currency: "vnd",
+                                                    }
+                                                  )}
+                                                </h1>
+                                              ) : (
+                                                ""
+                                              )}
+                                            </div>
                                           </td>
                                           <td className="px-4">
                                             <HoverCard

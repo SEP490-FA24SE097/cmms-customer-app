@@ -289,11 +289,17 @@ export default function DetailsPage() {
   };
 
   const materialId = materialData?.data?.material.id;
-  const searchParamsquantity = {
+  const [searchParamsquantity, setSearchParamsquantity] = useState({
     materialId: materialId,
     variantId: selectedVariant || undefined,
-  };
-
+  });
+  useEffect(() => {
+    setSearchParamsquantity((prevParams) => ({
+      ...prevParams,
+      materialId: materialId,
+      variantId: selectedVariant || undefined,
+    }));
+  }, [materialId, selectedVariant]);
   const { data: storeQuantityData, isLoading: isLoadingStoreQuantity } =
     useGetQuantityStore(searchParamsquantity);
 
