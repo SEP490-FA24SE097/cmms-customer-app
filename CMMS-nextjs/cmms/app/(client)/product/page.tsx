@@ -592,13 +592,18 @@ export default function Listing() {
                       <div className="flex w-full justify-between">
                         {product.material.discount &&
                         product.material.discount !== "0" ? (
-                          <div className="bg-blue-400 px-2 py-1 rounded-sm my-1">
-                            {/* {product.discount} */}{" "}
-                            {product.material.discount}
+                          <div className="bg-red-400 text-white px-2 py-1 rounded-sm my-1">
+                            {product.material.discount.includes("%")
+                              ? `-${product.material.discount}`
+                              : `-${parseInt(
+                                  product.material.discount,
+                                  10
+                                ).toLocaleString()}`}
                           </div>
                         ) : (
                           <div></div>
                         )}
+
                         <div
                           onClick={(e) => e.stopPropagation()}
                           className="flex items-center gap-2 mr-2"
@@ -1024,15 +1029,13 @@ export default function Listing() {
                                               className={`flex items-center border p-1 ${
                                                 selectedVariant ===
                                                 variant.variantId
-                                                  ? "bg-red-100 text-red-600"
-                                                  : "hover:bg-red-100 hover:text-red-600"
+                                                  ? "bg-blue-100 text-blue-600"
+                                                  : "hover:bg-blue-100 hover:text-blue-600"
                                               } `}
                                             >
-                                              <img
-                                                src={variant.image}
-                                                alt={`Variant ${index + 1}`}
-                                                className="w-12 h-12 object-cover"
-                                              />
+                                              <div className="p-2">
+                                                <h1>{variant.sku}</h1>
+                                              </div>
                                               <div className="flex-col mt-2">
                                                 {variant?.attributes?.map(
                                                   (attribute, idx) => (

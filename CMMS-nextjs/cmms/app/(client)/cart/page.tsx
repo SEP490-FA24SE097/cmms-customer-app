@@ -365,16 +365,7 @@ export default function CartPage() {
                           })}
                         </span>
                       </div>
-                      <div className="flex justify-between py-2 border-t">
-                        <span>Giảm giá</span>
-                        <span>
-                          -
-                          {cartData?.discount.toLocaleString("vi-VN", {
-                            style: "currency",
-                            currency: "vnd",
-                          })}
-                        </span>
-                      </div>
+
                       <div className="flex justify-between py-2 border-t font-bold">
                         <span>Thành tiền</span>
                         <span>

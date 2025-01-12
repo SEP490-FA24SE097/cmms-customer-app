@@ -21,6 +21,7 @@ export async function getInvoices(
     "/invoices/customer",
     searchParams
   );
+
   if (!result.success) {
     return { data: [], pageCount: 0, error: result.error };
   }
@@ -28,4 +29,4 @@ export async function getInvoices(
   return result.data;
 }
 
-// form mẫu 
+// form mẫu

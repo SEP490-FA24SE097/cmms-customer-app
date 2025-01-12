@@ -40,7 +40,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
   SelectContent,
@@ -145,7 +145,6 @@ export default function Order(
   const { data: invoices, isLoading } = useGetInvoice(searchParams);
   // console.log(invoices);
   const totalPages = invoices?.totalPages || 1;
-  console.log(invoices);
   // Update searchParams whenever currentPage changes
   useEffect(() => {
     setSearchParams((prev) => ({
@@ -163,7 +162,7 @@ export default function Order(
     }
   };
   if (isLoading) {
-    return <div>Đang tải...</div>;
+    return <Skeleton className="h-full w-full rounded-xl" />;
   }
   return (
     <div className="w-full">
@@ -456,20 +455,6 @@ export default function Order(
                                                         currency: "vnd",
                                                       }
                                                     )}
-                                                  </h1>
-                                                </div>
-                                                <div className="flex justify-between p-2">
-                                                  <h1>Giảm giá</h1>
-                                                  <h1>
-                                                    {invoice?.discount !== null
-                                                      ? invoice.discount.toLocaleString(
-                                                          "vi-VN",
-                                                          {
-                                                            style: "currency",
-                                                            currency: "vnd",
-                                                          }
-                                                        )
-                                                      : "0 ₫"}
                                                   </h1>
                                                 </div>
                                                 <div className="flex justify-between p-2">

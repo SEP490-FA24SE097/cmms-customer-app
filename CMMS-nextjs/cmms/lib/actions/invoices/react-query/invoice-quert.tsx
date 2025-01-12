@@ -8,7 +8,6 @@ import { useQuery } from "@tanstack/react-query";
 import { ICusInvoices, IInvoices } from "../type/invoice-type";
 import { getInvoices } from "../action/invoice-action";
 
-
 // list material
 export const useGetInvoice = (
   searchParams: Record<string, string | number | boolean>

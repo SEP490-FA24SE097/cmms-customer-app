@@ -733,16 +733,7 @@ export default function CheckoutPage() {
                         })}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Giảm giá</span>
-                      <span>
-                        -
-                        {cartData?.discount.toLocaleString("vi-VN", {
-                          style: "currency",
-                          currency: "vnd",
-                        })}
-                      </span>
-                    </div>
+                    
                   </div>
 
                   <div className="text-lg font-semibold mb-4">
