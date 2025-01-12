@@ -617,86 +617,60 @@ const HomePage: React.FC = () => {
                                     </h1>
 
                                     <div className="flex items-center space-x-2">
-                                      <span className="text-3xl font-bold text-red-500">
-                                        {materialData?.data?.variants
-                                          ?.length === 0
-                                          ? materialData.data.material
-                                              ?.discount &&
-                                            materialData.data.material
-                                              ?.discount !== "0"
-                                            ? materialData.data.material?.afterDiscountPrice?.toLocaleString(
-                                                "vi-VN",
-                                                {
-                                                  style: "currency",
-                                                  currency: "vnd",
-                                                }
-                                              )
-                                            : materialData.data.material?.salePrice?.toLocaleString(
-                                                "vi-VN",
-                                                {
-                                                  style: "currency",
-                                                  currency: "vnd",
-                                                }
-                                              )
-                                          : selectedVariantDiscount
-                                          ? selectedVariantAfter?.toLocaleString(
-                                              "vi-VN",
-                                              {
-                                                style: "currency",
-                                                currency: "vnd",
-                                              }
-                                            )
-                                          : selectedVariantValue?.toLocaleString(
-                                              "vi-VN",
-                                              {
-                                                style: "currency",
-                                                currency: "vnd",
-                                              }
-                                            )}
-                                      </span>
-
-                                      {materialData?.data?.material?.discount &&
-                                      materialData?.data?.material?.discount !==
-                                        "0" ? (
-                                        <span className="text-gray-500 line-through">
-                                          {(
-                                            materialData?.data?.material
-                                              ?.salePrice ||
-                                            "Giá sản phẩm không có sẵn"
-                                          ).toLocaleString("vi-VN", {
-                                            style: "currency",
-                                            currency: "VND",
-                                          })}
-                                        </span>
-                                      ) : (
-                                        ""
-                                      )}
-                                      {selectedVariantDiscount &&
-                                      selectedVariantDiscount !== "0" ? (
-                                        <span className="text-gray-500 line-through">
-                                          {/* {(selectedVariantValue
-                                          ? selectedVariantValue
-                                          : materialData?.data?.material
-                                              ?.salePrice ||
-                                            "Giá sản phẩm không có sẵn"
-                                        ).toLocaleString("vi-VN", {
-                                          style: "currency",
-                                          currency: "VND",
-                                        })} */}
-                                          {selectedVariantValue?.toLocaleString(
-                                            "vi-VN",
-                                            {
+                                      {materialData?.data?.variants?.length ===
+                                      0 ? (
+                                        <>
+                                          <span className="text-3xl font-bold text-red-500">
+                                            {(materialData.data.material
+                                              .afterDiscountPrice
+                                              ? materialData.data.material
+                                                  .afterDiscountPrice
+                                              : materialData.data.material
+                                                  .salePrice
+                                            ).toLocaleString("vi-VN", {
                                               style: "currency",
                                               currency: "vnd",
-                                            }
+                                            })}
+                                          </span>
+                                          {materialData.data.material
+                                            .afterDiscountPrice && (
+                                            <span className="text-gray-500 line-through">
+                                              {(
+                                                materialData.data.material
+                                                  .salePrice ||
+                                                "Giá sản phẩm không có sẵn"
+                                              ).toLocaleString("vi-VN", {
+                                                style: "currency",
+                                                currency: "vnd",
+                                              })}
+                                            </span>
                                           )}
-                                        </span>
+                                        </>
                                       ) : (
-                                        ""
+                                        <>
+                                          <span className="text-3xl font-bold text-red-500">
+                                            {(selectedVariantAfter
+                                              ? selectedVariantAfter
+                                              : selectedVariantValue
+                                            )?.toLocaleString("vi-VN", {
+                                              style: "currency",
+                                              currency: "VND",
+                                            })}
+                                          </span>
+                                          {selectedVariantAfter !== null &&
+                                            selectedVariantAfter > 0 && (
+                                              <span className="text-gray-500 line-through">
+                                                {selectedVariantValue?.toLocaleString(
+                                                  "vi-VN",
+                                                  {
+                                                    style: "currency",
+                                                    currency: "vnd",
+                                                  }
+                                                )}
+                                              </span>
+                                            )}
+                                        </>
                                       )}
-                                      <span className="text-red-500 text-sm">
-                                        Mới
-                                      </span>
                                     </div>
                                     <div className="flex justify-between items-center">
                                       <div className="flex gap-2 items-center">
@@ -929,46 +903,47 @@ const HomePage: React.FC = () => {
                                       </div>
                                     </div>
                                     <div>
-                                      <div>
+                                      {storeQuantityData?.data && (
                                         <h2>
                                           Hiện tại có{" "}
                                           <span className="font-bold">
-                                            {
+                                            {storeQuantityData?.data
+                                              ?.variantItems?.length ||
                                               storeQuantityData?.data?.items
-                                                .length
-                                            }
+                                                ?.length}
                                           </span>{" "}
                                           chi nhánh còn sản phẩm
                                         </h2>
-                                        <div className="h-32">
-                                          {storeQuantityData?.data?.items
-                                            .length === 0 ? (
-                                            ""
-                                          ) : (
-                                            <ul className="max-h-32 text-[12px] text-blue-500 overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
-                                              {storeQuantityData?.data &&
-                                                storeQuantityData.data.items.map(
-                                                  (item, index) => (
-                                                    <li
-                                                      className="w-full"
-                                                      key={index}
-                                                    >
-                                                      <p className="flex pl-2 items-center gap-3">
-                                                        <FaStore size={30} />
-                                                        <div className="flex w-full justify-between">
-                                                          {item.storeName}
-                                                          &nbsp;
-                                                          <span className="text-end font-bold">
-                                                            {item.quantity}
-                                                          </span>
-                                                        </div>
-                                                      </p>
-                                                    </li>
-                                                  )
-                                                )}
-                                            </ul>
-                                          )}
-                                        </div>
+                                      )}
+                                      <div className="h-32">
+                                        {/* <pre>{JSON.stringify(storeQuantityData, null, 2)}</pre> */}
+                                        {storeQuantityData?.data
+                                          ?.totalQuantityInAllStore !== 0 && (
+                                          <ul className="max-h-32 text-[12px] text-blue-500 overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
+                                            {storeQuantityData?.data &&
+                                              (
+                                                storeQuantityData.data
+                                                  .variantItems ||
+                                                storeQuantityData.data.items
+                                              )?.map((item, index) => (
+                                                <li
+                                                  className="w-full"
+                                                  key={index}
+                                                >
+                                                  <p className="flex pl-2 items-center gap-3">
+                                                    <FaStore size={30} />
+                                                    <div className="flex w-full justify-between">
+                                                      {item.storeName}
+                                                      &nbsp;
+                                                      <span className="text-end font-bold">
+                                                        {item.quantity}
+                                                      </span>
+                                                    </div>
+                                                  </p>
+                                                </li>
+                                              ))}
+                                          </ul>
+                                        )}
                                       </div>
                                     </div>
 
@@ -1329,83 +1304,60 @@ const HomePage: React.FC = () => {
                                   </h1>
 
                                   <div className="flex items-center space-x-2">
-                                    <span className="text-3xl font-bold text-red-500">
-                                      {materialData?.data?.variants?.length ===
-                                      0
-                                        ? materialData.data.material
-                                            ?.discount &&
-                                          materialData.data.material
-                                            ?.discount !== "0"
-                                          ? materialData.data.material?.afterDiscountPrice?.toLocaleString(
-                                              "vi-VN",
-                                              {
-                                                style: "currency",
-                                                currency: "vnd",
-                                              }
-                                            )
-                                          : materialData.data.material?.salePrice?.toLocaleString(
-                                              "vi-VN",
-                                              {
-                                                style: "currency",
-                                                currency: "vnd",
-                                              }
-                                            )
-                                        : selectedVariantDiscount
-                                        ? selectedVariantAfter?.toLocaleString(
-                                            "vi-VN",
-                                            {
+                                    {materialData?.data?.variants?.length ===
+                                    0 ? (
+                                      <>
+                                        <span className="text-3xl font-bold text-red-500">
+                                          {(materialData.data.material
+                                            .afterDiscountPrice
+                                            ? materialData.data.material
+                                                .afterDiscountPrice
+                                            : materialData.data.material
+                                                .salePrice
+                                          ).toLocaleString("vi-VN", {
+                                            style: "currency",
+                                            currency: "vnd",
+                                          })}
+                                        </span>
+                                        {materialData.data.material
+                                          .afterDiscountPrice && (
+                                          <span className="text-gray-500 line-through">
+                                            {(
+                                              materialData.data.material
+                                                .salePrice ||
+                                              "Giá sản phẩm không có sẵn"
+                                            ).toLocaleString("vi-VN", {
                                               style: "currency",
                                               currency: "vnd",
-                                            }
-                                          )
-                                        : selectedVariantValue?.toLocaleString(
-                                            "vi-VN",
-                                            {
-                                              style: "currency",
-                                              currency: "vnd",
-                                            }
-                                          )}
-                                    </span>
-
-                                    {materialData?.data?.material?.discount &&
-                                    materialData?.data?.material?.discount !==
-                                      "0" ? (
-                                      <span className="text-gray-500 line-through">
-                                        {(
-                                          materialData?.data?.material
-                                            ?.salePrice ||
-                                          "Giá sản phẩm không có sẵn"
-                                        ).toLocaleString("vi-VN", {
-                                          style: "currency",
-                                          currency: "VND",
-                                        })}
-                                      </span>
-                                    ) : (
-                                      ""
-                                    )}
-                                    {selectedVariantDiscount &&
-                                    selectedVariantDiscount !== "0" ? (
-                                      <span className="text-gray-500 line-through">
-                                        {/* {(selectedVariantValue
-                                          ? selectedVariantValue
-                                          : materialData?.data?.material
-                                              ?.salePrice ||
-                                            "Giá sản phẩm không có sẵn"
-                                        ).toLocaleString("vi-VN", {
-                                          style: "currency",
-                                          currency: "VND",
-                                        })} */}
-                                        {selectedVariantValue?.toLocaleString(
-                                          "vi-VN",
-                                          { style: "currency", currency: "vnd" }
+                                            })}
+                                          </span>
                                         )}
-                                      </span>
+                                      </>
                                     ) : (
-                                      ""
+                                      <>
+                                        <span className="text-3xl font-bold text-red-500">
+                                          {(selectedVariantAfter
+                                            ? selectedVariantAfter
+                                            : selectedVariantValue
+                                          )?.toLocaleString("vi-VN", {
+                                            style: "currency",
+                                            currency: "VND",
+                                          })}
+                                        </span>
+                                        {selectedVariantAfter !== null &&
+                                          selectedVariantAfter > 0 && (
+                                            <span className="text-gray-500 line-through">
+                                              {selectedVariantValue?.toLocaleString(
+                                                "vi-VN",
+                                                {
+                                                  style: "currency",
+                                                  currency: "vnd",
+                                                }
+                                              )}
+                                            </span>
+                                          )}
+                                      </>
                                     )}
-                                    <span className="text-red-500 text-sm">
-                                      Mới
-                                    </span>
                                   </div>
                                   <div className="flex justify-between items-center">
                                     <div className="flex gap-2 items-center">
@@ -1636,46 +1588,47 @@ const HomePage: React.FC = () => {
                                     </div>
                                   </div>
                                   <div>
-                                    <div>
+                                    {storeQuantityData?.data && (
                                       <h2>
                                         Hiện tại có{" "}
                                         <span className="font-bold">
-                                          {
+                                          {storeQuantityData?.data?.variantItems
+                                            ?.length ||
                                             storeQuantityData?.data?.items
-                                              .length
-                                          }
+                                              ?.length}
                                         </span>{" "}
                                         chi nhánh còn sản phẩm
                                       </h2>
-                                      <div className="h-32">
-                                        {storeQuantityData?.data?.items
-                                          .length === 0 ? (
-                                          ""
-                                        ) : (
-                                          <ul className="max-h-32 text-[12px] text-blue-500 overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
-                                            {storeQuantityData?.data &&
-                                              storeQuantityData.data.items.map(
-                                                (item, index) => (
-                                                  <li
-                                                    className="w-full"
-                                                    key={index}
-                                                  >
-                                                    <p className="flex pl-2 items-center gap-3">
-                                                      <FaStore size={30} />
-                                                      <div className="flex w-full justify-between">
-                                                        {item.storeName}
-                                                        &nbsp;
-                                                        <span className="text-end font-bold">
-                                                          {item.quantity}
-                                                        </span>
-                                                      </div>
-                                                    </p>
-                                                  </li>
-                                                )
-                                              )}
-                                          </ul>
-                                        )}
-                                      </div>
+                                    )}
+                                    <div className="h-32">
+                                      {/* <pre>{JSON.stringify(storeQuantityData, null, 2)}</pre> */}
+                                      {storeQuantityData?.data
+                                        ?.totalQuantityInAllStore !== 0 && (
+                                        <ul className="max-h-32 text-[12px] text-blue-500 overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
+                                          {storeQuantityData?.data &&
+                                            (
+                                              storeQuantityData.data
+                                                .variantItems ||
+                                              storeQuantityData.data.items
+                                            )?.map((item, index) => (
+                                              <li
+                                                className="w-full"
+                                                key={index}
+                                              >
+                                                <p className="flex pl-2 items-center gap-3">
+                                                  <FaStore size={30} />
+                                                  <div className="flex w-full justify-between">
+                                                    {item.storeName}
+                                                    &nbsp;
+                                                    <span className="text-end font-bold">
+                                                      {item.quantity}
+                                                    </span>
+                                                  </div>
+                                                </p>
+                                              </li>
+                                            ))}
+                                        </ul>
+                                      )}
                                     </div>
                                   </div>
 

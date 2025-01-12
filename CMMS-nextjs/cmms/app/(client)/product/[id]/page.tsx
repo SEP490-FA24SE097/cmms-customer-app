@@ -203,17 +203,26 @@ export default function DetailsPage() {
   }, [materialData]); // Re-run when materialData changes
 
   const [selectedVariantName, setSelectedVariantName] = useState<string | null>(
-    materialData?.data?.variants[0]?.sku ?? null
+    null
   );
   const [selectedVariantPrice, setSelectedVariantPrice] = useState<
     number | null
-  >(materialData?.data?.variants[0]?.price ?? null);
+  >(null);
   const [selectedVariantDiscount, setSelectedVariantDiscount] = useState<
     string | null
-  >(materialData?.data?.variants[0]?.discount ?? null);
+  >(null);
   const [selectedVariantAfter, setSelectedVariantAfter] = useState<
     number | null
-  >(materialData?.data?.variants[0]?.afterDiscountPrice ?? null);
+  >(null);
+  useEffect(() => {
+    if (materialData?.data?.variants && materialData.data.variants.length > 0) {
+      const variant = materialData.data.variants[0];
+      setSelectedVariantName(variant.sku);
+      setSelectedVariantPrice(variant.price);
+      setSelectedVariantDiscount(variant.discount);
+      setSelectedVariantAfter(variant.afterDiscountPrice);
+    }
+  }, [materialData]);
   // const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
   const [count, setCount] = useState(1);
   const [comment, setComment] = useState("");
@@ -310,6 +319,7 @@ export default function DetailsPage() {
     session?.user.user.district +
     ", " +
     session?.user.user.ward;
+  console.log("after", selectedVariantAfter);
   return (
     <div className="bg-gray-100">
       <div className="max-w-[85%] mx-auto lg:w-[70%]">
@@ -474,59 +484,50 @@ export default function DetailsPage() {
               </div> */}
 
               <div className="flex items-center space-x-2">
-                <span className="text-3xl font-bold text-red-500">
-                  {materialData?.data?.variants.length === 0
-                    ? materialData.data.material.discount
-                      ? materialData.data.material.afterDiscountPrice?.toLocaleString(
-                          "vi-VN",
-                          {
-                            style: "currency",
-                            currency: "vnd",
-                          }
-                        )
-                      : materialData.data.material.salePrice?.toLocaleString(
-                          "vi-VN",
-                          {
-                            style: "currency",
-                            currency: "vnd",
-                          }
-                        )
-                    : selectedVariantDiscount
-                    ? selectedVariantAfter?.toLocaleString("vi-VN", {
-                        style: "currency",
-                        currency: "vnd",
-                      })
-                    : selectedVariantPrice?.toLocaleString("vi-VN", {
+                {materialData?.data?.variants.length === 0 ? (
+                  <>
+                    <span className="text-3xl font-bold text-red-500">
+                      {(materialData.data.material.afterDiscountPrice
+                        ? materialData.data.material.afterDiscountPrice
+                        : materialData.data.material.salePrice
+                      ).toLocaleString("vi-VN", {
                         style: "currency",
                         currency: "vnd",
                       })}
-                </span>
-                {materialData?.data?.material.discount ? (
-                  <span className="text-gray-500 line-through">
-                    {(
-                      materialData?.data?.material?.salePrice ||
-                      "Giá sản phẩm không có sẵn"
-                    ).toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })}
-                  </span>
+                    </span>
+                    {materialData.data.material.afterDiscountPrice && (
+                      <span className="text-gray-500 line-through">
+                        {(
+                          materialData.data.material.salePrice ||
+                          "Giá sản phẩm không có sẵn"
+                        ).toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "vnd",
+                        })}
+                      </span>
+                    )}
+                  </>
                 ) : (
-                  ""
-                )}
-                {selectedVariantDiscount && selectedVariantDiscount !== "0" ? (
-                  <span className="text-gray-500 line-through">
-                    {(selectedVariantPrice
-                      ? selectedVariantPrice
-                      : materialData?.data?.material?.salePrice ||
-                        "Giá sản phẩm không có sẵn"
-                    ).toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })}
-                  </span>
-                ) : (
-                  ""
+                  <>
+                    <span className="text-3xl font-bold text-red-500">
+                      {(selectedVariantAfter
+                        ? selectedVariantAfter
+                        : selectedVariantPrice
+                      )?.toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      })}
+                    </span>
+                    {selectedVariantAfter !== null &&
+                      selectedVariantAfter > 0 && (
+                        <span className="text-gray-500 line-through">
+                          {selectedVariantPrice?.toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "vnd",
+                          })}
+                        </span>
+                      )}
+                  </>
                 )}
               </div>
               <div className="flex justify-between items-center">
@@ -692,20 +693,25 @@ export default function DetailsPage() {
               </div>
               <div>
                 <div>
-                  <h2>
-                    Hiện tại có{" "}
-                    <span className="font-bold">
-                      {storeQuantityData?.data?.items?.length}
-                    </span>{" "}
-                    chi nhánh còn sản phẩm
-                  </h2>
+                  {storeQuantityData?.data && (
+                    <h2>
+                      Hiện tại có{" "}
+                      <span className="font-bold">
+                        {storeQuantityData?.data?.variantItems?.length ||
+                          storeQuantityData?.data?.items?.length}
+                      </span>{" "}
+                      chi nhánh còn sản phẩm
+                    </h2>
+                  )}
                   <div className="h-32">
-                    {!storeQuantityData?.data?.totalQuantityInAllStore ? (
-                      ""
-                    ) : (
+                    {/* <pre>{JSON.stringify(storeQuantityData, null, 2)}</pre> */}
+                    {storeQuantityData?.data?.totalQuantityInAllStore !== 0 && (
                       <ul className="max-h-32 text-[12px] text-blue-500 overflow-y-auto mt-1 p-2 border rounded-sm shadow-sm">
                         {storeQuantityData?.data &&
-                          storeQuantityData.data.items?.map((item, index) => (
+                          (
+                            storeQuantityData.data.variantItems ||
+                            storeQuantityData.data.items
+                          )?.map((item, index) => (
                             <li className="w-full" key={index}>
                               <p className="flex pl-2 items-center gap-3">
                                 <FaStore size={30} />

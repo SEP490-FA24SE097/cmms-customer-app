@@ -245,17 +245,25 @@ export default function Header() {
               </Button> */}
               <Dialog open={isDialogOpen2} onOpenChange={setIsDialogOpen2}>
                 <DialogTrigger asChild>
-                  <Button variant="outline">
-                    <FaMapLocationDot className="text-blue-500" size={25} />{" "}
-                    {session?.user.user.ward ? (
-                      <div className="text-xs">
-                        {" "}
-                        <TruncatedText text={addressFull} />
-                      </div>
-                    ) : (
-                      "Chọn địa chỉ?"
-                    )}
-                  </Button>
+                  {isLogin ? (
+                    <Button variant="outline">
+                      <FaMapLocationDot className="text-blue-500" size={25} />
+                      {session?.user.user.ward ? (
+                        <div className="text-xs">
+                          <TruncatedText text={addressFull} />
+                        </div>
+                      ) : (
+                        "Chọn địa chỉ?"
+                      )}
+                    </Button>
+                  ) : (
+                    <Link href="/login">
+                      <Button variant="outline">
+                        <FaMapLocationDot className="text-blue-500" size={25} />
+                        Chọn địa chỉ?
+                      </Button>
+                    </Link>
+                  )}
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
