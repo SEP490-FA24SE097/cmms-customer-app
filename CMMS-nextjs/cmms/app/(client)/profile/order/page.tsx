@@ -337,7 +337,7 @@ export default function Order(
                                                   </strong>
                                                   :{" "}
                                                   {new Date(
-                                                    invoice.shippingDetailVM.estimatedArrival
+                                                    invoice.shippingDetailVM?.estimatedArrival
                                                   ).toLocaleDateString()}
                                                 </h1>
                                               </div>
@@ -360,7 +360,7 @@ export default function Order(
                                               <div className="text-md flex-[3]">
                                                 <h1 className="mr-5">
                                                   <strong>Địa chỉ</strong>:{" "}
-                                                  {invoice.shippingDetailVM
+                                                  {invoice?.shippingDetailVM
                                                     ?.address || ""}
                                                 </h1>
                                               </div>
@@ -368,7 +368,7 @@ export default function Order(
                                                 <h1>
                                                   <strong>Số điện thoại</strong>
                                                   :{" "}
-                                                  {invoice.shippingDetailVM
+                                                  {invoice?.shippingDetailVM
                                                     ?.phoneReceive || ""}
                                                 </h1>
                                               </div>
@@ -381,8 +381,8 @@ export default function Order(
                                                   </strong>
                                                   :{" "}
                                                   {
-                                                    invoice.shippingDetailVM
-                                                      .shippingDate
+                                                    invoice?.shippingDetailVM
+                                                      ?.shippingDate
                                                   }
                                                 </h1>
                                               </div>

@@ -18,11 +18,11 @@ export async function createPayment(
 ): Promise<ApiSingleResponse<PaymentResponse>> {
   noStore();
   const result = await apiRequest(() => axiosAuth.post("/payment", data));
-
+  console.log(data);
   if (!result.success) {
     return { data: null, error: result.error || undefined };
   }
-
+  console.log(result);
   // Ensure the response data conforms to the expected structure
   return {
     data: result.data as PaymentResponse, // Type assertion if you are sure about the structure
@@ -34,9 +34,7 @@ export async function createPaymentVNPAY(
   data: any
 ): Promise<ApiSingleResponse<string>> {
   noStore();
-  console.log(data);
   const result = await apiRequest(() => axiosAuth.post("/payment", data));
-  console.log(result);
 
   if (!result.success) {
     return { data: null, error: result.error || undefined };

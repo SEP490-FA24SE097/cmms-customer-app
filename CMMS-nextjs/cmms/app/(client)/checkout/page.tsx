@@ -685,7 +685,7 @@ export default function CheckoutPage() {
                             />
                             <div>
                               <h1 className="text-[15px] capitalize font-medium overflow-hidden line-clamp-2 text-ellipsis">
-                                {product.itemName} dsf sdf asdf asdf asdf asdf
+                                {product.itemName}
                               </h1>
                               {product.isChangeQuantity === true ? (
                                 <h1 className="capitalize text-sm w-20 text-red-500 font-medium">

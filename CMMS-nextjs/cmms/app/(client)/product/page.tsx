@@ -625,6 +625,7 @@ export default function Listing() {
                                   handleVariantValueClick(
                                     product.variants[0]?.price || 0
                                   );
+                                  setBackgroundImage("");
                                 }}
                                 className="text-stone-500 hover:text-black hover:bg-white"
                               >

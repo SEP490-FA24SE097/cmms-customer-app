@@ -476,6 +476,7 @@ const HomePage: React.FC = () => {
                                       product.variants[0]?.afterDiscountPrice ||
                                         0
                                     );
+                                    setBackgroundImage("");
                                   }}
                                   className="text-stone-500 hover:text-black hover:bg-white"
                                 >
@@ -1163,6 +1164,7 @@ const HomePage: React.FC = () => {
                                   handleVariantAfterClick(
                                     product.variants[0]?.afterDiscountPrice || 0
                                   );
+                                  setBackgroundImage("");
                                 }}
                                 className="text-stone-500 hover:text-black hover:bg-white"
                               >
