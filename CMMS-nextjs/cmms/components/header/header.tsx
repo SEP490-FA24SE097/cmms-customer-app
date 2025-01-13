@@ -496,12 +496,12 @@ export default function Header() {
                               <div className="mt-6 flex justify-end space-x-4">
                                 {cartData?.storeItems.length === 0 ? (
                                   <button className="bg-slate-400 text-white py-2 px-4 rounded">
-                                    Tiền tới thanh toán
+                                    Tiến tới thanh toán
                                   </button>
                                 ) : (
                                   <Link href="/cart">
                                     <button className="bg-blue-500 text-white py-2 px-4 rounded">
-                                      Tiền tới thanh toán
+                                      Tiến tới thanh toán
                                     </button>
                                   </Link>
                                 )}

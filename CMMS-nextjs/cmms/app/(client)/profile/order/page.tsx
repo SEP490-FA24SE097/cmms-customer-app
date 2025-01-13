@@ -461,8 +461,8 @@ export default function Order(
                                                   <h1>Phí vận chuyển</h1>
                                                   <h1>
                                                     {invoice?.shippingDetailVM
-                                                      .shippingFee !== null
-                                                      ? invoice.shippingDetailVM.shippingFee.toLocaleString(
+                                                      ?.shippingFee !== null
+                                                      ? invoice?.shippingDetailVM?.shippingFee.toLocaleString(
                                                           "vi-VN",
                                                           {
                                                             style: "currency",
